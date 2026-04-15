@@ -4,4 +4,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "spring-diy-template"
+rootProject.name = "spring-diy"
