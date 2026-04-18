@@ -45,3 +45,5 @@ bin/
 
 ## tomcat
 **/tomcat.8080
+/docs/
+/LEARNING.md
