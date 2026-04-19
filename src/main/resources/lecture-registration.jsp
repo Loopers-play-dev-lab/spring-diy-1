@@ -8,7 +8,7 @@
     <title>강의 등록</title>
 </head>
 <body>
-<form id="registrationForm">
+<form id="registrationForm" action="/lecture" method="post">
     <label for="name">이름:</label>
     <input type="text" id="name" name="name" required>
     <label for="price">가격:</label>
@@ -33,7 +33,7 @@
 
             const jsonData = JSON.stringify(lecture);
 
-            fetch("http://localhost:8080/lectures", {
+            fetch("http://localhost:8080/lecture", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
