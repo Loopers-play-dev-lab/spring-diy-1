@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 @WebServlet("/lectures")
 public class LectureController extends HttpServlet {
@@ -36,8 +37,8 @@ public class LectureController extends HttpServlet {
     }
 
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        BufferedReader reader = request.getReader();
+    public void doPost(HttpServletRequest req, HttpServletResponse response) throws ServletException, IOException {
+        BufferedReader reader = req.getReader();
         StringBuilder sb = new StringBuilder();
         String line;
 
@@ -48,7 +49,6 @@ public class LectureController extends HttpServlet {
         ObjectMapper mapper = new ObjectMapper();
         Map map = mapper.readValue(sb.toString(), Map.class);
 
-        System.out.println(request.getParameterNames());
         String name = map.get("name").toString();
         int price = Integer.parseInt(map.get("price").toString());
 
@@ -56,5 +56,44 @@ public class LectureController extends HttpServlet {
         response.sendRedirect("/lectures");
     }
 
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        BufferedReader reader = req.getReader();
+        StringBuilder sb = new StringBuilder();
+        String line;
 
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map map = mapper.readValue(sb.toString(), Map.class);
+
+        Long id = Long.parseLong(map.get("id").toString());
+        this.lecturesRepository.delete(id);
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        BufferedReader reader = req.getReader();
+        StringBuilder sb = new StringBuilder();
+        String line;
+
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map map = mapper.readValue(sb.toString(), Map.class);
+
+        Long id = Long.parseLong(map.get("id").toString());
+        String name = map.get("name").toString();
+        int price = Integer.parseInt(map.get("price").toString());
+
+        Optional<Lecture> lecture = this.lecturesRepository.getById(id);
+        lecture.ifPresent(lecture1 -> {
+            lecture1.put(name, price);
+            this.lecturesRepository.save(lecture1);
+        });
+    }
 }

@@ -5,6 +5,7 @@ import com.diy.app.domain.Lecture;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class LecturesRepository {
     long id;
@@ -35,5 +36,9 @@ public class LecturesRepository {
 
     public Collection<Lecture> getAll() {
         return store.values();
+    }
+
+    public Optional<Lecture> getById(Long id) {
+        return Optional.ofNullable(store.get(id));
     }
 }
