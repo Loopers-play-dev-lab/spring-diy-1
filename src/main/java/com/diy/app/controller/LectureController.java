@@ -29,14 +29,6 @@ public class LectureController extends HttpServlet {
     }
 
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher("lecture-list.jsp");
-        Collection<Lecture> lectures = lecturesRepository.getAll();
-        request.setAttribute("lectures", lectures);
-        dispatcher.forward(request, response);
-    }
-
-    @Override
     public void doPost(HttpServletRequest req, HttpServletResponse response) throws ServletException, IOException {
         BufferedReader reader = req.getReader();
         StringBuilder sb = new StringBuilder();
@@ -69,7 +61,7 @@ public class LectureController extends HttpServlet {
         ObjectMapper mapper = new ObjectMapper();
         Map map = mapper.readValue(sb.toString(), Map.class);
 
-        Long id = Long.parseLong(map.get("id").toString());
+        long id = Long.parseLong(map.get("id").toString());
         this.lecturesRepository.delete(id);
     }
 
@@ -78,7 +70,6 @@ public class LectureController extends HttpServlet {
         BufferedReader reader = req.getReader();
         StringBuilder sb = new StringBuilder();
         String line;
-
         while ((line = reader.readLine()) != null) {
             sb.append(line);
         }
@@ -91,9 +82,26 @@ public class LectureController extends HttpServlet {
         int price = Integer.parseInt(map.get("price").toString());
 
         Optional<Lecture> lecture = this.lecturesRepository.getById(id);
-        lecture.ifPresent(lecture1 -> {
-            lecture1.put(name, price);
-            this.lecturesRepository.save(lecture1);
-        });
+        if(lecture.isEmpty()) {
+            resp.setStatus(404);
+            return;
+        }
+
+        Lecture lecture1 = lecture.get();
+        lecture1.put(name, price);
+        this.lecturesRepository.save(lecture1);
+        resp.setStatus(200);
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        resp.getWriter().write("Not Found");
+
+    }
+
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        RequestDispatcher dispatcher = request.getRequestDispatcher("lecture-list.jsp");
+        Collection<Lecture> lectures = lecturesRepository.getAll();
+        request.setAttribute("lectures", lectures);
+        dispatcher.forward(request, response);
     }
 }
