@@ -47,7 +47,35 @@ public class LectureServlet extends HttpServlet {
         List<Map> lectures = (List<Map>) getServletContext().getAttribute("lectures");
         lectures.add(lecture);
         resp.sendRedirect("/lecture");
+    }
 
+    @Override
+    protected void doPut(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+        System.out.println("do put called.");
+
+        Map updated = objectMapper.readValue(req.getInputStream(), Map.class);
+        String id = (String) updated.get("id");
+
+        List<Map> lectures = (List<Map>) getServletContext().getAttribute("lectures");
+        for (Map lecture : lectures) {
+            if (id.equals(lecture.get("id"))) {
+                lecture.put("name", updated.get("name"));
+                lecture.put("price", updated.get("price"));
+                break;
+            }
+        }
+        resp.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    @Override
+    protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+        System.out.println("do delete called.");
+
+        String id = req.getParameter("id");
+
+        List<Map> lectures = (List<Map>) getServletContext().getAttribute("lectures");
+        lectures.removeIf(lecture -> id.equals(lecture.get("id")));
+        resp.setStatus(HttpServletResponse.SC_OK);
     }
 }
 
