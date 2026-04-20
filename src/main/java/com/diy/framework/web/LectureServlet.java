@@ -1,7 +1,5 @@
 package com.diy.framework.web;
 
-import com.diy.app.domain.Lecture;
-import com.diy.app.domain.Price;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -15,7 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collection;
 
-// TODO: Object Mapper 도 잘하면 묶을 수 있을 거 같은데 방법 좀 고안해보기
+import static com.diy.framework.web.Lecture.*;
+
 @WebServlet("/lectures")
 public class LectureServlet extends HttpServlet {
 
@@ -25,7 +24,7 @@ public class LectureServlet extends HttpServlet {
     // init 은 당연히 1번만 불러옴
     @Override
     public void init(ServletConfig config) throws ServletException {
-        System.out.println("init");
+        System.out.println("config = " + config);
         lectureRepository = new LectureRepository();
         objectMapper = new ObjectMapper();
         super.init(config);
@@ -33,16 +32,20 @@ public class LectureServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        System.out.println("req = " + req);
+        System.out.println("resp = " + resp);
+//        resp.getWriter().write("lectures");
+
         // service 내부 구현 -> doGet, doPost, doDelete, do~~ 걸려 있음. 삭제하면 동작 x
-        System.out.println("service");
         super.service(req, resp);
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("doGet");
         final RequestDispatcher requestDispatcher = req.getRequestDispatcher("lecture-list.jsp");
         final Collection<Lecture> lectures = lectureRepository.findAll();
+
+        System.out.println("lectures = " + lectures);
 
         req.setAttribute("lectures", lectures);
         requestDispatcher.forward(req, resp);
@@ -52,7 +55,7 @@ public class LectureServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("doPost");
+
         req.setCharacterEncoding("UTF-8");
         String json = req.getReader().readLine();
 
@@ -68,7 +71,7 @@ public class LectureServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("doPut");
+
         req.setCharacterEncoding("UTF-8");
         String json = req.getReader().readLine();
 
@@ -78,19 +81,19 @@ public class LectureServlet extends HttpServlet {
         long inputPriceValue = rootNode.path("price").asLong();
         Price inputPrice = Price.of(inputPriceValue);
 
-        Lecture lecture = lectureRepository.findById(id).orElseThrow();
+        Lecture lecture = lectureRepository.findById(id);
         lectureRepository.save(lecture.edit(inputName, inputPrice));
     }
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("doDelete");
+
         String json = req.getReader().readLine();
 
         JsonNode rootNode = objectMapper.readTree(json);
         long id = rootNode.path("id").asLong();
 
-        Lecture lecture = lectureRepository.findById(id).orElseThrow();
+        Lecture lecture = lectureRepository.findById(id);
         lectureRepository.delete(lecture);
     }
 }
