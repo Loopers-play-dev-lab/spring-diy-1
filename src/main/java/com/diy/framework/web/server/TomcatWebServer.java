@@ -1,21 +1,21 @@
 package com.diy.framework.web.server;
 
+import com.diy.framework.web.server.servlet.LecturesServlet;
+import java.io.File;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
+import java.security.CodeSource;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.webresources.DirResourceSet;
 import org.apache.catalina.webresources.StandardRoot;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
-import java.security.CodeSource;
-
 
 public class TomcatWebServer {
 
     private final Tomcat tomcat = new Tomcat();
-    private final int port = 8080;
+    private final int port = 8084;
 
     public void start() {
         setServerContext();
@@ -40,6 +40,9 @@ public class TomcatWebServer {
 
         final Context context = this.tomcat.addWebapp("/", absoluteResourcesPath);
 
+        Tomcat.addServlet(context, "lecturesServlet", new LecturesServlet());
+
+        context.addServletMapping("/lectures", "lecturesServlet");
         context.setRequestCharacterEncoding("UTF-8");
         context.setResponseCharacterEncoding("UTF-8");
 

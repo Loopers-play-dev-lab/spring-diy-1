@@ -33,7 +33,7 @@
 
             const jsonData = JSON.stringify(lecture);
 
-            fetch("http://localhost:8080/lectures", {
+            fetch("http://localhost:8084/lectures", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
