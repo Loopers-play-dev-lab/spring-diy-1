@@ -1,5 +1,8 @@
 package com.diy.framework.web.server;
 
+import com.diy.app.presentation.LectureController;
+import com.diy.app.presentation.LectureServlet;
+import com.diy.config.AppConfig;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
@@ -39,11 +42,15 @@ public class TomcatWebServer {
         final String absoluteResourcesPath = new File(resourcesPath).getAbsolutePath();
 
         final Context context = this.tomcat.addWebapp("/", absoluteResourcesPath);
-
         context.setRequestCharacterEncoding("UTF-8");
         context.setResponseCharacterEncoding("UTF-8");
 
         setServerResources(context);
+        setDependency(context);
+    }
+
+    private void setDependency(final Context context) {
+        Tomcat.addServlet(context, "lectureServlet", new LectureServlet());
     }
 
     private void setServerResources(final Context context) {
