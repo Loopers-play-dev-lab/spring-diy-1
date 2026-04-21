@@ -1,8 +1,6 @@
-package com.diy.framework.web;
+package com.diy.app.domain;
 
-import org.jetbrains.annotations.NotNull;
-
-// TODO: 이거 프레임워크 말고 app 으로 옮기는 게 좋을 듯
+// TODO: Entity, Id 등 인터페이스화 -> 어노테이션으로 만들기
 public class Lecture {
     private static long idOffset = 0L;
 
@@ -34,20 +32,6 @@ public class Lecture {
         this.price = price;
 
         return this;
-    }
-
-    public record Price(
-       long value
-    ) {
-        public static Price of(long value) {
-            return new Price(value);
-        }
-
-        @NotNull
-        @Override
-        public String toString() {
-            return Long.valueOf(this.value).toString();
-        }
     }
 
     public Long getId() {
