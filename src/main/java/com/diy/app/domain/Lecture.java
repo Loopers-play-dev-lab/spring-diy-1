@@ -2,14 +2,20 @@ package com.diy.app.domain;
 
 public class Lecture {
 
+    private Long id;
     private String name;
     private String price;
 
     public Lecture() {}
 
-    public Lecture(String name, String price) {
+    public Lecture(Long id, String name, String price) {
+        this.id = id;
         this.name = name;
         this.price = price;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setName(String name) {
@@ -18,6 +24,10 @@ public class Lecture {
 
     public void setPrice(String price) {
         this.price = price;
+    }
+
+    public Long getId() {
+        return this.id;
     }
 
     public String getName() {

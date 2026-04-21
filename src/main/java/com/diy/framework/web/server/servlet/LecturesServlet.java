@@ -1,10 +1,12 @@
 package com.diy.framework.web.server.servlet;
 
 import com.diy.app.domain.Lecture;
+import com.diy.app.infrastructure.LectureRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -13,6 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class LecturesServlet extends HttpServlet {
+
+    private final LectureRepository lectureRepository = new LectureRepository();
 
     @Override
     public void init(final ServletConfig config) throws ServletException {
@@ -23,6 +27,12 @@ public class LecturesServlet extends HttpServlet {
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
         System.out.println("doGet called.");
+
+        List<Lecture> lectures = lectureRepository.getLectures();
+
+        lectures.forEach(lecture -> System.out.println(lecture.getName() + " " + lecture.getPrice()));
+
+        request.setAttribute("lectures", lectures);
         request.getRequestDispatcher("lecture-list.jsp").forward(request, response);
     }
 
@@ -33,7 +43,6 @@ public class LecturesServlet extends HttpServlet {
         String jsonData;
         try (BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()))) {
             jsonData = br.lines().collect(Collectors.joining());
-            System.out.println(jsonData);
         }
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -41,6 +50,8 @@ public class LecturesServlet extends HttpServlet {
 
         System.out.println(lecture.getName());
         System.out.println(lecture.getPrice());
+
+        lectureRepository.save(lecture);
     }
 
     @Override
