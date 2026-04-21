@@ -26,4 +26,12 @@ public class LectureRepository {
 
         store.put(lecture.getId(), lecture);
     }
+
+    public void delete(Long id) {
+        if (!store.containsKey(id)) {
+            throw new IllegalArgumentException(String.format("Lecture not found. id: %d", id));
+        }
+
+        store.remove(id);
+    }
 }

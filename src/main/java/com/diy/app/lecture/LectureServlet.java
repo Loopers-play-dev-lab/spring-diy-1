@@ -59,6 +59,15 @@ public class LectureServlet extends HttpServlet {
         resp.sendRedirect("/lectures");
     }
 
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        long id = Long.parseLong(req.getParameter("id"));
+
+        lectureRepository.delete(id);
+
+        resp.sendRedirect("/lectures");
+    }
+
     private String getRequestBody(HttpServletRequest req) throws IOException {
         StringBuilder sb = new StringBuilder();
         BufferedReader reader = req.getReader();
