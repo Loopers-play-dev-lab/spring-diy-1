@@ -17,9 +17,8 @@ public class LectureService {
         lectureRepository.insertLecture(lecture);
     }
 
-    public String modifyLecture(Lecture lecture) {
-        Lecture modifiedLecture = lectureRepository.updateLecture(lecture);
-        return modifiedLecture.getId();
+    public void modifyLecture(Lecture lecture) {
+        lectureRepository.updateLecture(lecture);
     }
 
     public void deleteLecture(String id) {

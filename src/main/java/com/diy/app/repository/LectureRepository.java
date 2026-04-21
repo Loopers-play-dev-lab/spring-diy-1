@@ -20,12 +20,11 @@ public class LectureRepository {
         lectures.put(uuid, lecture);
     }
 
-    public Lecture updateLecture(Lecture lecture) {
+    public void updateLecture(Lecture lecture) {
         Lecture updatedLecture = lectures.replace(lecture.getId(), lecture);
         if (updatedLecture == null) {
             throw new IllegalArgumentException("Lecture not found");
         }
-        return updatedLecture;
     }
 
     public boolean deleteLecture(String lectureId) {
