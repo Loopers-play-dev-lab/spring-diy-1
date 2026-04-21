@@ -9,10 +9,10 @@
 </head>
 <body>
 <form id="registrationForm">
-    <label for="name">이름:</label>
-    <input type="text" id="name" name="name" required>
-    <label for="price">가격:</label>
-    <input type="number" id="price" name="price" required>
+    <label for="name">강의명:</label>
+    <input type="text" id="title" name="title" required>
+    <label for="price">강의자:</label>
+    <input type="text" id="lecturer" name="lecturer" required>
     <button type="submit">등록</button>
 </form>
 
