@@ -1,6 +1,7 @@
 package com.diy.app.lecture;
 
 import com.diy.app.lecture.request.CreateLectureRequest;
+import com.diy.app.lecture.request.UpdateLectureRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.RequestDispatcher;
@@ -45,6 +46,17 @@ public class LectureServlet extends HttpServlet {
         String viewPath = "lecture-list.jsp";
         RequestDispatcher requestDispatcher = req.getRequestDispatcher(viewPath);
         requestDispatcher.forward(req, resp);
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String requestBody = getRequestBody(req);
+        UpdateLectureRequest request = objectMapper.readValue(requestBody, UpdateLectureRequest.class);
+
+        Lecture lecture = new Lecture(request.id(), request.name(), request.price());
+        lectureRepository.update(lecture);
+
+        resp.sendRedirect("/lectures");
     }
 
     private String getRequestBody(HttpServletRequest req) throws IOException {

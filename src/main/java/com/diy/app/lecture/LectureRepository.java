@@ -18,4 +18,12 @@ public class LectureRepository {
     public List<Lecture> findAll() {
         return new ArrayList<>(store.values());
     }
+
+    public void update(Lecture lecture) {
+        if (!store.containsKey(lecture.getId())) {
+            throw new IllegalArgumentException(String.format("Lecture not found. id: %d", lecture.getId()));
+        }
+
+        store.put(lecture.getId(), lecture);
+    }
 }
