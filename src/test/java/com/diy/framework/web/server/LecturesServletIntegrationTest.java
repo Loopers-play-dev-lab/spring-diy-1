@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LecturesServletIntegrationTest {
 
@@ -28,16 +29,23 @@ class LecturesServletIntegrationTest {
         HttpURLConnection conn = openConnection("GET");
 
         assertEquals(200, conn.getResponseCode());
-        assertEquals("get lectures", readBody(conn));
+        assertEquals("text/html;charset=UTF-8", conn.getContentType());
+        assertTrue(readBody(conn).contains("<title>강의 목록</title>"));
     }
 
     @Test
     void POST_강의_등록() throws Exception {
-        HttpURLConnection conn = openConnection("POST");
-        conn.setDoOutput(true);
+        HttpURLConnection postConn = openConnection("POST");
+        postConn.setDoOutput(true);
+        postConn.setRequestProperty("Content-Type", "application/json");
 
-        assertEquals(200, conn.getResponseCode());
-        assertEquals("post lectures", readBody(conn));
+        String json = "{\"name\":\"Java\",\"price\":\"10000\"}";
+        postConn.getOutputStream().write(json.getBytes());
+
+        assertEquals(200, postConn.getResponseCode());
+
+        HttpURLConnection getConn = openConnection("GET");
+        assertTrue(readBody(getConn).contains("Java"));
     }
 
     @Test
