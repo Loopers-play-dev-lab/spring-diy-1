@@ -9,4 +9,13 @@ public class LectureRequest {
       int price
   ) {
   }
+
+  public record Update(
+      String name,
+      int price
+  ) {
+    public Lecture toLecture(Long id) {
+      return new Lecture(id, name, price);
+    }
+  }
 }

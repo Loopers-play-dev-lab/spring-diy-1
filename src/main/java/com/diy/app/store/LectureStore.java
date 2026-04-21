@@ -22,9 +22,16 @@ public class LectureStore {
     return new ArrayList<>(lectureMap.values());
   }
 
+  public Lecture get(Long id) {
+    return lectureMap.get(id);
+  }
 
   public Lecture add(LectureRequest.Create createRequest) {
     Long newId = idGenerator.incrementAndGet();
     return lectureMap.put(newId, new Lecture(newId, createRequest.name(), createRequest.price()));
+  }
+
+  public void update(Lecture lecture) {
+    lectureMap.replace(lecture.getId(), lecture);
   }
 }

@@ -22,6 +22,26 @@ public class LectureServlet extends HttpServlet {
     redirect(resp);
   }
 
+  @Override
+  protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    Long id = getId(req);
+    var updateRequest = objectMapper.readValue(req.getInputStream(), LectureRequest.Update.class);
+    lectureStore.update(updateRequest.toLecture(id));
+
+    redirect(resp);
+  }
+
+  private Long getId(HttpServletRequest req) {
+    String path = req.getPathInfo();
+    if (path == null || path.length() <= 1) throw new IllegalArgumentException("잘못된 ID입니다.");
+
+    try {
+      return Long.parseLong(path.substring(1));
+    } catch (NumberFormatException _) {
+      throw new IllegalArgumentException("유효한 ID값을 입력해야 합니다.");
+    }
+  }
+
   private void redirect(HttpServletResponse resp) throws IOException {
       resp.setStatus(HttpServletResponse.SC_FOUND);
       resp.sendRedirect("/lecture-list");
