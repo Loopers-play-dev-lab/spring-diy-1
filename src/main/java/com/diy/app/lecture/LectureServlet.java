@@ -3,6 +3,7 @@ package com.diy.app.lecture;
 import com.diy.app.lecture.request.CreateLectureRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -10,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet("/lectures")
 public class LectureServlet extends HttpServlet {
@@ -32,6 +34,17 @@ public class LectureServlet extends HttpServlet {
 
         resp.setStatus(HttpServletResponse.SC_SEE_OTHER);
         resp.setHeader("Location", "/lectures");
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        List<Lecture> lectures = lectureRepository.findAll();
+
+        req.setAttribute("lectures", lectures);
+
+        String viewPath = "lecture-list.jsp";
+        RequestDispatcher requestDispatcher = req.getRequestDispatcher(viewPath);
+        requestDispatcher.forward(req, resp);
     }
 
     private String getRequestBody(HttpServletRequest req) throws IOException {
