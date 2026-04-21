@@ -31,6 +31,14 @@ public class LectureServlet extends HttpServlet {
     redirect(resp);
   }
 
+  @Override
+  protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    Long id = getId(req);
+    lectureStore.delete(id);
+
+    redirect(resp);
+  }
+
   private Long getId(HttpServletRequest req) {
     String path = req.getPathInfo();
     if (path == null || path.length() <= 1) throw new IllegalArgumentException("잘못된 ID입니다.");

@@ -12,10 +12,22 @@
 <c:forEach var="lecture" items="${lectures}">
     <li>id: ${lecture.id}
         <a href="/lecture-update/${lecture.id}">수정</a>
+        <button onclick="deleteLecture(${lecture.id})">삭제</button>
     </li>
     <li>name: ${lecture.name}</li>
     <li>price: ${lecture.price}</li>
     <br>
 </c:forEach>
+
+<script>
+    function deleteLecture(lectureId) {
+      fetch("http://localhost:8080/lectures/" + lectureId, { method: "DELETE" })
+      .then(response => {
+        if (response.redirected) {
+          window.location.href = response.url;
+        }
+      });
+    }
+</script>
 </body>
 </html>

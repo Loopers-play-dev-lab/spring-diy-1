@@ -34,4 +34,9 @@ public class LectureStore {
   public void update(Lecture lecture) {
     lectureMap.replace(lecture.getId(), lecture);
   }
+
+  public void delete(Long id) {
+    lectureMap.remove(id);
+  }
+
 }
