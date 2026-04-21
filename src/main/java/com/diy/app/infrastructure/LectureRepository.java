@@ -20,4 +20,18 @@ public class LectureRepository {
     public List<Lecture> getLectures() {
         return this.lectures;
     }
+
+    public void delete(Long id) {
+        lectures.removeIf(lecture -> lecture.getId().equals(id));
+    }
+
+    public void update(Long id, Lecture updated) {
+        lectures.stream()
+                .filter(lecture -> lecture.getId().equals(id))
+                .findFirst()
+                .ifPresent(lecture -> {
+                    lecture.setName(updated.getName());
+                    lecture.setPrice(updated.getPrice());
+                });
+    }
 }
