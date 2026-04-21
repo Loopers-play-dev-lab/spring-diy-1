@@ -1,5 +1,6 @@
 package com.diy.app.store;
 
+import com.diy.app.controller.api.LectureRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,4 +22,9 @@ public class LectureStore {
     return new ArrayList<>(lectureMap.values());
   }
 
+
+  public Lecture add(LectureRequest.Create createRequest) {
+    Long newId = idGenerator.incrementAndGet();
+    return lectureMap.put(newId, new Lecture(newId, createRequest.name(), createRequest.price()));
+  }
 }
