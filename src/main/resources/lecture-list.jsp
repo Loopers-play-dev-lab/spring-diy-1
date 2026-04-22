@@ -10,10 +10,40 @@
 <body>
 <a href="/lecture-registration.jsp">등록</a>
 <c:forEach var="lecture" items="${lectures}">
-    <li>id: ${lecture.id}</li>
-    <li>name: ${lecture.name}</li>
-    <li>price: ${lecture.price}</li>
+    <div class="lecture-item" data-id="${lecture.id}">
+        <li>id: ${lecture.id}</li>
+        <li>name: <input type="text" class="name-input" value="${lecture.name}"></li>
+        <li>price: <input type="number" class="price-input" value="${lecture.price}"></li>
+        <button class="edit-btn">수정</button>
+    </div>
     <br>
 </c:forEach>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll(".edit-btn").forEach(function(btn) {
+            btn.addEventListener("click", function() {
+                const item = btn.closest(".lecture-item");
+                const id = item.dataset.id;
+                const name = item.querySelector(".name-input").value;
+                const price = item.querySelector(".price-input").value;
+
+                const lecture = { id: id, name: name, price: price };
+
+                fetch("http://localhost:8080/lectures", {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(lecture)
+                }).then(function(response) {
+                    if (response.ok) {
+                        window.location.reload();
+                    }
+                });
+            });
+        });
+    });
+</script>
 </body>
 </html>

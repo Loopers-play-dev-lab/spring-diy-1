@@ -17,10 +17,13 @@ public class LectureRepository {
         return new ArrayList<>(store.values());
     }
 
-
     public void register(Lecture lecture) {
         long id = counter.incrementAndGet();
         lecture.setId(id);
         store.put(id, lecture);
+    }
+
+    public void update(Lecture lecture) {
+        store.put(lecture.getId(), lecture);
     }
 }
