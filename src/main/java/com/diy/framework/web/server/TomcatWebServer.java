@@ -23,17 +23,6 @@ public class TomcatWebServer {
         startServerInternal();
     }
 
-    public void startServerInternal() {
-        try {
-            tomcat.setPort(port);
-            tomcat.start();
-            final Thread awaitThread = new Thread(() -> tomcat.getServer().await());
-            awaitThread.start();
-        } catch (LifecycleException e) {
-            throw new RuntimeException("톰켓 서버 실행 중 예외가 발생했습니다.", e);
-        }
-    }
-
     private void setServerContext() {
         final String resourcesPath = Paths.get("src", "main", "resources").toString();
         final String absoluteResourcesPath = new File(resourcesPath).getAbsolutePath();
@@ -44,6 +33,24 @@ public class TomcatWebServer {
         context.setResponseCharacterEncoding("UTF-8");
 
         setServerResources(context);
+    }
+
+    private void startDaemonAwaitThread() {
+        final Thread awaitThread = new Thread(() -> TomcatWebServer.this.tomcat.getServer().await());
+        awaitThread.setContextClassLoader(getClass().getClassLoader());
+        awaitThread.setDaemon(false);
+        awaitThread.start();
+    }
+
+    public void startServerInternal() {
+        try {
+            tomcat.setPort(port);
+            tomcat.start();
+            final Thread awaitThread = new Thread(() -> tomcat.getServer().await());
+            awaitThread.start();
+        } catch (LifecycleException e) {
+            throw new RuntimeException("톰켓 서버 실행 중 예외가 발생했습니다.", e);
+        }
     }
 
     private void setServerResources(final Context context) {
@@ -65,10 +72,5 @@ public class TomcatWebServer {
         }
     }
 
-    private void startDaemonAwaitThread() {
-        final Thread awaitThread = new Thread(() -> TomcatWebServer.this.tomcat.getServer().await());
-        awaitThread.setContextClassLoader(getClass().getClassLoader());
-        awaitThread.setDaemon(false);
-        awaitThread.start();
-    }
+
 }
