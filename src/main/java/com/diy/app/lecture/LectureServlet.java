@@ -10,8 +10,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @WebServlet("/lectures")
@@ -69,14 +69,7 @@ public class LectureServlet extends HttpServlet {
     }
 
     private String getRequestBody(HttpServletRequest req) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        BufferedReader reader = req.getReader();
-
-        String line;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-
-        return sb.toString();
+        byte[] bytes = req.getInputStream().readAllBytes();
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 }
