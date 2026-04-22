@@ -1,9 +1,12 @@
 package com.diy.app.domain;
 
 public class Lecture {
-    private final long id;
-    private final String name;
-    private final long price;
+    private long id;
+    private String name;
+    private long price;
+
+    public Lecture() {
+    }
 
     public Lecture(long id, String name, long price) {
         this.id = id;
@@ -21,6 +24,11 @@ public class Lecture {
 
     public long getPrice() {
         return price;
+    }
+
+    public void update(Lecture lecture) {
+        this.name = lecture.name;
+        this.price = lecture.price;
     }
 
     @Override
