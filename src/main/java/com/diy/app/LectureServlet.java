@@ -29,7 +29,7 @@ public class LectureServlet extends HttpServlet {
         System.out.println("=== doGet called ===");
 
         List<Lecture> lectures = findAll();
-        req.setAttribute("toLecture", lectures);
+        req.setAttribute("lectures", lectures);
         req.getRequestDispatcher("/lecture-list.jsp").forward(req, resp);
     }
 
