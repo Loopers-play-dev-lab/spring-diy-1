@@ -24,4 +24,8 @@ public class LectureService {
         lecture.setName(name);
         lecture.setPrice(price);
     }
+
+    public void deleteLecture(final long id) {
+        lectureRepository.deleteLectureById(id);
+    }
 }

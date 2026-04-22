@@ -33,4 +33,9 @@ public class LectureRepositoryImpl implements LectureRepository {
     public Lecture getLectureById(final long id) {
         return lectures.get(id);
     }
+
+    @Override
+    public void deleteLectureById(final long id) {
+        lectures.remove(id);
+    }
 }

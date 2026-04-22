@@ -13,6 +13,9 @@
     <li>id: ${lecture.id}</li>
     <li>name: ${lecture.name}</li>
     <li>price: ${lecture.price}</li>
+    <button type="button"
+        class="btn-delete"
+        data-id="${lecture.id}">삭제</button>
     <br>
 </c:forEach>
 <form id="registrationForm">
@@ -52,6 +55,25 @@
                 location.reload(true);
             });
         });
+
+        const buttons = document.getElementsByClassName("btn-delete");
+        for (let btn of buttons) {
+            btn.addEventListener("click", function(event) {
+                event.preventDefault();
+                const body = { "id" : btn.dataset.id };
+                const jsonData = JSON.stringify(body);
+
+                fetch("http://localhost:8080/lectures", {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: jsonData
+                }).then(response => {
+                    location.reload(true);
+                });
+            });
+        }
     });
 </script>
 </body>
