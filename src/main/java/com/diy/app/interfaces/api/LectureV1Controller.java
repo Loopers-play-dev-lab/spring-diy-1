@@ -42,4 +42,15 @@ public class LectureV1Controller extends HttpServlet {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
+
+    @Override
+    public void doPut(final HttpServletRequest req, final HttpServletResponse res) throws ServletException, IOException {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, String> body = mapper.readValue(req.getInputStream(), new TypeReference<Map<String, String>>() {});
+            lectureService.updateLecture(Long.parseLong(body.get("id")), body.get("name"), Long.parseLong(body.get("price")));
+        } catch (Exception e) {
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }
+    }
 }

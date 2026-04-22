@@ -28,4 +28,9 @@ public class LectureRepositoryImpl implements LectureRepository {
         lecture.setId(id.getAndIncrement());
         return lectures.putIfAbsent(lecture.getId(), lecture);
     }
+
+    @Override
+    public Lecture getLectureById(final long id) {
+        return lectures.get(id);
+    }
 }
