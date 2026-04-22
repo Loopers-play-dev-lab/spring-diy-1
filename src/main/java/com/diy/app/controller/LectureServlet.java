@@ -27,11 +27,11 @@ public class LectureServlet extends HttpServlet {
     }
 
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Lecture lecture = objectMapper.readValue(request.getInputStream(), Lecture.class);
         lectureRepository.register(lecture);
 
-        response.setStatus(HttpServletResponse.SC_OK);
+        response.sendRedirect("/lectures");
     }
 
 }

@@ -19,5 +19,8 @@ public class LectureRepository {
 
 
     public void register(Lecture lecture) {
+        long id = counter.incrementAndGet();
+        lecture.setId(id);
+        store.put(id, lecture);
     }
 }
