@@ -1,6 +1,8 @@
 package com.diy.app.interfaces.api;
 
 import com.diy.app.application.Lecture.LectureService;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -10,7 +12,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.InaccessibleObjectException;
+import java.util.HashMap;
+import java.util.Map;
 
 @WebServlet("/lectures")
 public class LectureV1Controller extends HttpServlet {
@@ -27,5 +30,16 @@ public class LectureV1Controller extends HttpServlet {
         RequestDispatcher dispatcher = req.getRequestDispatcher("lecture-list.jsp");
         req.setAttribute("lectures", lectureService.getLectures());
         dispatcher.forward(req, res);
+    }
+
+    @Override
+    public void doPost(final HttpServletRequest req, final HttpServletResponse res) throws ServletException, IOException {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, String> body = mapper.readValue(req.getInputStream(), new TypeReference<Map<String, String>>() {});
+            lectureService.createLecture(body.get("name"), Long.parseLong(body.get("price")));
+        } catch (Exception e) {
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }
     }
 }

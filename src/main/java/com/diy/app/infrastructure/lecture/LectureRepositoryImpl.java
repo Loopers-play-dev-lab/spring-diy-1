@@ -22,4 +22,10 @@ public class LectureRepositoryImpl implements LectureRepository {
     public Collection<Lecture> getLectures() {
         return lectures.values();
     }
+
+    @Override
+    public Lecture save(final Lecture lecture) {
+        lecture.setId(id.getAndIncrement());
+        return lectures.putIfAbsent(lecture.getId(), lecture);
+    }
 }

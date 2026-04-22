@@ -12,4 +12,8 @@ public class LectureService {
     public Collection<Lecture> getLectures() {
         return lectureRepository.getLectures();
     }
+
+    public void createLecture(final String name, final long price) {
+        lectureRepository.save(new Lecture(name, price));
+    }
 }
