@@ -40,4 +40,11 @@ public class LectureServlet extends HttpServlet {
         response.setStatus(HttpServletResponse.SC_OK);
     }
 
+    @Override
+    public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Lecture lecture = objectMapper.readValue(request.getInputStream(), Lecture.class);
+        lectureRepository.delete(lecture.getId());
+        response.setStatus(HttpServletResponse.SC_OK);
+    }
+
 }

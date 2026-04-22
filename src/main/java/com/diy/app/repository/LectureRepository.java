@@ -26,4 +26,8 @@ public class LectureRepository {
     public void update(Lecture lecture) {
         store.put(lecture.getId(), lecture);
     }
+
+    public void delete(long id) {
+        store.remove(id);
+    }
 }

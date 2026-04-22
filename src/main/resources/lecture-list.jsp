@@ -15,6 +15,7 @@
         <li>name: <input type="text" class="name-input" value="${lecture.name}"></li>
         <li>price: <input type="number" class="price-input" value="${lecture.price}"></li>
         <button class="edit-btn">수정</button>
+        <button class="delete-btn">삭제</button>
     </div>
     <br>
 </c:forEach>
@@ -36,6 +37,25 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify(lecture)
+                }).then(function(response) {
+                    if (response.ok) {
+                        window.location.reload();
+                    }
+                });
+            });
+        });
+
+        document.querySelectorAll(".delete-btn").forEach(function(btn) {
+            btn.addEventListener("click", function() {
+                const item = btn.closest(".lecture-item");
+                const id = item.dataset.id;
+
+                fetch("http://localhost:8080/lectures", {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ id: id })
                 }).then(function(response) {
                     if (response.ok) {
                         window.location.reload();
