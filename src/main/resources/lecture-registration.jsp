@@ -8,7 +8,7 @@
     <title>강의 등록</title>
 </head>
 <body>
-<form id="registrationForm">
+<form id="registrationForm" action="/lectures" method="post">
     <label for="name">이름:</label>
     <input type="text" id="name" name="name" required>
     <label for="price">가격:</label>
