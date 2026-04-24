@@ -8,68 +8,50 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 @WebServlet("/lectures")
 public class LectureServlet extends HttpServlet {
-    private List<Lecture> lectures  = new ArrayList<>();
+    public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private final Map<Long, Lecture> repository = new HashMap<>();
 
     @Override
-    public void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json;charset=utf-8");
-        resp.setCharacterEncoding("utf-8");
+    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+        final Collection<Lecture> lectures = repository.values();
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        resp.getWriter().write(objectMapper.writeValueAsString(lectures));
+        req.setAttribute("lectures", lectures);
+        req.getRequestDispatcher("lecture-list.jsp").forward(req, resp);
     }
 
     @Override
-    public void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json;charset=utf-8");
-        resp.setCharacterEncoding("utf-8");
+    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+        final String body = new String(req.getInputStream().readAllBytes());
+        final Lecture lecture = OBJECT_MAPPER.readValue(body, Lecture.class);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        Lecture lecture = objectMapper.readValue(req.getInputStream(), Lecture.class);
-        lectures.add(lecture);
+        final long id = repository.size() + 1L;
+        lecture.setId(id);
+        repository.put(lecture.getId(), lecture);
 
-        resp.setStatus(HttpServletResponse.SC_CREATED); // 201
-        resp.getWriter().write(objectMapper.writeValueAsString(lecture));
+        resp.sendRedirect("/lectures");
     }
 
     @Override
-    public void doPut(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json;charset=utf-8");
-        resp.setCharacterEncoding("utf-8");
+    protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+        final Long id = Long.valueOf(req.getParameter("id"));
+        repository.remove(id);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        Lecture updated = objectMapper.readValue(req.getInputStream(), Lecture.class);
-
-        for (int i = 0; i < lectures.size(); i++) {
-            if (lectures.get(i).id().equals(updated.id())) {
-                lectures.set(i, updated);
-                resp.getWriter().write(objectMapper.writeValueAsString(updated));
-                return;
-            }
-        }
-
-        resp.setStatus(HttpServletResponse.SC_NOT_FOUND); // 404
+        resp.sendRedirect("/lectures");
     }
 
     @Override
-    public void doDelete(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json;charset=utf-8");
-        resp.setCharacterEncoding("utf-8");
+    protected void doPut(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+        final String body = new String(req.getInputStream().readAllBytes());
+        final Lecture lecture = OBJECT_MAPPER.readValue(body, Lecture.class);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        Integer id = objectMapper.readTree(req.getInputStream()).get("id").asInt();
+        repository.put(lecture.getId(), lecture);
 
-        boolean removed = lectures.removeIf(lecture -> lecture.id().equals(id));
-
-        if (removed) {
-            resp.setStatus(HttpServletResponse.SC_NO_CONTENT); // 204
-        } else {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND); // 404
-        }
+        resp.sendRedirect("/lectures");
     }
 }
