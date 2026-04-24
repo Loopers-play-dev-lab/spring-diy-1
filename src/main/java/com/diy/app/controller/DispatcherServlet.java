@@ -33,6 +33,7 @@ public class DispatcherServlet extends HttpServlet {
         this.postControllerMap.put("/lectures", new LecturePostControllerV1());
         this.putControllerMap.put("/lectures", new LecturePutControllerV1());
         this.delControllerMap.put("/lectures", new LectureDelControllerV1());
+        this.getControllerMap.put("/", new HomeGetControllerV1());
         this.viewResolve = new ViewResolve();
     }
 
@@ -42,6 +43,7 @@ public class DispatcherServlet extends HttpServlet {
             RequestBody body = RequestParam.parseBody(req);
             String method = req.getMethod();
             String uri = req.getRequestURI();
+            System.out.println(method + " " + uri);
             ControllerV1 controller = null;
             switch (method) {
                 case "GET":
@@ -68,7 +70,5 @@ public class DispatcherServlet extends HttpServlet {
         } catch (Exception e) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
-
-        super.service(req, resp);
     }
 }
