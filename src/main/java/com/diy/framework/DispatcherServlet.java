@@ -5,6 +5,7 @@ import com.diy.app.lecture.LectureRepository;
 import com.diy.app.lecture.LectureService;
 import com.diy.framework.exception.MethodNotAllowedException;
 import com.diy.framework.view.JspViewResolver;
+import com.diy.framework.view.View;
 import com.diy.framework.view.ViewResolver;
 
 import javax.servlet.ServletContext;
@@ -22,16 +23,17 @@ public class DispatcherServlet extends HttpServlet {
 
     private final Map<String, Controller> mappings = new HashMap<>();
 
+    private ViewResolver viewResolver;
+
     @Override
     public void init() {
-        ServletContext servletContext = getServletContext();
-        ViewResolver viewResolver = new JspViewResolver(servletContext);
-
         LectureRepository lectureRepository = new LectureRepository();
         LectureService lectureService = new LectureService(lectureRepository);
-        LectureController lectureController = new LectureController(lectureService, viewResolver);
-                                                             
+        LectureController lectureController = new LectureController(lectureService);
         mappings.put("/lectures", lectureController);
+
+        ServletContext servletContext = getServletContext();
+        this.viewResolver = new JspViewResolver(servletContext);
     }
 
     @Override
@@ -45,7 +47,9 @@ public class DispatcherServlet extends HttpServlet {
         }
 
         try {
-            controller.handleRequest(req, resp);
+            ModelAndView mav = controller.handleRequest(req, resp);
+            View view = viewResolver.resolveViewName(mav.getViewName());
+            view.render(req, resp, mav.getModel());
         } catch (MethodNotAllowedException e) {
             resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, e.getMessage());
         } catch (Exception e) {
