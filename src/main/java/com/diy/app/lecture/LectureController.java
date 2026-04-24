@@ -1,9 +1,7 @@
 package com.diy.app.lecture;
 
 import com.diy.app.lecture.request.CreateLectureRequest;
-import com.diy.framework.Controller;
 import com.diy.framework.ModelAndView;
-import com.diy.framework.exception.MethodNotAllowedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.ServletException;
@@ -15,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LectureController implements Controller {
+public class LectureController {
 
     private final ObjectMapper objectMapper;
     private final LectureService lectureService;
@@ -25,18 +23,7 @@ public class LectureController implements Controller {
         this.lectureService = lectureService;
     }
 
-    @Override
-    public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        if (request.getMethod().equals("GET")) {
-            return doGet(request, response);
-        } else if (request.getMethod().equals("POST")) {
-            return doPost(request, response);
-        }
-
-        throw new MethodNotAllowedException(request.getMethod());
-    }
-
-    private ModelAndView doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public ModelAndView doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         List<Lecture> lectures = lectureService.getAllLectures();
 
         Map<String, Object> model = new HashMap<>();
@@ -45,7 +32,7 @@ public class LectureController implements Controller {
         return new ModelAndView("lecture-list", model);
     }
 
-    private ModelAndView doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ModelAndView doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         byte[] bodyBytes = request.getInputStream().readAllBytes();
         String body = new String(bodyBytes, StandardCharsets.UTF_8);
         CreateLectureRequest createRequest = objectMapper.readValue(body, CreateLectureRequest.class);

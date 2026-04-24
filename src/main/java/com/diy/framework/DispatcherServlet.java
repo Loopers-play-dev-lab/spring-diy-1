@@ -1,9 +1,5 @@
 package com.diy.framework;
 
-import com.diy.app.lecture.LectureController;
-import com.diy.app.lecture.LectureRepository;
-import com.diy.app.lecture.LectureService;
-import com.diy.framework.exception.MethodNotAllowedException;
 import com.diy.framework.view.JspViewResolver;
 import com.diy.framework.view.View;
 import com.diy.framework.view.ViewResolver;
@@ -15,22 +11,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 @WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
 
-    private final Map<String, Controller> mappings = new HashMap<>();
-
+    private RequestMapping requestMapping;
     private ViewResolver viewResolver;
 
     @Override
     public void init() {
-        LectureRepository lectureRepository = new LectureRepository();
-        LectureService lectureService = new LectureService(lectureRepository);
-        LectureController lectureController = new LectureController(lectureService);
-        mappings.put("/lectures", lectureController);
+        requestMapping = new RequestMapping();
+        requestMapping.initMapping();
 
         ServletContext servletContext = getServletContext();
         this.viewResolver = new JspViewResolver(servletContext);
@@ -38,9 +29,11 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+        String method = req.getMethod();
         String requestURI = req.getRequestURI();
+        HandlerKey key = new HandlerKey(method, requestURI);
 
-        Controller controller = mappings.get(requestURI);
+        Controller controller = requestMapping.getController(key);
         if (controller == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -50,8 +43,6 @@ public class DispatcherServlet extends HttpServlet {
             ModelAndView mav = controller.handleRequest(req, resp);
             View view = viewResolver.resolveViewName(mav.getViewName());
             view.render(req, resp, mav.getModel());
-        } catch (MethodNotAllowedException e) {
-            resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, e.getMessage());
         } catch (Exception e) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
