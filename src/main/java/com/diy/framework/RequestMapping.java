@@ -9,18 +9,17 @@ import java.util.Map;
 
 public class RequestMapping {
 
-    private final Map<HandlerKey, Controller> mappings = new HashMap<>();
+    private final Map<String, Controller> mappings = new HashMap<>();
 
     public void initMapping() {
         LectureRepository lectureRepository = new LectureRepository();
         LectureService lectureService = new LectureService(lectureRepository);
         LectureController lectureController = new LectureController(lectureService);
 
-        mappings.put(new HandlerKey("GET", "/lectures"), lectureController::doGet);
-        mappings.put(new HandlerKey("POST", "/lectures"), lectureController::doPost);
+        mappings.put( "/lectures", lectureController);
     }
 
-    public Controller getController(HandlerKey key) {
+    public Controller getController(String key) {
         return mappings.get(key);
     }
 }

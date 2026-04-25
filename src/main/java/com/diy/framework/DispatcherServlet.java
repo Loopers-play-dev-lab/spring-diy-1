@@ -35,11 +35,9 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-        String method = req.getMethod();
         String requestURI = req.getRequestURI();
-        HandlerKey key = new HandlerKey(method, requestURI);
 
-        Controller controller = requestMapping.getController(key);
+        Controller controller = requestMapping.getController(requestURI);
         if (controller == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -47,7 +45,7 @@ public class DispatcherServlet extends HttpServlet {
 
         try {
             Map<String, ?> params = parseParams(req);
-            ModelAndView mav = controller.handleRequest(params);
+            ModelAndView mav = controller.handleRequest(req, resp, params);
             View view = resolveView(mav.getViewName());
             view.render(req, resp, mav.getModel());
         } catch (Exception e) {

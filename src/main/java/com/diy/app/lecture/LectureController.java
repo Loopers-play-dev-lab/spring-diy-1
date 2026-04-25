@@ -1,13 +1,16 @@
 package com.diy.app.lecture;
 
 import com.diy.app.lecture.request.CreateLectureRequest;
+import com.diy.framework.Controller;
 import com.diy.framework.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LectureController {
+public class LectureController implements Controller {
 
     private final LectureService lectureService;
 
@@ -15,7 +18,19 @@ public class LectureController {
         this.lectureService = lectureService;
     }
 
-    public ModelAndView doGet(Map<String, ?> params) {
+    @Override
+    public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response, Map<String, ?> params) throws Exception {
+        String method = request.getMethod();
+        if ("GET".equals(method)) {
+            return doGet();
+        } else if ("POST".equals(method)) {
+            return doPost(request.getParameterMap());
+        }
+
+        return null;
+    }
+
+    public ModelAndView doGet() {
         List<Lecture> lectures = lectureService.getAllLectures();
 
         Map<String, Object> model = new HashMap<>();
