@@ -4,12 +4,22 @@ import com.diy.app.domain.LectureRepository;
 import com.diy.app.domain.LectureService;
 import com.diy.app.domain.LectureServiceImpl;
 import com.diy.app.infrastructure.LectureInmemoryRepository;
+import com.diy.app.presentation.HomeController;
+import com.diy.app.presentation.LectureAbstractController;
 import com.diy.app.presentation.LectureController;
 import com.diy.module.database.InMemoryDatabase;
 
 public class AppConfig {
+    public static LectureAbstractController lectureAbstractController() {
+        return LectureAbstractController.getInstance();
+    }
+
     public static LectureController lectureController() {
         return LectureController.getInstance(lectureService());
+    }
+
+    public static HomeController homeController() {
+        return HomeController.getInstance();
     }
 
     public static LectureService lectureService() {
@@ -23,5 +33,4 @@ public class AppConfig {
     private static InMemoryDatabase inMemoryDatabase() {
         return InMemoryDatabase.getInstance();
     }
-
 }
