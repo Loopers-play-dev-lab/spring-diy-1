@@ -4,6 +4,7 @@ import com.diy.app.business.domain.Lecture;
 import com.diy.app.business.service.LectureService;
 import com.diy.app.infra.httpSpec.HttpMethod;
 import com.diy.app.infra.port.Controller;
+import com.diy.app.infra.viewRender.HtmlView;
 import com.diy.app.infra.viewRender.JspView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -34,8 +35,8 @@ public class LectureController implements Controller {
             } else if (uriArg.length == 2) {
                 req.setAttribute("lectures", service.getAllLectures());
 
-                final JspView jspView = new JspView("lecture-list.jsp");
-                jspView.render(req, resp);
+                final HtmlView htmlView = new HtmlView("lecture-list.html");
+                htmlView.render(req, resp);
             }
         }
         if (method.equals(HttpMethod.POST.getValue())) {
