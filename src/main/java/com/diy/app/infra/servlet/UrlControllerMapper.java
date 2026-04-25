@@ -14,7 +14,7 @@ public class UrlControllerMapper {
     private static UrlControllerMapper instance;
 
     public UrlControllerMapper() {
-        uriToController.put("/lectures", new LectureController(ViewResolver.getInstance(), LectureService.getInstance()));
+        uriToController.put("/lectures", new LectureController(LectureService.getInstance()));
     }
 
     public Controller findController(String uri) {

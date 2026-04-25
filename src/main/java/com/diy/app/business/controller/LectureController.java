@@ -13,14 +13,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class LectureController implements Controller {
-    public static final String PREFIX_URL = "/lecture";
 
-    private ViewResolver viewResolver;
     private LectureService service;
     private ObjectMapper objectMapper;
 
-    public LectureController(ViewResolver viewResolver, LectureService service) {
-        this.viewResolver = viewResolver;
+    public LectureController(LectureService service) {
         this.service = service;
         this.objectMapper = new ObjectMapper();
     }
@@ -37,7 +34,7 @@ public class LectureController implements Controller {
                 req.setAttribute("lecture", service.getLectureById(id));
             } else if (uriArg.length == 2) {
                 req.setAttribute("lectures", service.getAllLectures());
-                viewResolver.resolve(req, resp, "lecture-list");
+                req.setAttribute("render", "lecture-list");
             }
         }
         if (method.equals(HttpMethod.POST.getValue())) {
