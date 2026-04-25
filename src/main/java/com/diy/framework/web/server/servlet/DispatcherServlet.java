@@ -1,8 +1,9 @@
-package com.diy.framework.web.server;
+package com.diy.framework.web.server.servlet;
 
 import com.diy.framework.web.server.exceptions.CustomException;
-import com.diy.framework.web.server.interfaces.Controller;
-import com.diy.framework.web.server.utils.HttpServletUtils;
+import com.diy.framework.web.server.controller.Controller;
+import com.diy.framework.web.server.controller.ControllerResolver;
+import com.diy.framework.web.server.servlet.utils.HttpServletUtils;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,10 +23,10 @@ public class DispatcherServlet extends HttpServlet {
   @Override
   protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
     String path = HttpServletUtils.getUriPath(req);
+    req.setAttribute("params", HttpServletUtils.parseBody(req));
 
     try {
-      Controller controller = controllerResolver.find(path);
-      req.setAttribute("params", HttpServletUtils.parseBody(req));
+      Controller controller = controllerResolver.resolve(path);
       controller.handleRequest(req, resp);
     } catch (CustomException e) {
       resp.sendError(e.getHttpCode(), e.getMessage());

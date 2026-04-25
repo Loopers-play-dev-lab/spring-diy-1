@@ -1,4 +1,4 @@
-package com.diy.framework.web.server.interfaces;
+package com.diy.framework.web.server.controller;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
