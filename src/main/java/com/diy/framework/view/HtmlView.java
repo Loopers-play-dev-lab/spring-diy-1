@@ -16,7 +16,7 @@ public class HtmlView implements View {
     }
 
     @Override
-    public void render(final HttpServletRequest req, final HttpServletResponse res, final Map<String, Object> model) throws IOException {
+    public void render(final Map<String, Object> model, final HttpServletRequest req, final HttpServletResponse res) throws IOException {
         final String viewFile = readViewFile(req);
 
         res.setContentType("text/html;charset=utf-8");

@@ -1,26 +1,18 @@
 package com.diy.framework.view;
 
-import javax.servlet.ServletContext;
-import java.io.IOException;
-
 public class JspViewResolver implements ViewResolver {
 
+    private static final String REDIRECT_PREFIX = "redirect:";
     private static final String PREFIX = "/";
     private static final String SUFFIX = ".jsp";
 
-    private final ServletContext servletContext;
-
-    public JspViewResolver(ServletContext servletContext) {
-        this.servletContext = servletContext;
-    }
-
     @Override
-    public View resolveViewName(String viewName) throws IOException {
-        String fullPath = PREFIX + viewName + SUFFIX;
-        if (servletContext.getResource(fullPath) == null) {
-            return null;
+    public View resolveViewName(String viewName) {
+        if (viewName.startsWith(REDIRECT_PREFIX)) {
+            return new RedirectView(viewName.substring(REDIRECT_PREFIX.length()));
         }
 
+        String fullPath = PREFIX + viewName + SUFFIX;
         return new JspView(fullPath);
     }
 }
