@@ -18,11 +18,10 @@ public class UrlControllerMapper {
     }
 
     public Controller findController(String uri) {
-        System.out.println("uri = " + uri);
         for (String k : uriToController.keySet()) {
             if (uri.startsWith(k)) return uriToController.get(k);
         }
-        throw new IllegalArgumentException("해당 URI와 매칭되는 컨트롤러가 존재하지 않습니다.");
+        return null;
     }
 
     public static UrlControllerMapper getInstance() {

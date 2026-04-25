@@ -2,6 +2,7 @@ package com.diy.app.infra.servlet;
 
 import com.diy.app.business.controller.LectureController;
 import com.diy.app.business.service.LectureService;
+import com.diy.app.infra.dto.ModelAndView;
 import com.diy.app.infra.httpSpec.ContentType;
 import com.diy.app.infra.httpSpec.HttpHeader;
 import com.diy.app.infra.port.Controller;
@@ -20,17 +21,22 @@ import java.util.Objects;
 @WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
 
-    private ViewResolver viewResolver = ViewResolver.getInstance();
+    private final ViewResolver viewResolver = ViewResolver.getInstance();
     private final UrlControllerMapper mapper = UrlControllerMapper.getInstance();
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String uri = req.getRequestURI();
 
+        if (uri.equals("/favicon.ico")) return;
+
         Controller controller = mapper.findController(uri);
-        System.out.println("controller = " + controller);
+
         try {
-            viewResolver.resolve(req, resp, controller.handleRequest(req, resp));
+            ModelAndView modelAndView;
+            if (Objects.isNull(controller)) modelAndView = new ModelAndView(uri);
+            else modelAndView = controller.handleRequest(req, resp);
+            viewResolver.resolve(req, resp, modelAndView);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

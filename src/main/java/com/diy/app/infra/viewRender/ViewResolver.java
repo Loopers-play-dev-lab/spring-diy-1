@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
 import java.util.Objects;
 
 public class ViewResolver {
@@ -22,15 +23,24 @@ public class ViewResolver {
         URL htmlFile = getClass().getClassLoader().getResource(modelAndView.getViewName() + ".html");
         URL jspFile = getClass().getClassLoader().getResource(modelAndView.getViewName() + ".jsp");
 
-        System.out.println("htmlFile = " + htmlFile);
-        System.out.println("jspFile = " + jspFile);
-
+        if (modelAndView.getViewName().startsWith("redirect:")) {
+            resp.sendRedirect(modelAndView.getViewName().substring(9));
+            return;
+        }
         View view = null;
+
+        setReq(req, modelAndView);
 
         if (Objects.nonNull(jspFile)) view = new JspView(jspFile.getFile().split("resources/")[1]);
         else if (Objects.nonNull(htmlFile)) view = new HtmlView(htmlFile.getFile().split("resources/")[1]);
         else throw new IllegalArgumentException("파일이 존재하지 않습니다.");
 
         view.render(req, resp);
+    }
+
+    public void setReq(final HttpServletRequest req, final ModelAndView modelAndView) {
+        for (Map.Entry<String, Object> entry : modelAndView.getModel().entrySet()) {
+            req.setAttribute(entry.getKey(), entry.getValue());
+        }
     }
 }
