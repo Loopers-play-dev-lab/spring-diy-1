@@ -1,10 +1,10 @@
-package com.diy.app.servlet;
+package com.diy.app.infra.servlet;
 
 import com.diy.app.business.domain.Lecture;
 import com.diy.app.business.service.LectureService;
-import com.diy.app.httpSpec.ContentType;
-import com.diy.app.httpSpec.HttpHeader;
-import com.diy.app.httpSpec.HttpMethod;
+import com.diy.app.infra.httpSpec.ContentType;
+import com.diy.app.infra.httpSpec.HttpHeader;
+import com.diy.app.infra.httpSpec.HttpMethod;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

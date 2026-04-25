@@ -1,4 +1,4 @@
-package com.diy.app.httpSpec;
+package com.diy.app.infra.httpSpec;
 
 public enum ContentType {
     JSON("application/json")

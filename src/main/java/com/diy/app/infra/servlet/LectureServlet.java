@@ -1,4 +1,4 @@
-//package com.diy.app.servlet;
+//package com.diy.app.spring.servlet;
 //
 //import com.diy.app.business.domain.Lecture;
 //import com.fasterxml.jackson.databind.ObjectMapper;
