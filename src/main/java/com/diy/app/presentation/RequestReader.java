@@ -1,15 +1,11 @@
 package com.diy.app.presentation;
 
-import java.io.BufferedReader;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 public class RequestReader {
-    public static String readRequest(BufferedReader reader) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-        return sb.toString();
+    public static String readRequest(HttpServletRequest req) throws IOException {
+        byte[] bytes = req.getInputStream().readAllBytes();
+        return new String(bytes);
     }
 }

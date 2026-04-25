@@ -1,8 +1,5 @@
 package com.diy.framework.web.server;
 
-import com.diy.app.presentation.LectureController;
-import com.diy.app.presentation.LectureServlet;
-import com.diy.config.AppConfig;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
@@ -50,7 +47,7 @@ public class TomcatWebServer {
     }
 
     private void setDependency(final Context context) {
-        Tomcat.addServlet(context, "lectureServlet", new LectureServlet());
+//        Tomcat.addServlet(context, "lectureServlet", new LectureServlet());
     }
 
     private void setServerResources(final Context context) {
