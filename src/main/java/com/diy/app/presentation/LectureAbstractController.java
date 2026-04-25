@@ -9,10 +9,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import static com.diy.app.presentation.LectureRequestMapper.jsonToLectureRequest;
-import static com.diy.app.presentation.RequestReader.readRequest;
 
 public class LectureAbstractController extends AbstractController {
     private final LectureController lectureController;
@@ -32,22 +32,21 @@ public class LectureAbstractController extends AbstractController {
     @Override
     public ModelAndView doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         List<Lecture> lectures = lectureController.getLectures();
-        req.setAttribute("lectures", lectures);
-        return new ModelAndView("lecture-list");
+        Map<String, Object> model = new HashMap<>();
+        model.put("lectures", lectures);
+        return new ModelAndView("lecture-list", model);
     }
 
     @Override
     public ModelAndView doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String body = readRequest(req.getReader());
-        LectureRequest request = jsonToLectureRequest(body);
+        LectureRequest request = LectureRequest.from(req.getAttribute("params"));
         lectureController.addLecture(request);
         return new ModelAndView("redirect:/lectures");
     }
 
     @Override
     public ModelAndView doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String body = readRequest(req.getReader());
-        LectureRequest request = jsonToLectureRequest(body);
+        LectureRequest request = LectureRequest.from(req.getAttribute("params"));
         lectureController.updateLecture(request);
         return new ModelAndView("");
     }
