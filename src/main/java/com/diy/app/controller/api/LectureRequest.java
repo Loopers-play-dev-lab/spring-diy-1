@@ -11,10 +11,11 @@ public class LectureRequest {
   }
 
   public record Update(
+      Long id,
       String name,
       int price
   ) {
-    public Lecture toLecture(Long id) {
+    public Lecture toLecture() {
       return new Lecture(id, name, price);
     }
   }
