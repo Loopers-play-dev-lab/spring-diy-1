@@ -2,6 +2,7 @@ package com.diy.framework.web;
 
 import com.diy.app.domain.Lecture;
 import com.diy.app.domain.Price;
+import com.diy.framework.web.view.JspView;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -41,11 +42,11 @@ public class LectureServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("doGet");
-        final RequestDispatcher requestDispatcher = req.getRequestDispatcher("lecture-list.jsp");
         final Collection<Lecture> lectures = lectureRepository.findAll();
-
         req.setAttribute("lectures", lectures);
-        requestDispatcher.forward(req, resp);
+
+        final JspView jspView = new JspView("lecture-list.jsp");
+        jspView.render(req, resp);
         // 반면 do~~ 내부 구현 -> 400 (default) 혹은 405 (1.1)
 //        super.doGet(req, resp);
     }
