@@ -48,6 +48,8 @@ public class DispatcherServlet extends HttpServlet {
             ModelAndView mav = controller.handleRequest(req, resp, params);
             View view = resolveView(mav.getViewName());
             view.render(req, resp, mav.getModel());
+        } catch (UnsupportedOperationException e) {
+            resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, e.getMessage());
         } catch (Exception e) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }

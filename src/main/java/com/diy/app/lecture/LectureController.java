@@ -27,7 +27,7 @@ public class LectureController implements Controller {
             return doPost(request.getParameterMap());
         }
 
-        return null;
+        throw new UnsupportedOperationException(String.format("지원하지 않는 HTTP Method: %s", request.getMethod()));
     }
 
     public ModelAndView doGet() {
