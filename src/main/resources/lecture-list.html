@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>강의 목록</title>
+</head>
+<body>
+<a href="/lecture-registration.jsp">등록</a>
+<!-- "${lectures}" -->
+</body>
+
+<script>
+  buttons = document.querySelectorAll("button");
+  buttons.forEach(button => {
+    button.addEventListener("click", () => {
+      const lectureId = button.parentElement.id;
+      fetch('/lectures?lectureId=' + lectureId, {
+        method: "DELETE"
+      }).then(res => {
+        console.log(res)
+        if (res.ok) {
+          window.location.href = "/lectures";
+        }
+      })
+    })
+  })
+</script>
+</html>
