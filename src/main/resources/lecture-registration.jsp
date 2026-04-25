@@ -36,7 +36,7 @@
             fetch("http://localhost:8080/lectures", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json; charset=UTF-8"
                 },
                 body: jsonData
             }).then(response => {

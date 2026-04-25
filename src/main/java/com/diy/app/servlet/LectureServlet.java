@@ -27,31 +27,25 @@ public class LectureServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.setCharacterEncoding("UTF-8");
         req.setAttribute("lectures", lectures);
         req.getRequestDispatcher("/lecture-list.jsp").forward(req, resp);
-        resp.setCharacterEncoding("UTF-8");
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.setCharacterEncoding("UTF-8");
         Lecture body = objectMapper.readValue(req.getReader(), Lecture.class);
         Lecture lecture = new Lecture(nextId++, body.getName(), body.getPrice());
         lectures.add(lecture);
 
-        resp.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json");
         resp.getWriter().write(objectMapper.writeValueAsString(lecture));
     }
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.setCharacterEncoding("UTF-8");
         Lecture body = objectMapper.readValue(req.getReader(), Lecture.class);
         lectures.stream().filter(lec -> lec.getId() == body.getId()).forEach(lec -> lec.update(body));
 
-        resp.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json");
         resp.getWriter().write(objectMapper.writeValueAsString(body));
     }
