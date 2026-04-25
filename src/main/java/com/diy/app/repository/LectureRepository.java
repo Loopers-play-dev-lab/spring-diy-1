@@ -32,18 +32,21 @@ public class LectureRepository {
         return Optional.ofNullable(lectureDB.get(id));
     }
 
-    public void insert(String name, long price) {
+    public Lecture insert(String name, long price) {
         Lecture lecture = new Lecture(nextId.getAndAdd(1L), name, price);
         lectureDB.put(lecture.getId(), lecture);
+        return lecture;
     }
 
-    public void update(Lecture lecture) {
-        if (!lectureDB.containsKey(lecture.getId())) throw new IllegalArgumentException("없는 ID");
-        lectureDB.put(lecture.getId(), lecture);
+    public int update(Lecture lecture) {
+        if (lectureDB.containsKey(lecture.getId())) {
+            lectureDB.put(lecture.getId(), lecture);
+            return 1;
+        }
+        return 0;
     }
 
-    public void delete(long id) {
-        if (!lectureDB.containsKey(id)) throw new IllegalArgumentException("없는 ID");
-        lectureDB.remove(id);
+    public int delete(long id) {
+        return lectureDB.remove(id) == null ? 0 : 1;
     }
 }

@@ -1,5 +1,7 @@
 package com.diy.app.servlet;
 
+import com.diy.app.domain.Lecture;
+import com.diy.app.service.LectureService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -14,12 +16,46 @@ import java.util.Map;
 
 @WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
+
+    private static final LectureService service = LectureService.getInstance();
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         final Map<String, ?> params = parseParams(req);
 
-        System.out.println("req.getMethod() = " + req.getMethod());
-        System.out.println("req.getRequestURI() = " + req.getRequestURI());
+        String method = req.getMethod();
+        System.out.println("req.getMethod() = " + method);
+        String uri = req.getRequestURI();
+        System.out.println("req.getRequestURI() = " + uri);
+
+        if (!uri.startsWith("/lectures")) return;
+
+        if (method.equals(HttpMethod.GET.getValue())) {
+            String[] uriArg = uri.split("/");
+            if (uriArg.length == 3) {
+                long id = Long.parseLong(uriArg[2]);
+                req.setAttribute("lecture", service.getLectureById(id));
+            } else if (uriArg.length == 2) {
+                req.setAttribute("lectures", service.getAllLectures());
+                req.getRequestDispatcher("/lecture-list.jsp").forward(req, resp);
+            }
+        }
+        if (method.equals(HttpMethod.POST.getValue())) {
+            Lecture body = objectMapper.readValue(req.getReader(), Lecture.class);
+            service.create(body.getName(), body.getPrice());
+
+            resp.sendRedirect("/lectures");
+        }
+        if (method.equals(HttpMethod.PUT.getValue())) {
+            Lecture body = objectMapper.readValue(req.getReader(), Lecture.class);
+            service.update(body);
+        }
+        if (method.equals(HttpMethod.GET.getValue())) {
+            String[] uriArg = uri.split("/");
+            long id = Long.parseLong(uriArg[2]);
+            req.setAttribute("lecture", service.getLectureById(id));
+        }
     }
 
     private Map<String,?> parseParams(final HttpServletRequest req) throws IOException {
