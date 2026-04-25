@@ -37,8 +37,7 @@ public class LectureServlet extends HttpServlet {
         Lecture lecture = new Lecture(nextId++, body.getName(), body.getPrice());
         lectures.add(lecture);
 
-        resp.setContentType("application/json");
-        resp.getWriter().write(objectMapper.writeValueAsString(lecture));
+        resp.sendRedirect("/lectures");
     }
 
     @Override
