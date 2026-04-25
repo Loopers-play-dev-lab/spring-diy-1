@@ -6,13 +6,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-public class HtmlView {
+public class HtmlView implements View {
     private final String viewName;
 
     public HtmlView(final String viewName) {
         this.viewName = viewName;
     }
 
+    @Override
     public void render(final HttpServletRequest req, final HttpServletResponse res) throws IOException {
         final String viewFile = readViewFile(req);
 
