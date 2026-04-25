@@ -10,32 +10,34 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 @WebServlet("/lectures")
 public class LectureServlet extends HttpServlet {
     private final ObjectMapper objectMapper = new ObjectMapper();
-    long nextId;
-    List<Lecture> lectures;
+    AtomicLong nextId;
+    Map<Long, Lecture> lectureDB;
 
     @Override
     public void init() throws ServletException {
-        nextId = 0;
-        lectures = new ArrayList<>();
+        nextId= new AtomicLong(1L);
+        lectureDB = new ConcurrentHashMap<>();
         super.init();
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.setAttribute("lectures", lectures);
+        req.setAttribute("lectures", lectureDB.values());
         req.getRequestDispatcher("/lecture-list.jsp").forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Lecture body = objectMapper.readValue(req.getReader(), Lecture.class);
-        Lecture lecture = new Lecture(nextId++, body.getName(), body.getPrice());
-        lectures.add(lecture);
+        Lecture lecture = new Lecture(nextId.getAndAdd(1L), body.getName(), body.getPrice());
+        lectureDB.put(lecture.getId(), lecture);
 
         resp.sendRedirect("/lectures");
     }
@@ -43,7 +45,8 @@ public class LectureServlet extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Lecture body = objectMapper.readValue(req.getReader(), Lecture.class);
-        lectures.stream().filter(lec -> lec.getId() == body.getId()).forEach(lec -> lec.update(body));
+        Lecture lecture = lectureDB.get(body.getId());
+        lecture.update(body);
 
         resp.setContentType("application/json");
         resp.getWriter().write(objectMapper.writeValueAsString(body));
@@ -52,7 +55,7 @@ public class LectureServlet extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         long id = Long.parseLong(req.getParameter("id"));
-        lectures.removeIf(lecture -> lecture.getId() == id);
+        lectureDB.remove(id);
 
         resp.setContentType("application/json");
         resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
