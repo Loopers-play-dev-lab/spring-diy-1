@@ -35,9 +35,11 @@ public class LectureServlet extends HttpServlet {
                 break;
             }
             case "PUT": {
+                doPutInternal(req, resp);
                 break;
             }
             case "DELETE": {
+                doDeleteInternal(req, resp);
                 break;
             }
             default:throw new ServletException("Unknow method: "+method);
@@ -58,5 +60,18 @@ public class LectureServlet extends HttpServlet {
         map.put(lecture.getId(),lecture);
         resp.sendRedirect(req.getContextPath()+"/lectures");
     }
+    private void doPutInternal(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        byte[] bytes = req.getInputStream().readAllBytes();
+        String body = new String(bytes, StandardCharsets.UTF_8);
+        Lecture input = new ObjectMapper().readValue(body,Lecture.class);
+        Lecture lecture = map.get(input.getId());
+        lecture.setName(input.getName());
+        lecture.setPrice(input.getPrice());
+    }
 
+    private void doDeleteInternal(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        byte[] bytes = req.getInputStream().readAllBytes();
+        String body = new String(bytes, StandardCharsets.UTF_8);
+        map.remove(Long.parseLong(body));
+    }
 }
