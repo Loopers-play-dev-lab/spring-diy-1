@@ -1,4 +1,4 @@
-package com.diy.framework.web;
+package com.diy.app.servlet;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;

@@ -1,4 +1,4 @@
-package com.diy.framework.web;
+package com.diy.app.repository;
 
 import com.diy.app.domain.Lecture;
 

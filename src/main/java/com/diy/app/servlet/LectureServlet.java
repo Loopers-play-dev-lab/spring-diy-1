@@ -1,12 +1,12 @@
-package com.diy.framework.web;
+package com.diy.app.servlet;
 
 import com.diy.app.domain.Lecture;
 import com.diy.app.domain.Price;
+import com.diy.app.repository.LectureRepository;
 import com.diy.framework.web.view.JspView;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
