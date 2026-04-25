@@ -13,7 +13,7 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-public class HtmlView {
+public class HtmlView implements View {
     private final String viewName;
 
     public HtmlView(final String viewName) {

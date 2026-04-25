@@ -3,6 +3,7 @@ package com.diy.app.infra.servlet;
 import com.diy.app.business.controller.LectureController;
 import com.diy.app.business.service.LectureService;
 import com.diy.app.infra.port.Controller;
+import com.diy.app.infra.viewRender.ViewResolver;
 
 import java.util.Comparator;
 import java.util.Map;
@@ -13,7 +14,7 @@ public class UrlControllerMapper {
     private static UrlControllerMapper instance;
 
     public UrlControllerMapper() {
-        uriToController.put("/lectures", new LectureController(LectureService.getInstance()));
+        uriToController.put("/lectures", new LectureController(ViewResolver.getInstance(), LectureService.getInstance()));
     }
 
     public Controller findController(String uri) {

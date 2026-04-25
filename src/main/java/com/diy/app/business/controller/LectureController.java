@@ -6,6 +6,7 @@ import com.diy.app.infra.httpSpec.HttpMethod;
 import com.diy.app.infra.port.Controller;
 import com.diy.app.infra.viewRender.HtmlView;
 import com.diy.app.infra.viewRender.JspView;
+import com.diy.app.infra.viewRender.ViewResolver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,10 +15,12 @@ import javax.servlet.http.HttpServletResponse;
 public class LectureController implements Controller {
     public static final String PREFIX_URL = "/lecture";
 
+    private ViewResolver viewResolver;
     private LectureService service;
     private ObjectMapper objectMapper;
 
-    public LectureController(LectureService service) {
+    public LectureController(ViewResolver viewResolver, LectureService service) {
+        this.viewResolver = viewResolver;
         this.service = service;
         this.objectMapper = new ObjectMapper();
     }
@@ -34,9 +37,7 @@ public class LectureController implements Controller {
                 req.setAttribute("lecture", service.getLectureById(id));
             } else if (uriArg.length == 2) {
                 req.setAttribute("lectures", service.getAllLectures());
-
-                final HtmlView htmlView = new HtmlView("lecture-list.html");
-                htmlView.render(req, resp);
+                viewResolver.resolve(req, resp, "lecture-list");
             }
         }
         if (method.equals(HttpMethod.POST.getValue())) {
