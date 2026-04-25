@@ -1,8 +1,7 @@
-package com.diy.app.repository;
+package com.diy.app.business.repository;
 
-import com.diy.app.domain.Lecture;
+import com.diy.app.business.domain.Lecture;
 
-import javax.servlet.ServletException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

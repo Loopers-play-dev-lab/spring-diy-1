@@ -1,7 +1,10 @@
 package com.diy.app.servlet;
 
-import com.diy.app.domain.Lecture;
-import com.diy.app.service.LectureService;
+import com.diy.app.business.domain.Lecture;
+import com.diy.app.business.service.LectureService;
+import com.diy.app.httpSpec.ContentType;
+import com.diy.app.httpSpec.HttpHeader;
+import com.diy.app.httpSpec.HttpMethod;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -25,9 +28,7 @@ public class DispatcherServlet extends HttpServlet {
         final Map<String, ?> params = parseParams(req);
 
         String method = req.getMethod();
-        System.out.println("req.getMethod() = " + method);
         String uri = req.getRequestURI();
-        System.out.println("req.getRequestURI() = " + uri);
 
         if (!uri.startsWith("/lectures")) return;
 

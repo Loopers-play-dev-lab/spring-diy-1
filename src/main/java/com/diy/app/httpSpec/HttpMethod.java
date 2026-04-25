@@ -1,4 +1,4 @@
-package com.diy.app.servlet;
+package com.diy.app.httpSpec;
 
 public enum HttpMethod {
     GET("GET"),

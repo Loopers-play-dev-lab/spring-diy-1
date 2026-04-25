@@ -1,6 +1,6 @@
 //package com.diy.app.servlet;
 //
-//import com.diy.app.domain.Lecture;
+//import com.diy.app.business.domain.Lecture;
 //import com.fasterxml.jackson.databind.ObjectMapper;
 //
 //import javax.servlet.ServletException;

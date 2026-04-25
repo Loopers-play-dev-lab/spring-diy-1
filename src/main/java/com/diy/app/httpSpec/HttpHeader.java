@@ -1,4 +1,4 @@
-package com.diy.app.servlet;
+package com.diy.app.httpSpec;
 
 public enum HttpHeader {
     CONTENT_TYPE("Content-Type"),

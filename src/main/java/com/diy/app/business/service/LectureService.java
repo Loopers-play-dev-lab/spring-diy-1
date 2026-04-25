@@ -1,7 +1,7 @@
-package com.diy.app.service;
+package com.diy.app.business.service;
 
-import com.diy.app.domain.Lecture;
-import com.diy.app.repository.LectureRepository;
+import com.diy.app.business.domain.Lecture;
+import com.diy.app.business.repository.LectureRepository;
 
 import java.util.List;
 
