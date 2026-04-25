@@ -1,5 +1,7 @@
 package com.diy.app.infra.viewRender;
 
+import com.diy.app.infra.dto.ModelAndView;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,17 +18,17 @@ public class ViewResolver {
         return instance;
     }
 
-    public void resolve(final HttpServletRequest req, final HttpServletResponse resp, final String fileName) throws IOException, ServletException {
-        URL htmlFile = getClass().getClassLoader().getResource(fileName + ".html");
-        URL jspFile = getClass().getClassLoader().getResource(fileName + ".jsp");
+    public void resolve(final HttpServletRequest req, final HttpServletResponse resp, final ModelAndView modelAndView) throws IOException, ServletException {
+        URL htmlFile = getClass().getClassLoader().getResource(modelAndView.getViewName() + ".html");
+        URL jspFile = getClass().getClassLoader().getResource(modelAndView.getViewName() + ".jsp");
+
+        System.out.println("htmlFile = " + htmlFile);
+        System.out.println("jspFile = " + jspFile);
 
         View view = null;
 
-        System.out.println("jspFile = " + jspFile);
-        System.out.println("htmlFile = " + htmlFile);
-
-        if (Objects.nonNull(htmlFile)) view = new HtmlView(htmlFile.getFile().split("main/")[1]);
-        else if (Objects.nonNull(jspFile)) view = new JspView(jspFile.getFile().split("main/")[1]);
+        if (Objects.nonNull(jspFile)) view = new JspView(jspFile.getFile().split("resources/")[1]);
+        else if (Objects.nonNull(htmlFile)) view = new HtmlView(htmlFile.getFile().split("resources/")[1]);
         else throw new IllegalArgumentException("파일이 존재하지 않습니다.");
 
         view.render(req, resp);

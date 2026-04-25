@@ -18,6 +18,7 @@ public class UrlControllerMapper {
     }
 
     public Controller findController(String uri) {
+        System.out.println("uri = " + uri);
         for (String k : uriToController.keySet()) {
             if (uri.startsWith(k)) return uriToController.get(k);
         }

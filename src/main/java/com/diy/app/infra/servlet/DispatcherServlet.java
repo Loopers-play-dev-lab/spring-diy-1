@@ -28,9 +28,9 @@ public class DispatcherServlet extends HttpServlet {
         String uri = req.getRequestURI();
 
         Controller controller = mapper.findController(uri);
+        System.out.println("controller = " + controller);
         try {
-            controller.handleRequest(req, resp);
-            if (Objects.nonNull(req.getAttribute("render"))) viewResolver.resolve(req, resp, (String) req.getAttribute("render"));
+            viewResolver.resolve(req, resp, controller.handleRequest(req, resp));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
