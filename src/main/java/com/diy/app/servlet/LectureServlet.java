@@ -46,7 +46,7 @@ public class LectureServlet extends HttpServlet {
         req.setAttribute("lectures", lectures);
 
         final JspView jspView = new JspView("lecture-list.jsp");
-        jspView.render(req, resp);
+//        jspView.render(req, resp);
         // 반면 do~~ 내부 구현 -> 400 (default) 혹은 405 (1.1)
 //        super.doGet(req, resp);
     }
