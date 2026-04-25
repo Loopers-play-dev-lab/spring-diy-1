@@ -19,4 +19,9 @@ public class LectureRequest {
       return new Lecture(id, name, price);
     }
   }
+
+  public record Delete(
+      Long id
+  ) {
+  }
 }
