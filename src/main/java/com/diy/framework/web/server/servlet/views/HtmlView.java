@@ -1,5 +1,6 @@
 package com.diy.framework.web.server.servlet.views;
 
+import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,7 +18,11 @@ public class HtmlView implements View {
     this.viewName = viewName;
   }
 
-  public void render(final HttpServletRequest req, final HttpServletResponse res) throws IOException {
+  public void render(
+      Map<String, Object> model,
+      final HttpServletRequest req,
+      final HttpServletResponse res
+  ) throws IOException {
     if (viewName == null || viewName.isBlank()) return;
 
     if (viewName.startsWith(REDIRECT_PREFIX)) {
@@ -25,6 +30,7 @@ public class HtmlView implements View {
       return;
     }
 
+    model.forEach(req::setAttribute);
     final String viewFile = readViewFile(req);
 
     res.setContentType("text/html;charset=utf-8");

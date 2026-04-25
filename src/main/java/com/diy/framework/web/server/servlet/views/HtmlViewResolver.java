@@ -4,7 +4,7 @@ public class HtmlViewResolver implements ViewResolver {
   private static String FILE_EXTENSION = ".html";
 
   @Override
-  public View resolve(String viewName) {
+  public View resolveViewName(String viewName) {
     if (viewName == null || viewName.isBlank()) {
       return new HtmlView(viewName);
     }

@@ -9,12 +9,14 @@ import javax.servlet.http.HttpServletRequest;
 
 public class HttpServletUtils {
 
+  private static final ObjectMapper objectMapper = new ObjectMapper();
+
   public static Map<String, ?> parseBody(final HttpServletRequest req) throws IOException {
     if ("application/json".equals(req.getHeader("Content-Type"))) {
       final byte[] bodyBytes = req.getInputStream().readAllBytes();
       final String body = new String(bodyBytes, StandardCharsets.UTF_8);
 
-      return new ObjectMapper().readValue(body, new TypeReference<Map<String, Object>>() {});
+      return objectMapper.readValue(body, new TypeReference<Map<String, Object>>() {});
     } else {
       return req.getParameterMap();
     }

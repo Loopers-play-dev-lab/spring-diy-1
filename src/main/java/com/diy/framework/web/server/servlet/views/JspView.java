@@ -1,6 +1,7 @@
 package com.diy.framework.web.server.servlet.views;
 
 import java.io.IOException;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,7 +13,11 @@ public class JspView implements View {
     this.viewName = viewName;
   }
 
-  public void render(final HttpServletRequest req, final HttpServletResponse res) throws ServletException, IOException {
+  public void render(
+      Map<String, Object> model,
+      final HttpServletRequest req,
+      final HttpServletResponse res
+  ) throws ServletException, IOException {
     if (viewName == null || viewName.isBlank()) return;
 
     if (viewName.startsWith(REDIRECT_PREFIX)) {
@@ -20,6 +25,7 @@ public class JspView implements View {
       return;
     }
 
+    model.forEach(req::setAttribute);
     req.getRequestDispatcher(viewName).forward(req, res);
   }
 }
