@@ -1,4 +1,4 @@
-package com.diy.app.domain;
+package com.diy.app.business.domain;
 
 public class Lecture {
     private long id;

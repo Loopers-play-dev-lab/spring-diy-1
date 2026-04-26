@@ -32,7 +32,7 @@ jobs:
               --repo Loopers-play-dev-lab/spring-diy-1 \
               --head "$PR_AUTHOR" \
               --base main \
-              --title "${{ github.event.pull_request.title }}" \
+              --title "$PR_AUTHOR/${{ github.event.pull_request.head.ref }}" \
               --body "${{ github.event.pull_request.body }}"
           else
             echo "PR #$EXISTING_PR already exists, skipped creation."
