@@ -26,11 +26,6 @@ public class LectureController implements Controller {
 
     }
 
-    @Override
-    public String getPath() {
-        return "lectures";
-    }
-
     private ModelAndView doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
         return new ModelAndView("redirect:/lectures");
