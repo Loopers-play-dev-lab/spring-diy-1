@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.Collection;
 
 // TODO: Object Mapper 도 잘하면 묶을 수 있을 거 같은데 방법 좀 고안해보기
-@WebServlet("/lectures")
+//@WebServlet("/lectures")
 public class LectureServlet extends HttpServlet {
 
     private LectureRepository lectureRepository;
