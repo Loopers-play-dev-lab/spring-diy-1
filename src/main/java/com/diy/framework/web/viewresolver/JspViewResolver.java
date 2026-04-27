@@ -8,11 +8,13 @@ public class JspViewResolver implements ViewResolver {
     @Override
     public View resolveViewName(String viewName) {
         if (viewName.contains("redirect:")) {
-            return new JspView(viewName);
+            String path = viewName.substring(viewName.indexOf(":") + 1);
+            return new JspView(path);
         }
         if (!viewName.contains("jsp")) {
-            throw new RuntimeException("500 Internal Server Error");
+            return new JspView(viewName + ".jsp");
+        } else {
+            return new JspView(viewName);
         }
-        return new JspView(viewName);
     }
 }

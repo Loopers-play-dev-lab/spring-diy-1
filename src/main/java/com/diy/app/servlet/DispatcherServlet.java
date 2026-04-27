@@ -6,8 +6,6 @@ import com.diy.framework.web.controller.ControllerMap;
 import com.diy.framework.web.view.View;
 import com.diy.framework.web.viewresolver.JspViewResolver;
 import com.diy.framework.web.viewresolver.ViewResolver;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -16,8 +14,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 // "/*" 는 .jsp 나 .html 과 같은 페이지까지 전부 불러오게 됨 -> 내부 동작에 의한 무한 호출에 빠질 수 있음
 @WebServlet("/")

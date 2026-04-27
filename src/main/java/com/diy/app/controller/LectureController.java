@@ -32,14 +32,15 @@ public class LectureController implements Controller {
     }
 
     private ModelAndView doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-
-        return new ModelAndView("redirect:/lectures");
-    }
-
-    private ModelAndView doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         Map<String, Object> model = parseParams(req);
 
         return new ModelAndView("lecture-list", model);
+    }
+
+    private ModelAndView doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+
+
+        return new ModelAndView("redirect:/lectures");
     }
 
     private Map<String, Object> parseParams(final HttpServletRequest req) throws IOException {
@@ -48,10 +49,11 @@ public class LectureController implements Controller {
             final String body = new String(bodyBytes, StandardCharsets.UTF_8);
 
             return new ObjectMapper().readValue(body, new TypeReference<>() {});
+        } else {
+            return req.getParameterMap().entrySet().stream().collect(Collectors.toMap(
+                    Map.Entry::getKey,
+                    Arrays::asList
+            ));
         }
-//        else {
-//            return req.getParameterMap();
-//        }
-        throw new RuntimeException("400 Bad Request");
     }
 }
