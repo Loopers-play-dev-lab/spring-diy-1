@@ -2,7 +2,7 @@ package com.diy.app.deprecated.servlet;
 
 import com.diy.app.domain.Lecture;
 import com.diy.app.domain.Price;
-import com.diy.app.repository.LectureRepository;
+import com.diy.app.repository.build.LectureRepositoryImpl;
 import com.diy.framework.web.view.JspView;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,14 +19,14 @@ import java.util.Collection;
 //@WebServlet("/lectures")
 public class LectureServlet extends HttpServlet {
 
-    private LectureRepository lectureRepository;
+    private LectureRepositoryImpl lectureRepositoryImpl;
     private ObjectMapper objectMapper;
 
     // init 은 당연히 1번만 불러옴
     @Override
     public void init(ServletConfig config) throws ServletException {
         System.out.println("init");
-        lectureRepository = new LectureRepository();
+        lectureRepositoryImpl = new LectureRepositoryImpl();
         objectMapper = new ObjectMapper();
         super.init(config);
     }
@@ -41,7 +41,7 @@ public class LectureServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("doGet");
-        final Collection<Lecture> lectures = lectureRepository.findAll();
+        final Collection<Lecture> lectures = lectureRepositoryImpl.findAll();
         req.setAttribute("lectures", lectures);
 
         final JspView jspView = new JspView("lecture-list.jsp");
@@ -61,7 +61,7 @@ public class LectureServlet extends HttpServlet {
         long priceValue = rootNode.path("price").asLong();
         Price price = Price.of(priceValue);
 
-        lectureRepository.save(Lecture.open(
+        lectureRepositoryImpl.save(Lecture.open(
                 name, price
         ));
     }
@@ -78,8 +78,8 @@ public class LectureServlet extends HttpServlet {
         long inputPriceValue = rootNode.path("price").asLong();
         Price inputPrice = Price.of(inputPriceValue);
 
-        Lecture lecture = lectureRepository.findById(id).orElseThrow();
-        lectureRepository.save(lecture.edit(inputName, inputPrice));
+        Lecture lecture = lectureRepositoryImpl.findById(id).orElseThrow();
+        lectureRepositoryImpl.save(lecture.edit(inputName, inputPrice));
     }
 
     @Override
@@ -90,7 +90,7 @@ public class LectureServlet extends HttpServlet {
         JsonNode rootNode = objectMapper.readTree(json);
         long id = rootNode.path("id").asLong();
 
-        Lecture lecture = lectureRepository.findById(id).orElseThrow();
-        lectureRepository.delete(lecture);
+        Lecture lecture = lectureRepositoryImpl.findById(id).orElseThrow();
+        lectureRepositoryImpl.delete(lecture);
     }
 }

@@ -3,7 +3,7 @@ package com.diy.app.controller;
 import com.diy.app.controller.dto.OpenLectureRequest;
 import com.diy.app.domain.Lecture;
 import com.diy.app.domain.Price;
-import com.diy.app.repository.LectureRepository;
+import com.diy.app.repository.build.LectureRepositoryImpl;
 import com.diy.framework.web.HttpMethod;
 import com.diy.framework.web.ModelAndView;
 import com.diy.framework.web.controller.Controller;
@@ -21,11 +21,11 @@ import static com.diy.app.controller.dto.LectureListResponse.*;
 
 public class LectureController implements Controller {
 
-    private final LectureRepository lectureRepository;
+    private final LectureRepositoryImpl lectureRepositoryImpl;
     private final ObjectMapper objectMapper;
 
-    public LectureController(LectureRepository lectureRepository) {
-        this.lectureRepository = lectureRepository;
+    public LectureController(LectureRepositoryImpl lectureRepositoryImpl) {
+        this.lectureRepositoryImpl = lectureRepositoryImpl;
         this.objectMapper = new ObjectMapper();
     }
 
@@ -48,7 +48,7 @@ public class LectureController implements Controller {
     }
 
     private ModelAndView doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        Collection<Lecture> lectures = lectureRepository.findAll();
+        Collection<Lecture> lectures = lectureRepositoryImpl.findAll();
         req.setAttribute("lectures", lectures);
         Map<String, List<LectureListDto>> model = parseParams(req);
 
@@ -59,7 +59,7 @@ public class LectureController implements Controller {
         final String body = new String(req.getInputStream().readAllBytes());
         final OpenLectureRequest openLectureRequest = objectMapper.readValue(body, OpenLectureRequest.class);
 
-        lectureRepository.save(Lecture.open(
+        lectureRepositoryImpl.save(Lecture.open(
                 openLectureRequest.name(),
                 Price.of(openLectureRequest.price())
         ));

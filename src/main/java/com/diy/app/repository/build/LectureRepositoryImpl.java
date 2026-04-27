@@ -1,6 +1,8 @@
-package com.diy.app.repository;
+package com.diy.app.repository.build;
 
 import com.diy.app.domain.Lecture;
+import com.diy.app.repository.LectureJpaRepository;
+import com.diy.framework.jpa.repository.JpaRepository;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -8,7 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 
 // TODO: 제네릭 + 인터페이스화 시키기
-public class LectureRepository {
+public class LectureRepositoryImpl implements LectureJpaRepository {
 
     private static final Map<Long, Lecture> _map = new HashMap<>();
 
@@ -19,8 +21,6 @@ public class LectureRepository {
     }
 
     public Collection<Lecture> findAll() {
-        _map.values().forEach(it -> System.out.println("it1 == " + it));
-        map.values().forEach(it -> System.out.println("it2 == " + it));
         return map.values();
     }
 
