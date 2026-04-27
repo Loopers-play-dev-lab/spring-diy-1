@@ -4,6 +4,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 public class JspView implements View {
     private final String viewName;
@@ -13,9 +14,9 @@ public class JspView implements View {
     }
 
     @Override
-    public void render(final Model model, final HttpServletRequest req, final HttpServletResponse res)
+    public void render(final Map<String, Object> model, final HttpServletRequest req, final HttpServletResponse res)
             throws ServletException, IOException {
-        model.getAttributes().forEach(req::setAttribute);
+        model.forEach(req::setAttribute);
         req.getRequestDispatcher(viewName).forward(req, res);
     }
 }

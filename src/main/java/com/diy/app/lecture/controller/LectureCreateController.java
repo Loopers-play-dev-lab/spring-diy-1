@@ -3,6 +3,7 @@ package com.diy.app.lecture.controller;
 import com.diy.app.lecture.Lecture;
 import com.diy.app.lecture.LectureStorage;
 import com.diy.framework.web.Controller;
+import com.diy.framework.web.view.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,7 +14,7 @@ public class LectureCreateController implements Controller {
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         byte[] bodyBytes = request.getInputStream().readAllBytes();
         String body = new String(bodyBytes, StandardCharsets.UTF_8);
 
@@ -22,6 +23,6 @@ public class LectureCreateController implements Controller {
         lecture.setId(nextId);
         LectureStorage.LECTURES.add(lecture);
 
-        response.sendRedirect("/lectures");
+        return new ModelAndView("redirect:/lectures");
     }
 }
