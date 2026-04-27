@@ -24,10 +24,12 @@ import java.util.Map;
 public class DispatcherServlet extends HttpServlet {
 
     private final ViewResolver viewResolver = new JspViewResolver();
+    private ControllerMap controllerMap;
 
     // 🔥 WebServlet 안에서는 Constructor 대신 init을 써야 함 - 아니면 예외(NoSuchMethodsException) 발생
     @Override
     public void init(ServletConfig config) throws ServletException {
+        controllerMap = new ControllerMap();
         super.init(config);
     }
 
@@ -35,7 +37,9 @@ public class DispatcherServlet extends HttpServlet {
     protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
         final Map<String, ?> params = parseParams(req);
 
-        Controller controller = ControllerMap.find(req.getPathInfo());
+        System.out.println(req.getServletPath());
+
+        Controller controller = controllerMap.find(req.getServletPath());
 
         try {
             final ModelAndView mav = controller.handleRequest(req, resp);
