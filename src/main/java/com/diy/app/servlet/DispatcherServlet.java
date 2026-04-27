@@ -35,7 +35,6 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-        final Map<String, ?> params = parseParams(req);
 
         System.out.println(req.getServletPath());
 
@@ -46,17 +45,6 @@ public class DispatcherServlet extends HttpServlet {
             render(mav, req, resp);
         } catch (Exception e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private Map<String, ?> parseParams(final HttpServletRequest req) throws IOException {
-        if ("application/json".equals(req.getHeader("Content-Type"))) {
-            final byte[] bodyBytes = req.getInputStream().readAllBytes();
-            final String body = new String(bodyBytes, StandardCharsets.UTF_8);
-
-            return new ObjectMapper().readValue(body, new TypeReference<Map<String, Object>>() {});
-        } else {
-            return req.getParameterMap();
         }
     }
 

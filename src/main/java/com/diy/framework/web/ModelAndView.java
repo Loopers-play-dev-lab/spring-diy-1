@@ -14,6 +14,7 @@ public class ModelAndView {
 
     public ModelAndView(String viewName, final Map<String, Object> model) {
         this.viewName = viewName;
+        this.model.putAll(model);
     }
 
     public String getViewName() {
