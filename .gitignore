@@ -42,3 +42,8 @@ bin/
 
 ### Mac OS ###
 .DS_Store\ntomcat.8080/
+
+## tomcat
+**/tomcat.8080
+/docs/*
+/LEARNING.md
