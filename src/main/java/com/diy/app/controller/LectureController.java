@@ -1,9 +1,12 @@
 package com.diy.app.controller;
 
 import com.diy.app.controller.dto.LectureListResponse;
+import com.diy.app.domain.Lecture;
+import com.diy.app.domain.Price;
 import com.diy.app.repository.LectureRepository;
 import com.diy.framework.web.ModelAndView;
 import com.diy.framework.web.controller.Controller;
+import com.diy.framework.web.view.JspView;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -42,13 +45,20 @@ public class LectureController implements Controller {
     }
 
     private ModelAndView doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        Collection<Lecture> lectures = lectureRepository.findAll();
+        req.setAttribute("lectures", lectures);
         Map<String, List<LectureListDto>> model = parseParams(req);
 
         return new ModelAndView("lecture-list", model);
     }
 
     private ModelAndView doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        final Map<String, String> map = parseParams(req);
 
+        lectureRepository.save(Lecture.open(
+                map.get("name"),
+                Price.of(Long.parseLong(map.get("price")))
+        ));
 
         return new ModelAndView("redirect:/lectures");
     }

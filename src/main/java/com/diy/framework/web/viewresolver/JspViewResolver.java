@@ -9,7 +9,7 @@ public class JspViewResolver implements ViewResolver {
     public View resolveViewName(String viewName) {
         if (viewName.contains("redirect:")) {
             String path = viewName.substring(viewName.indexOf(":") + 1);
-            return new JspView(path);
+            return new JspView(path, true);
         }
         if (!viewName.contains("jsp")) {
             return new JspView(viewName + ".jsp");
