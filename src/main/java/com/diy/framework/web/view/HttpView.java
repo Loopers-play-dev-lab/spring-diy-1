@@ -1,6 +1,6 @@
 package com.diy.framework.web.view;
 
-import com.diy.framework.web.Model;
+import com.diy.framework.web.utils.Model;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -19,7 +19,6 @@ public class HttpView implements View {
         String realPath = sc.getRealPath(fileName);
         return realPath != null;
     }
-
 
     public void render(HttpServletRequest req, HttpServletResponse res, Model model) throws Exception {
         final String viewFile = readViewFile(req, model.getViewName());

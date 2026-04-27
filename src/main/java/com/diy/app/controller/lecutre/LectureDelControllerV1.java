@@ -1,9 +1,9 @@
 package com.diy.app.controller.lecutre;
 
 import com.diy.app.repository.LecturesRepository;
-import com.diy.framework.web.ControllerV1;
-import com.diy.framework.web.Model;
-import com.diy.framework.web.RequestBody;
+import com.diy.framework.web.utils.ControllerV1;
+import com.diy.framework.web.utils.Model;
+import com.diy.framework.web.utils.RequestBody;
 
 public class LectureDelControllerV1 implements ControllerV1 {
     private final LecturesRepository lecturesRepository;

@@ -1,4 +1,4 @@
-package com.diy.framework.web;
+package com.diy.framework.web.utils;
 
 import java.util.HashMap;
 import java.util.Map;
