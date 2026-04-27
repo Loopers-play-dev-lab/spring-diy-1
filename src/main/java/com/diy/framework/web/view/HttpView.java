@@ -1,6 +1,7 @@
 package com.diy.framework.web.view;
 
 import com.diy.framework.web.utils.Model;
+import com.diy.framework.web.utils.ResponseV1;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -8,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-public class HttpView implements View {
+public class HttpView implements ViewV1 {
     public HttpView() {
         super();
     }
@@ -20,8 +21,8 @@ public class HttpView implements View {
         return realPath != null;
     }
 
-    public void render(HttpServletRequest req, HttpServletResponse res, Model model) throws Exception {
-        final String viewFile = readViewFile(req, model.getViewName());
+    public void render(HttpServletRequest req, HttpServletResponse res, ResponseV1 response) throws Exception {
+        final String viewFile = readViewFile(req, response.getViewName());
 
         res.setContentType("text/html;charset=utf-8");
         final PrintWriter writer = res.getWriter();

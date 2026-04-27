@@ -4,7 +4,8 @@ import com.diy.app.domain.Lecture;
 import com.diy.app.repository.LecturesRepository;
 import com.diy.framework.web.utils.ControllerV1;
 import com.diy.framework.web.utils.Model;
-import com.diy.framework.web.utils.RequestBody;
+import com.diy.framework.web.utils.RequestBodyV1;
+import com.diy.framework.web.utils.ResponseV1;
 
 import java.util.Collection;
 
@@ -16,11 +17,11 @@ public class LectureGetControllerV1 implements ControllerV1 {
     }
 
     @Override
-    public Model handle(RequestBody body) {
+    public ResponseV1 handle(RequestBodyV1 body) {
         Collection<Lecture> lectures = lecturesRepository.getAll();
 
-        Model model = new Model("lecture-list");
+        Model model = new Model();
         model.addModel("lectures", lectures);
-        return model;
+        return new ResponseV1("lecture-list",model);
     }
 }

@@ -10,17 +10,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RequestParam {
-    public static RequestBody parseBody(HttpServletRequest req) throws IOException {
+    public static RequestBodyV1 parseBody(HttpServletRequest req) throws IOException {
         if ("application/json".equals(req.getHeader("Content-Type"))) {
             byte[] bodyBytes = req.getInputStream().readAllBytes();
             String body = new String(bodyBytes, StandardCharsets.UTF_8);
 
-            return RequestBody.of(
+            return RequestBodyV1.of(
                     new ObjectMapper()
                             .readValue(body, new TypeReference<Map<String, Object>>() {})
             );
         } else {
-            return RequestBody.of(
+            return RequestBodyV1.of(
                     new HashMap<>()
             );
         }

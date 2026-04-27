@@ -5,11 +5,6 @@ import com.diy.app.controller.lecutre.LectureGetControllerV1;
 import com.diy.app.controller.lecutre.LecturePostControllerV1;
 import com.diy.app.controller.lecutre.LecturePutControllerV1;
 import com.diy.framework.web.DispatcherServlet;
-import com.diy.framework.web.utils.ControllerV1;
-import com.diy.framework.web.utils.Model;
-import com.diy.framework.web.utils.RequestBody;
-import com.diy.framework.web.utils.RequestParam;
-import com.diy.framework.web.view.View;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

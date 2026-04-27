@@ -4,7 +4,8 @@ import com.diy.app.domain.Lecture;
 import com.diy.app.repository.LecturesRepository;
 import com.diy.framework.web.utils.ControllerV1;
 import com.diy.framework.web.utils.Model;
-import com.diy.framework.web.utils.RequestBody;
+import com.diy.framework.web.utils.RequestBodyV1;
+import com.diy.framework.web.utils.ResponseV1;
 
 import java.util.Optional;
 
@@ -16,7 +17,7 @@ public class LecturePutControllerV1 implements ControllerV1 {
     }
 
     @Override
-    public Model handle(RequestBody body) {
+    public ResponseV1 handle(RequestBodyV1 body) {
         Long id = Long.parseLong(body.get("id").toString());
         String name = body.get("name").toString();
         int price = Integer.parseInt(body.get("price").toString());
@@ -30,6 +31,6 @@ public class LecturePutControllerV1 implements ControllerV1 {
         lecture1.put(name, price);
         this.lecturesRepository.save(lecture1);
 
-        return new Model("put-lecture");
+        return new ResponseV1("put-lecture");
     }
 }
