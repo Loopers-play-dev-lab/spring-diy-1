@@ -1,12 +1,10 @@
 package com.diy.app.controller;
 
-import com.diy.app.controller.dto.LectureListResponse;
 import com.diy.app.domain.Lecture;
 import com.diy.app.domain.Price;
 import com.diy.app.repository.LectureRepository;
 import com.diy.framework.web.ModelAndView;
 import com.diy.framework.web.controller.Controller;
-import com.diy.framework.web.view.JspView;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -16,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.diy.app.controller.dto.LectureListResponse.*;
 
@@ -53,11 +50,11 @@ public class LectureController implements Controller {
     }
 
     private ModelAndView doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        final Map<String, String> map = parseParams(req);
+        final Map<String, String> reqMap = parseParams(req);
 
         lectureRepository.save(Lecture.open(
-                map.get("name"),
-                Price.of(Long.parseLong(map.get("price")))
+                reqMap.get("name"),
+                Price.of(Long.parseLong(reqMap.get("price")))
         ));
 
         return new ModelAndView("redirect:/lectures");

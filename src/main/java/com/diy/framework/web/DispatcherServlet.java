@@ -1,6 +1,5 @@
-package com.diy.app.servlet;
+package com.diy.framework.web;
 
-import com.diy.framework.web.ModelAndView;
 import com.diy.framework.web.controller.Controller;
 import com.diy.framework.web.controller.ControllerMap;
 import com.diy.framework.web.view.View;
@@ -31,8 +30,6 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-
-        System.out.println(req.getServletPath());
 
         Controller controller = controllerMap.find(req.getServletPath());
 

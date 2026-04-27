@@ -25,7 +25,6 @@ public class LectureRepository {
     }
 
     public Lecture save(Lecture lecture) {
-        System.out.println("lecture = " + lecture);
         _map.put(lecture.getId(), lecture);
         return map.get(lecture.getId());
     }
