@@ -1,20 +1,20 @@
 package com.diy.framework.web.server;
 
-import com.diy.app.controller.AbstractController;
+import com.diy.framework.web.controller.AbstractController;
 
 import java.util.Map;
 
 public class HandlerMapping {
-    private final Map<HandlerContext, AbstractController> map;
+    private final Map<String, AbstractController> map;
 
-    public HandlerMapping(Map<HandlerContext, AbstractController> map) {
+    public HandlerMapping(Map<String, AbstractController> map) {
         this.map = map;
     }
 
-    public AbstractController getController(HandlerContext handlerContext) {
-        if (!map.containsKey(handlerContext)) {
+    public AbstractController getController(String path) {
+        if (!map.containsKey(path)) {
             throw new IllegalArgumentException("wrong context");
         }
-        return map.get(handlerContext);
+        return map.get(path);
     }
 }
