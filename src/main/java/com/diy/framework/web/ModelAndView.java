@@ -12,7 +12,7 @@ public class ModelAndView {
         this.viewName = viewName;
     }
 
-    public ModelAndView(String viewName, final Map<String, Object> model) {
+    public ModelAndView(String viewName, final Map<String, ?> model) {
         this.viewName = viewName;
         this.model.putAll(model);
     }

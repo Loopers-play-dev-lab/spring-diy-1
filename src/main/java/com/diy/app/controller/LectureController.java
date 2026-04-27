@@ -1,5 +1,7 @@
 package com.diy.app.controller;
 
+import com.diy.app.controller.dto.LectureListResponse;
+import com.diy.app.repository.LectureRepository;
 import com.diy.framework.web.ModelAndView;
 import com.diy.framework.web.controller.Controller;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -13,7 +15,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.diy.app.controller.dto.LectureListResponse.*;
+
 public class LectureController implements Controller {
+    private final LectureRepository lectureRepository;
+
+    public LectureController(LectureRepository lectureRepository) {
+        this.lectureRepository = lectureRepository;
+    }
+
     @Override
     public ModelAndView handleRequest(HttpServletRequest req, HttpServletResponse res) throws Exception {
 
@@ -32,7 +42,7 @@ public class LectureController implements Controller {
     }
 
     private ModelAndView doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        Map<String, Object> model = parseParams(req);
+        Map<String, List<LectureListDto>> model = parseParams(req);
 
         return new ModelAndView("lecture-list", model);
     }
@@ -43,17 +53,16 @@ public class LectureController implements Controller {
         return new ModelAndView("redirect:/lectures");
     }
 
-    private Map<String, Object> parseParams(final HttpServletRequest req) throws IOException {
+    private <T> Map<String, T> parseParams(final HttpServletRequest req) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
         if ("application/json".equals(req.getHeader("Content-Type"))) {
             final byte[] bodyBytes = req.getInputStream().readAllBytes();
             final String body = new String(bodyBytes, StandardCharsets.UTF_8);
 
-            return new ObjectMapper().readValue(body, new TypeReference<>() {});
+            return objectMapper.readValue(body, new TypeReference<>() {});
         } else {
-            return req.getParameterMap().entrySet().stream().collect(Collectors.toMap(
-                    Map.Entry::getKey,
-                    Arrays::asList
-            ));
+            String jsonStr = objectMapper.writeValueAsString(req.getParameterMap());
+            return objectMapper.readValue(jsonStr, new TypeReference<>() {});
         }
     }
 }
