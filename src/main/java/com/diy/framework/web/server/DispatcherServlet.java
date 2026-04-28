@@ -2,7 +2,8 @@ package com.diy.framework.web.server;
 
 import com.diy.framework.web.Controller;
 import com.diy.framework.web.HandlerMapping;
-import com.diy.framework.web.mvc.Model;
+import com.diy.framework.web.mvc.ModelAndView;
+import com.diy.framework.web.mvc.view.RedirectView;
 import com.diy.framework.web.mvc.view.View;
 import com.diy.framework.web.mvc.view.ViewResolver;
 import com.diy.framework.web.mvc.view.ViewResolverRegistry;
@@ -13,7 +14,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 
 @WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
@@ -34,12 +34,12 @@ public class DispatcherServlet extends HttpServlet {
             return;
         }
         try {
-            Model model = new Model();
-            String viewName = controller.handleRequest(req, resp, model);
+            final ModelAndView mav = controller.handleRequest(req, resp);
+            String viewName = mav.getViewName();
             if (viewName != null) {
                 View view = resolveView(viewName);
                 if (view != null) {
-                    view.render(req, resp, model);
+                    view.render(req, resp, mav.getModel());
                 }
                 else {
                     resp.sendError(404);
@@ -51,7 +51,11 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private View resolveView(String viewName) {
-        for (ViewResolver resolver : viewResolvers.getResolvers()) {
+        if(viewName.startsWith("redirect:")) {
+            return new RedirectView(viewName.substring("redirect:".length()));
+        }
+
+        for (ViewResolver resolver : viewResolvers.resolvers()) {
             View view = resolver.resolve(viewName, getServletContext());
             if (view != null) {
                 return view;

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 public class HtmlView implements View {
     private final String viewName;
@@ -20,7 +21,7 @@ public class HtmlView implements View {
     }
 
     @Override
-    public void render(final HttpServletRequest req, final HttpServletResponse res, final Model model) throws IOException {
+    public void render(final HttpServletRequest req, final HttpServletResponse res, final Map<String, Object> model) throws IOException {
         final String viewFile = readViewFile(req);
 
         res.setContentType("text/html;charset=utf-8");
