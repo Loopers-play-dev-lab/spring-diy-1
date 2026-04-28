@@ -2,10 +2,7 @@ package com.diy.app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -15,22 +12,32 @@ import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@WebServlet("/lectures")
-public class LectureServlet extends HttpServlet {
+public class LectureController implements Controller {
     private static final Map<Integer, Lecture> lectures = new LinkedHashMap<>();
 
-    @Override
-    public void init(final ServletConfig config) throws ServletException {
-        super.init(config);
+    public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws Exception {
+        String method = req.getMethod();
+        switch (method) {
+            case "GET":
+                doGet(req, resp);
+                break;
+            case "POST":
+                doPost(req, resp);
+                break;
+            case "PUT":
+                doPut(req, resp);
+                break;
+            case "DELETE":
+                doDelete(req, resp);
+                break;
+        }
     }
 
-    @Override
     public void doGet(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setAttribute("lectures", lectures.values());
         req.getRequestDispatcher("/lecture-list.jsp").forward(req, resp);
     }
 
-    @Override
     public void doPost(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -42,7 +49,6 @@ public class LectureServlet extends HttpServlet {
         }
     }
 
-    @Override
     public void doPut(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -59,11 +65,11 @@ public class LectureServlet extends HttpServlet {
         }
     }
 
-    @Override
     public void doDelete(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, String> body = objectMapper.readValue(req.getInputStream(), new TypeReference<Map<String, String>>() {});
+            Map<String, String> body = objectMapper.readValue(req.getInputStream(), new TypeReference<Map<String, String>>() {
+            });
 
             int id = Integer.parseInt(body.get("id"));
             lectures.remove(id);
