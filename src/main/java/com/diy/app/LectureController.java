@@ -1,7 +1,6 @@
 package com.diy.app;
 
 import com.diy.framework.web.Controller;
-import com.diy.framework.web.mvc.Model;
 import com.diy.framework.web.mvc.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

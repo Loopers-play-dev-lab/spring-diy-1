@@ -1,7 +1,5 @@
 package com.diy.framework.web.mvc.view;
 
-import com.diy.framework.web.mvc.Model;
-
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
