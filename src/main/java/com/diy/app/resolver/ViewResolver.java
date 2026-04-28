@@ -2,10 +2,9 @@ package com.diy.app.resolver;
 
 import com.diy.app.render.HtmlView;
 import com.diy.app.render.JspView;
+import com.diy.app.render.RedirectView;
 import com.diy.app.render.View;
 
-import javax.servlet.ServletContext;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,16 +16,22 @@ public class ViewResolver {
     public ViewResolver() {
         resolveAbles.add("jsp");
         resolveAbles.add("html");
+        resolveAbles.add("redirect:");
     }
 
     public View resolveViewName(String viewName) {
-        for (String ext : resolveAbles) {
-            String resolveFileName = viewName + "." + ext;
+        for (String judge : resolveAbles) {
+
+            if (viewName.startsWith(judge)) {
+                return new RedirectView(viewName.replaceAll("redirect:", ""));
+            }
+
+            String resolveFileName = viewName + "." + judge;
             URL resource = ClassLoader.getSystemResource(resolveFileName);
             if (resource != null) {
-                if (ext.equals("jsp")) {
+                if (judge.equals("jsp")) {
                     return new JspView(resolveFileName);
-                } else if (ext.equals("html")) {
+                } else if (judge.equals("html")) {
                     return new HtmlView(resolveFileName);
                 }
             }

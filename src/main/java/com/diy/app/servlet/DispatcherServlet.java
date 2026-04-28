@@ -59,11 +59,6 @@ public class DispatcherServlet extends HttpServlet {
     private void render(final ModelAndView mav, final HttpServletRequest req, final HttpServletResponse resp) throws Exception {
         final String viewName = mav.getViewName();
 
-        if (viewName.startsWith("redirect:")) {
-            resp.sendRedirect(viewName.replace("redirect:", ""));
-            return;
-        }
-
         final View view = viewResolver.resolveViewName(viewName);
         if (view == null) {
             throw new RuntimeException("View not found: " + viewName);
