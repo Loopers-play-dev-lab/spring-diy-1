@@ -15,7 +15,7 @@ import java.security.CodeSource;
 public class TomcatWebServer {
 
     private final Tomcat tomcat = new Tomcat();
-    private final int port = 8080;
+    private final int port = 8084;
 
     public void start() {
         setServerContext();
