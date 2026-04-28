@@ -30,13 +30,13 @@ public class LectureController implements Controller {
     private ModelAndView doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Lecture lecture = objectMapper.readValue(request.getInputStream(), Lecture.class);
         lectureRepository.delete(lecture);
-        return new ModelAndView("redirect:/lectures");
+        return new ModelAndView(null);
     }
 
     private ModelAndView doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Lecture lecture = objectMapper.readValue(request.getInputStream(), Lecture.class);
         lectureRepository.update(lecture);
-        return new ModelAndView("redirect:/lectures");
+        return new ModelAndView(null);
     }
 
     private ModelAndView doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
