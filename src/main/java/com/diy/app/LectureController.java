@@ -1,6 +1,7 @@
 package com.diy.app;
 
 import com.diy.framework.web.Controller;
+import com.diy.framework.web.mvc.Model;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,29 +12,31 @@ public class LectureController implements Controller {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public String handleRequest(final HttpServletRequest request, final HttpServletResponse response, final Model model) throws Exception {
         String method = request.getMethod();
+        Lecture lecture;
+
         switch (method) {
             case "GET":
-                request.setAttribute("lectures", lectureRepository.findAll());
-                request.getRequestDispatcher("/lecture-list.jsp").forward(request, response);
-                break;
+                model.addAttribute("lectures", lectureRepository.findAll());
+                return "lecture-list";
 
             case "POST":
-                Lecture lecture = objectMapper.readValue(request.getInputStream(), Lecture.class);
+                lecture = objectMapper.readValue(request.getInputStream(), Lecture.class);
                 lectureRepository.save(lecture);
                 response.sendRedirect("/lectures");
-                break;
+                return null;
 
             case "PUT":
-                Lecture putLecture = objectMapper.readValue(request.getInputStream(), Lecture.class);
-                lectureRepository.update(putLecture);
-                break;
+                lecture = objectMapper.readValue(request.getInputStream(), Lecture.class);
+                lectureRepository.update(lecture);
+                return null;
 
             case "DELETE":
-                Lecture deleteLecture = objectMapper.readValue(request.getInputStream(), Lecture.class);
-                lectureRepository.delete(deleteLecture);
-                break;
+                lecture = objectMapper.readValue(request.getInputStream(), Lecture.class);
+                lectureRepository.delete(lecture);
+                return null;
         }
+        return null;
     }
 }
