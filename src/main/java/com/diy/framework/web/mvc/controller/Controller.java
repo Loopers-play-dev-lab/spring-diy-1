@@ -1,4 +1,4 @@
-package com.diy.app;
+package com.diy.framework.web.mvc.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
