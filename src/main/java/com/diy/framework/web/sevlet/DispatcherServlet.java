@@ -27,8 +27,7 @@ public class DispatcherServlet extends HttpServlet {
         if(req.getRequestURI().startsWith("/lectures")) {
             // 강의 등록 로직
             if ("POST".equals(req.getMethod())) {
-                final String body = new String(req.getInputStream().readAllBytes());
-                final Lecture lecture = OBJECT_MAPPER.readValue(body, Lecture.class);
+                final Lecture lecture = OBJECT_MAPPER.convertValue(params, Lecture.class);
 
                 final long id = repository.size() + 1L;
                 lecture.setId(id);
@@ -37,7 +36,7 @@ public class DispatcherServlet extends HttpServlet {
                 resp.sendRedirect("/lectures");
             }
             // 강의 목록 로직
-            if ("GET".equals(req.getMethod())) {
+            else if ("GET".equals(req.getMethod())) {
                 final Collection<Lecture> lectures = repository.values();
 
                 req.setAttribute("lectures", lectures);
