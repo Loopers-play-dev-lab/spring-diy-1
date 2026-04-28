@@ -1,25 +1,33 @@
 package com.diy.app.lecture;
 
+import java.math.BigDecimal;
+
 public class Lecture {
     private Long id;
-    private String title;
-    private String lecturer;
+    private String name;
+    private BigDecimal price;
 
-    public Lecture(Long id, String title, String lecturer) {
+    public Lecture(){}
+
+    public Lecture(Long id, String name, BigDecimal price) {
         this.id = id;
-        this.title = title;
-        this.lecturer = lecturer;
+        this.name = name;
+        this.price = price;
     }
 
     public Long getId() {
         return this.id;
     }
 
-    public String getTitle() {
-        return this.title;
+    public String getName() {
+        return this.name;
     }
 
-    public String getLecturer() {
-        return this.lecturer;
+    public BigDecimal getPrice() {
+        return this.price;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

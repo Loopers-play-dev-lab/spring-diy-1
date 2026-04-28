@@ -11,8 +11,8 @@
 <a href="/lecture-registration.jsp">등록</a>
 <c:forEach var="lecture" items="${lectures}">
     <li>id: ${lecture.id}</li>
-    <li>title: ${lecture.title}</li>
-    <li>lecturer: ${lecture.lecturer}</li>
+    <li>name: ${lecture.name}</li>
+    <li>price: ${lecture.price}</li>
     <br>
 </c:forEach>
 </body>
