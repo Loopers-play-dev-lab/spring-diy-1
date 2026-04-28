@@ -2,6 +2,7 @@ package com.diy.app;
 
 import com.diy.framework.web.mvc.controller.Controller;
 import com.diy.framework.web.mvc.view.JspView;
+import com.diy.framework.web.mvc.view.View;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.ServletException;
@@ -37,7 +38,8 @@ public class LectureController implements Controller {
 
     public void doGet(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setAttribute("lectures", lectures.values());
-        req.getRequestDispatcher("/lecture-list.jsp").forward(req, resp);
+        final View view = new JspView("lecture-list.jsp");
+        view.render(req, resp);
     }
 
     public void doPost(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
