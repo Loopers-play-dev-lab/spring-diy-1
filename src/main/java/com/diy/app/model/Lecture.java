@@ -1,4 +1,4 @@
-package com.diy.app;
+package com.diy.app.model;
 
 import java.math.BigDecimal;
 
