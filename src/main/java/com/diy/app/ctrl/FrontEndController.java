@@ -22,7 +22,7 @@ public class FrontEndController extends HttpServlet {
     @Override
     public void init() throws ServletException {
         // Strategy 전략을 통해 html로 변경시 suffix, prefix만 설정
-        viewResolver = new ViewResolver("/",".html");
+        viewResolver = new ViewResolver("/",".jsp");
 
         controllerMap.put("GET:/lectures", new GetController());
         controllerMap.put("POST:/lectures", new PostController());
@@ -42,14 +42,22 @@ public class FrontEndController extends HttpServlet {
         }
         try {
             ModelAndView mav = controller.handleRequest(req, resp);
+            String viewName = mav.getViewName();
 
-            View view = viewResolver.resolve(mav.getViewName());
+            if (viewName.startsWith("redirect:")) {
+                String path = viewName.substring("redirect:".length());
+                resp.sendRedirect(req.getContextPath() + path);
+                return;
+            }
 
-            view.render(mav.getModel(), req, resp);
+            View view = viewResolver.resolve(viewName);
+
+            if (view != null) {
+                view.render(mav.getModel(), req, resp);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 }
