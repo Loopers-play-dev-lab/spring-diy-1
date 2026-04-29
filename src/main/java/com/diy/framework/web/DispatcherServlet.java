@@ -1,34 +1,24 @@
-package com.diy.app;
+package com.diy.framework.web;
 
-import com.diy.app.lecture.controller.LectureCreateController;
-import com.diy.app.lecture.controller.LectureDeleteController;
-import com.diy.app.lecture.controller.LectureListController;
-import com.diy.app.lecture.controller.LectureUpdateController;
-import com.diy.framework.web.Controller;
-import com.diy.framework.web.HandlerMapping;
 import com.diy.framework.web.view.JspViewResolver;
 import com.diy.framework.web.view.ModelAndView;
 import com.diy.framework.web.view.View;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
-@WebServlet("/")
-public class DispatcherServlet extends HttpServlet {
+public abstract class DispatcherServlet extends HttpServlet {
 
     private HandlerMapping handlerMapping;
     private final JspViewResolver viewResolver = new JspViewResolver();
 
+    protected abstract void initHandlerMappings(HandlerMapping handlerMapping);
+
     @Override
     public void init() {
         handlerMapping = new HandlerMapping();
-        handlerMapping.setMapping("GET", "/lectures", new LectureListController());
-        handlerMapping.setMapping("POST", "/lectures", new LectureCreateController());
-        handlerMapping.setMapping("PUT", "/lectures", new LectureUpdateController());
-        handlerMapping.setMapping("DELETE", "/lectures", new LectureDeleteController());
+        initHandlerMappings(handlerMapping);
     }
 
     @Override
