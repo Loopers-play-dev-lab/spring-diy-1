@@ -1,9 +1,10 @@
 package com.diy.framework.web.mvc.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.diy.framework.web.mvc.ModelAndView;
+
+import java.util.Map;
 
 @FunctionalInterface
 public interface Controller {
-    void handleRequest(final HttpServletRequest request, final HttpServletResponse response) throws Exception;
+    ModelAndView handleRequest(final Map<String, ?> params) throws Exception;
 }
