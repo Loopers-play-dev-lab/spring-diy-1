@@ -10,13 +10,14 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class HtmlView {
+public class HtmlView implements View {
     private final String viewName;
 
     public HtmlView(final String viewName) {
         this.viewName = viewName;
     }
 
+    @Override
     public void render(final HttpServletRequest req, final HttpServletResponse res) throws IOException {
         final String viewFile = readViewFile(req);
 

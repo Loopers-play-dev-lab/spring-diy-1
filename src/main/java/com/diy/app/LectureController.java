@@ -2,6 +2,7 @@ package com.diy.app;
 
 import com.diy.framework.web.Controller;
 import com.diy.framework.web.view.JspView;
+import com.diy.framework.web.view.View;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -16,7 +17,6 @@ public class LectureController implements Controller {
 
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final Map<Long, Lecture> repository = new HashMap<>();
-
 
     @Override
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -38,7 +38,7 @@ public class LectureController implements Controller {
 
             request.setAttribute("lectures", lectures);
 
-            final JspView jspView = new JspView("lecture-list.jsp");
+            final View jspView = new JspView("lecture-list.jsp");
             jspView.render(request, response);
         }
     }
