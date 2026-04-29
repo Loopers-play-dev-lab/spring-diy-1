@@ -2,13 +2,9 @@ package com.diy.app.presentation;
 
 import com.diy.app.domain.Lecture;
 import com.diy.config.AppConfig;
-import com.diy.framework.web.servlet.AbstractController;
-import com.diy.framework.web.view.ModelAndView;
+import com.diy.framework.web.mvc.servlet.AbstractController;
+import com.diy.framework.web.mvc.view.ModelAndView;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +26,7 @@ public class LectureAbstractController extends AbstractController {
     }
 
     @Override
-    public ModelAndView doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+    public ModelAndView doGet(Map<String, ?> params) {
         List<Lecture> lectures = lectureController.getLectures();
         Map<String, Object> model = new HashMap<>();
         model.put("lectures", lectures);
@@ -38,22 +34,22 @@ public class LectureAbstractController extends AbstractController {
     }
 
     @Override
-    public ModelAndView doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        LectureRequest request = LectureRequest.from(req.getAttribute("params"));
+    public ModelAndView doPost(Map<String, ?> params) {
+        LectureRequest request = LectureRequest.from(params);
         lectureController.addLecture(request);
         return new ModelAndView("redirect:/lectures");
     }
 
     @Override
-    public ModelAndView doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        LectureRequest request = LectureRequest.from(req.getAttribute("params"));
+    public ModelAndView doPut(Map<String, ?> params) {
+        LectureRequest request = LectureRequest.from(params);
         lectureController.updateLecture(request);
         return new ModelAndView("");
     }
 
     @Override
-    public ModelAndView doDelete(HttpServletRequest req, HttpServletResponse resp) {
-        String lectureId = req.getParameter("lectureId");
+    public ModelAndView doDelete(Map<String, ?> params) {
+        String lectureId = (String) params.get("lectureId");
         lectureController.deleteLecture(lectureId);
         return new ModelAndView("");
     }

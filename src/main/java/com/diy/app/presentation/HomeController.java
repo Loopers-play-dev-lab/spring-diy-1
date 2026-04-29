@@ -1,10 +1,9 @@
 package com.diy.app.presentation;
 
-import com.diy.framework.web.servlet.Controller;
-import com.diy.framework.web.view.ModelAndView;
+import com.diy.framework.web.mvc.servlet.Controller;
+import com.diy.framework.web.mvc.view.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 public class HomeController implements Controller {
     private static HomeController instance;
@@ -17,7 +16,7 @@ public class HomeController implements Controller {
     }
 
     @Override
-    public ModelAndView handleRequest(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    public ModelAndView handleRequest(String method, Map<String, ?> params) {
         System.out.println("Home");
         return new ModelAndView("home");
     }

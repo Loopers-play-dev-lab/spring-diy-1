@@ -1,4 +1,4 @@
-package com.diy.framework.web.view;
+package com.diy.framework.web.mvc.view;
 
 import com.diy.app.domain.Lecture;
 

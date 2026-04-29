@@ -1,4 +1,4 @@
-package com.diy.framework.web.view;
+package com.diy.framework.web.mvc.view;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -15,23 +15,10 @@ public class JspView implements View {
     }
 
     public void render(Map<String, Object> model, final HttpServletRequest req, final HttpServletResponse res) throws ServletException, IOException {
-        if (viewName.contains("redirect:")) {
-            res.sendRedirect(viewName.replace("redirect:", ""));
-            return;
-        }
-
-        if (viewName.isEmpty()) {
-            return;
-        }
-
         final RequestDispatcher requestDispatcher = req.getRequestDispatcher(viewName);
         for (Map.Entry<String, Object> entry : model.entrySet()) {
             req.setAttribute(entry.getKey(), entry.getValue());
         }
         requestDispatcher.forward(req, res);
-    }
-
-    public void render(final HttpServletResponse response) {
-
     }
 }

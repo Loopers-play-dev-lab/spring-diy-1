@@ -1,4 +1,4 @@
-package com.diy.framework.web.servlet;
+package com.diy.framework.web.mvc.servlet;
 
 import com.diy.app.presentation.LectureController;
 import com.diy.app.presentation.LectureResponse;

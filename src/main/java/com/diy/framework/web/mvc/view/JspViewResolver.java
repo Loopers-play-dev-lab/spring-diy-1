@@ -1,4 +1,4 @@
-package com.diy.framework.web.view;
+package com.diy.framework.web.mvc.view;
 
 public class JspViewResolver implements ViewResolver {
     private static final String VIEW_EXTENSION = ".jsp";
@@ -11,12 +11,6 @@ public class JspViewResolver implements ViewResolver {
         return instance;
     }
     public View resolveView(String viewName) {
-        if (viewName.contains("redirect:")) {
-            return new JspView(viewName);
-        }
-        if (viewName.isEmpty()) {
-            return new JspView(viewName);
-        }
         return new JspView(viewName + VIEW_EXTENSION);
     }
 

@@ -1,10 +1,7 @@
-package com.diy.framework.web.servlet;
+package com.diy.framework.web.mvc.servlet;
 
-import com.diy.config.AppConfig;
 import com.diy.framework.web.config.WebConfig;
-import com.diy.framework.web.view.ModelAndView;
-import com.diy.framework.web.view.View;
-import com.diy.framework.web.view.ViewResolver;
+import com.diy.framework.web.mvc.view.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -15,20 +12,26 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @WebServlet(urlPatterns = "/")
 public class DispatcherServlet extends HttpServlet {
     private final Map<String, Controller> controllerMap;
-    private final ViewResolver viewResolver;
+    private final List<ViewResolver> viewResolvers;
 
     public DispatcherServlet() {
         controllerMap = new HashMap<>();
-        controllerMap.put("/home", AppConfig.homeController());
-        controllerMap.put("/lectures", AppConfig.lectureAbstractController());
+        viewResolvers = new ArrayList<>();
+        viewResolvers.add(WebConfig.urlBasedViewResolver());
+        viewResolvers.add(WebConfig.jspViewResolver());
+    }
 
-        viewResolver = WebConfig.viewResolver();
+    public DispatcherServlet(Map<String, Controller> controllerMap) {
+        this();
+        this.controllerMap.putAll(controllerMap);
     }
 
     @Override
@@ -43,8 +46,7 @@ public class DispatcherServlet extends HttpServlet {
             return;
         }
         try {
-            req.setAttribute("params", params);
-            ModelAndView mav = controller.handleRequest(req, resp);
+            ModelAndView mav = controller.handleRequest(req.getMethod(), params);
             render(mav, req, resp);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -63,14 +65,21 @@ public class DispatcherServlet extends HttpServlet {
 
     private void render(final ModelAndView mav, final HttpServletRequest req, final HttpServletResponse res) throws ServletException, IOException {
         final String viewName = mav.getViewName();
-        if (viewName.isEmpty()) {
-            return;
-        }
 
-        View view = viewResolver.resolveView(viewName);
+        View view = resolveView(viewName);
         if (view == null) {
             throw new ServletException("View not found: " + viewName);
         }
         view.render(mav.getModel(), req, res);
+    }
+
+    private View resolveView(final String viewName) {
+        for (ViewResolver viewResolver : viewResolvers) {
+            View view = viewResolver.resolveView(viewName);
+            if (view != null) {
+                return view;
+            }
+        }
+        return null;
     }
 }
