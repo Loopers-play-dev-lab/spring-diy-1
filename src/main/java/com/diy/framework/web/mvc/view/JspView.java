@@ -1,0 +1,24 @@
+package com.diy.framework.web.mvc.view;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Map;
+
+public class JspView implements View {
+    private final String viewName;
+
+    public JspView(final String viewName) {
+        this.viewName = viewName;
+    }
+
+    public void render(Map<String, Object> model, final HttpServletRequest req, final HttpServletResponse res) throws ServletException, IOException {
+        final RequestDispatcher requestDispatcher = req.getRequestDispatcher(viewName);
+        for (Map.Entry<String, Object> entry : model.entrySet()) {
+            req.setAttribute(entry.getKey(), entry.getValue());
+        }
+        requestDispatcher.forward(req, res);
+    }
+}

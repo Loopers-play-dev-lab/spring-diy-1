@@ -1,5 +1,7 @@
-package com.diy.app.presentation;
+package com.diy.framework.web.mvc.servlet;
 
+import com.diy.app.presentation.LectureController;
+import com.diy.app.presentation.LectureResponse;
 import com.diy.config.AppConfig;
 
 import javax.servlet.RequestDispatcher;
