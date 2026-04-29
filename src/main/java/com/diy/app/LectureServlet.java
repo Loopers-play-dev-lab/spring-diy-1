@@ -3,7 +3,6 @@ package com.diy.app;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,7 +11,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-@WebServlet("/lectures")
+// FrontController로 대체됨
+// 톰캣 매핑에서 빠지므로 /lectures 요청은 FrontController("/")가 받게 됨.
+//@WebServlet("/lectures")
 public class LectureServlet extends HttpServlet {
 
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
