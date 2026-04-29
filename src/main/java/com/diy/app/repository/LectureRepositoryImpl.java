@@ -24,7 +24,8 @@ public class LectureRepositoryImpl implements ILectureRepository {
 
     @Override
     public void save(Lecture lecture) {
-        lectures.put(lectureId.incrementAndGet(), lecture);
+        lecture.setId(lectureId.incrementAndGet());
+        lectures.put(lecture.getId(), lecture);
     }
 
     @Override

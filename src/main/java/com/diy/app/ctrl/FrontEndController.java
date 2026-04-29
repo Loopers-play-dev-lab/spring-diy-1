@@ -1,9 +1,8 @@
 package com.diy.app.ctrl;
 
-import com.diy.app.Lecture;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.diy.app.view.View;
+import com.diy.app.view.ViewResolver;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -12,17 +11,18 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 
 @WebServlet("/")
 public class FrontEndController extends HttpServlet {
 
     private final Map<String, Controller> controllerMap = new HashMap<>();
-
+    private ViewResolver viewResolver;
     @Override
     public void init() throws ServletException {
+        // Strategy 전략을 통해 html로 변경시 suffix, prefix만 설정
+        viewResolver = new ViewResolver("/",".html");
+
         controllerMap.put("GET:/lectures", new GetController());
         controllerMap.put("POST:/lectures", new PostController());
         controllerMap.put("PUT:/lectures", new PostController());
@@ -37,11 +37,23 @@ public class FrontEndController extends HttpServlet {
         Controller controller = controllerMap.get(method + ":" + uri);
         if (controller == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
         }
         try {
-            controller.handleRequest(req, resp);
+            String viewName = controller.handleRequest(req, resp);
+            // redirect 처리
+            if (viewName.startsWith("redirect:")) {
+                String path = viewName.substring("redirect:".length());
+                resp.sendRedirect(req.getContextPath() + path);
+                return;
+            }
+
+            View view = viewResolver.resolve(viewName);
+            view.render(req, resp);
+
         } catch (Exception e) {
             e.printStackTrace();
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 }

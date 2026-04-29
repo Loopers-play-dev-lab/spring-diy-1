@@ -36,4 +36,12 @@ public class Lecture {
         this.price = price;
     }
 
+    @Override
+    public String toString() {
+        return "Lecture{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                '}';
+    }
 }
