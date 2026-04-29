@@ -1,84 +1,37 @@
 package com.diy.app;
 
-import com.diy.framework.web.mvc.controller.Controller;
-import com.diy.framework.web.mvc.view.JspView;
-import com.diy.framework.web.mvc.view.View;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.diy.framework.web.mvc.ModelAndView;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import com.fasterxml.jackson.core.type.TypeReference;
-
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class LectureController implements Controller {
+public class LectureController {
     private static final Map<Integer, Lecture> lectures = new LinkedHashMap<>();
 
-    public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws Exception {
-        String method = req.getMethod();
-        switch (method) {
-            case "GET":
-                doGet(req, resp);
-                break;
-            case "POST":
-                doPost(req, resp);
-                break;
-            case "PUT":
-                doPut(req, resp);
-                break;
-            case "DELETE":
-                doDelete(req, resp);
-                break;
-        }
+    public ModelAndView list(final Map<String, ?> params) {
+        return new ModelAndView("lecture-list", Map.of("lectures", lectures.values()));
     }
 
-    public void doGet(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.setAttribute("lectures", lectures.values());
-        final View view = new JspView("lecture-list.jsp");
-        view.render(req, resp);
+    public ModelAndView create(final Map<String, ?> params) {
+        Lecture lecture = Lecture.register((String) params.get("name"), new BigDecimal((String) params.get("price")));
+        lectures.put(lecture.getId(), lecture);
+        return new ModelAndView("redirect:/lectures");
     }
 
-    public void doPost(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, String> body = objectMapper.readValue(req.getInputStream(), new TypeReference<Map<String, String>>() {});
-            Lecture lecture = Lecture.register(body.get("name"), new BigDecimal(body.get("price")));
-            lectures.put(lecture.getId(), lecture);
-        } catch (Exception e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "잘못된 요청입니다.");
+    public ModelAndView update(final Map<String, ?> params) {
+        int id = Integer.parseInt((String) params.get("id"));
+        Lecture lecture = lectures.get(id);
+        if (lecture != null) {
+            lecture.updateName((String) params.get("name"));
+            lecture.updatePrice(new BigDecimal((String) params.get("price")));
         }
+        return new ModelAndView("redirect:/lectures");
     }
 
-    public void doPut(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, String> body = objectMapper.readValue(req.getInputStream(), new TypeReference<Map<String, String>>() {});
-
-            int id = Integer.parseInt(body.get("id"));
-            Lecture lecture = lectures.get(id);
-            if (lecture != null) {
-                lecture.updateName(body.get("name"));
-                lecture.updatePrice(new BigDecimal(body.get("price")));
-            }
-        } catch (Exception e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "잘못된 요청입니다.");
-        }
-    }
-
-    public void doDelete(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, String> body = objectMapper.readValue(req.getInputStream(), new TypeReference<Map<String, String>>() {
-            });
-
-            int id = Integer.parseInt(body.get("id"));
-            lectures.remove(id);
-        } catch (Exception e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "잘못된 요청입니다.");
-        }
+    public ModelAndView delete(final Map<String, ?> params) {
+        int id = Integer.parseInt((String) params.get("id"));
+        lectures.remove(id);
+        return new ModelAndView("redirect:/lectures");
     }
 }
