@@ -1,5 +1,6 @@
 package com.diy.app.ctrl;
 
+import com.diy.app.view.ModelAndView;
 import com.diy.app.view.View;
 import com.diy.app.view.ViewResolver;
 
@@ -40,20 +41,15 @@ public class FrontEndController extends HttpServlet {
             return;
         }
         try {
-            String viewName = controller.handleRequest(req, resp);
-            // redirect 처리
-            if (viewName.startsWith("redirect:")) {
-                String path = viewName.substring("redirect:".length());
-                resp.sendRedirect(req.getContextPath() + path);
-                return;
-            }
+            ModelAndView mav = controller.handleRequest(req, resp);
 
-            View view = viewResolver.resolve(viewName);
-            view.render(req, resp);
+            View view = viewResolver.resolve(mav.getViewName());
+
+            view.render(mav.getModel(), req, resp);
 
         } catch (Exception e) {
             e.printStackTrace();
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 }
