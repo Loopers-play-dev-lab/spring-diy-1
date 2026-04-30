@@ -24,6 +24,9 @@ dependencies {
 
     implementation(group = "org.json", name = "json", version = "20160810")
 
+    // aop
+    implementation("org.reflections:reflections:0.10.2")
+
     // 톰캣
     implementation("org.apache.tomcat.embed:tomcat-embed-core:8.5.42")
     implementation("org.apache.tomcat.embed:tomcat-embed-jasper:8.5.42")
