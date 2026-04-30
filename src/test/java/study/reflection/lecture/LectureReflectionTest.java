@@ -3,10 +3,7 @@ package study.reflection.lecture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.AccessFlag;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.*;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,7 +57,8 @@ public class LectureReflectionTest {
         final boolean visible = false;
         Lecture lecture = clazz.getDeclaredConstructor(String.class, int.class, boolean.class).newInstance(name, price, visible);
 
-        Arrays.stream(clazz.getDeclaredMethods()).filter(method -> method.accessFlags().contains(AccessFlag.PRIVATE))
+        Arrays.stream(clazz.getDeclaredMethods())
+                .filter(method -> method.accessFlags().contains(AccessFlag.PRIVATE))
                 .forEach(method -> {
                     try {
                         method.setAccessible(true);
@@ -83,5 +81,13 @@ public class LectureReflectionTest {
         }
     }
 
+    @Test
+    @DisplayName("요구사항 5 : 애너테이션으로 메서드 찾기")
+    void findMethodByAnnotation() {
+        Method[] methods = Lecture.class.getMethods();
+        Arrays.stream(methods)
+                .filter(method -> method.isAnnotationPresent(MethodOrder.class))
+                .forEach(System.out::println);
+    }
 
 }
