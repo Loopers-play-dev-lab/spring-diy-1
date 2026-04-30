@@ -90,4 +90,15 @@ public class LectureReflectionTest {
                 .forEach(System.out::println);
     }
 
+    @Test
+    @DisplayName("요구사항 6 : @MethodOrder 애너테이션 정보 조회")
+    void findMethodParameterByAnnotation() {
+        Method[] methods = Lecture.class.getMethods();
+        Arrays.stream(methods)
+                .filter(method -> method.isAnnotationPresent(MethodOrder.class))
+                .forEach(method -> {
+                    System.out.println(method + " : " + method.getAnnotation(MethodOrder.class).value());
+                });
+    }
+
 }
