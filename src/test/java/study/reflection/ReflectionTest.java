@@ -80,4 +80,17 @@ public class ReflectionTest {
             price.setAccessible(false);
         }
     }
+
+    @Test
+    @DisplayName("요구사항 5 : 인자가 존재하는 인스턴스 생성")
+    public void constructerWithParameter() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        String nameValue = "이름";
+        int priceValue = 1000000;
+
+        Class<Car> clazz = Car.class;
+        Car car = clazz.getDeclaredConstructor(String.class, int.class).newInstance(nameValue, priceValue);
+
+        assertThat(car.getName()).isEqualTo(nameValue);
+        assertThat(car.getPrice()).isEqualTo(priceValue);
+    }
 }
