@@ -3,9 +3,12 @@ package study.reflection;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReflectionTest {
 
@@ -51,5 +54,30 @@ public class ReflectionTest {
                         throw new RuntimeException(e);
                     }
                 });
+    }
+
+    @Test
+    @DisplayName("요구사항 4 : private field에 값 할당하기")
+    void setPirvateField() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+        Class<Car> clazz = Car.class;
+        Car car = clazz.getDeclaredConstructor().newInstance();
+
+        Field name = clazz.getDeclaredField("name");
+        name.setAccessible(true);
+        Field price = clazz.getDeclaredField("price");
+        price.setAccessible(true);
+
+        try {
+            String nameValue = "이름";
+            int priceValue = 1000000;
+            name.set(car, nameValue);
+            price.set(car, priceValue);
+
+            assertThat(car.getName()).isEqualTo(nameValue);
+            assertThat(car.getPrice()).isEqualTo(priceValue);
+        } finally {
+            name.setAccessible(false);
+            price.setAccessible(false);
+        }
     }
 }
