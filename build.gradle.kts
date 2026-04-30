@@ -1,3 +1,5 @@
+import org.gradle.internal.impldep.org.junit.Assert.assertThat
+
 plugins {
     id("java")
     kotlin("jvm")
@@ -32,6 +34,8 @@ dependencies {
     implementation("org.apache.tomcat.embed:tomcat-embed-jasper:8.5.42")
 
     implementation(kotlin("stdlib-jdk8"))
+
+    implementation("org.assertj:assertj-core:3.24.2")
 }
 
 tasks.test {
