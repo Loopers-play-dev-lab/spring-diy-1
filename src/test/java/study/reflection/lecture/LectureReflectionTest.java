@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.AccessFlag;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
@@ -48,4 +49,39 @@ public class LectureReflectionTest {
         Class<Lecture> clazz = Lecture.class;
         Arrays.stream(clazz.getDeclaredMethods()).filter(method -> method.accessFlags().contains(AccessFlag.PRIVATE)).forEach(System.out::println);
     }
+
+    @Test
+    @DisplayName("요구사항 4 : private 메서드 호출")
+    void executePrivateMethod() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+        Class<Lecture> clazz = Lecture.class;
+
+        final String name = "테스트 이름";
+        final int price = 10000;
+        final boolean visible = false;
+        Lecture lecture = clazz.getDeclaredConstructor(String.class, int.class, boolean.class).newInstance(name, price, visible);
+
+        Arrays.stream(clazz.getDeclaredMethods()).filter(method -> method.accessFlags().contains(AccessFlag.PRIVATE))
+                .forEach(method -> {
+                    try {
+                        method.setAccessible(true);
+                        method.invoke(lecture);
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    } catch (InvocationTargetException e) {
+                        throw new RuntimeException(e);
+                    } finally {
+                        method.setAccessible(false);
+                    }
+                });
+
+        Field field = clazz.getDeclaredField("visible");
+        field.setAccessible(true);
+        try {
+            assertThat(field.getBoolean(lecture)).isEqualTo(true);
+        } finally {
+            field.setAccessible(false);
+        }
+    }
+
+
 }
