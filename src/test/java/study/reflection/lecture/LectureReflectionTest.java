@@ -3,6 +3,7 @@ package study.reflection.lecture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.AccessFlag;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -39,5 +40,12 @@ public class LectureReflectionTest {
 
         assertThat(lecture.getName()).isEqualTo(name);
         assertThat(lecture.getPrice()).isEqualTo(price);
+    }
+
+    @Test
+    @DisplayName("요구사항 3 : private 메서드 찾기")
+    void findPrivateMethod() {
+        Class<Lecture> clazz = Lecture.class;
+        Arrays.stream(clazz.getDeclaredMethods()).filter(method -> method.accessFlags().contains(AccessFlag.PRIVATE)).forEach(System.out::println);
     }
 }
