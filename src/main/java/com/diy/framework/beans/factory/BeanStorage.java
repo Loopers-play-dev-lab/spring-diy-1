@@ -4,8 +4,8 @@ import com.diy.framework.beans.annotations.Component;
 
 import java.util.Set;
 
-public class BeanFactory {
-    public BeanFactory() {
+public class BeanStorage {
+    public BeanStorage() {
         BeanScanner bc = new BeanScanner("com.diy.app");
         Set<Class<?>> classes = bc.scanClassesTypeAnnotatedWith(Component.class);
         classes.forEach(System.out::println);
