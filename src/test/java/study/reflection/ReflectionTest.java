@@ -1,5 +1,6 @@
 package study.reflection;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import org.junit.jupiter.api.DisplayName;
@@ -46,4 +47,28 @@ public class ReflectionTest {
         }
     }
 
+    @Test
+    @DisplayName("요구사항4 -> private field에 값 할당")
+    void privateFieldAccess()
+        throws NoSuchFieldException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        Class<Car> clazz = Car.class;
+
+        Field name = clazz.getDeclaredField("name");
+        name.setAccessible(true);
+
+        Field price = clazz.getDeclaredField("price");
+        price.setAccessible(true);
+
+        Car car = clazz.getDeclaredConstructor().newInstance();
+        name.set(car, "test");
+        price.set(car, 100);
+
+        Method[] declaredMethods = clazz.getDeclaredMethods();
+        for (Method declaredMethod : declaredMethods) {
+
+            if (declaredMethod.getName().startsWith("test")) {
+                System.out.println(declaredMethod.invoke(car));
+            }
+        }
+    }
 }
