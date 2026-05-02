@@ -1,5 +1,6 @@
 package study.reflection;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -63,12 +64,20 @@ public class ReflectionTest {
         name.set(car, "test");
         price.set(car, 100);
 
-        Method[] declaredMethods = clazz.getDeclaredMethods();
-        for (Method declaredMethod : declaredMethods) {
+        System.out.println(car.testGetName());
+        System.out.println(car.testGetPrice());
+    }
 
-            if (declaredMethod.getName().startsWith("test")) {
-                System.out.println(declaredMethod.invoke(car));
-            }
-        }
+    @Test
+    @DisplayName("요구사항5 -> 인자를 가진 생성자의 인스턴스 생성")
+    void constructorWithArgs()
+        throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        Class<Car> clazz = Car.class;
+
+        Constructor<Car> declaredConstructor = clazz.getDeclaredConstructor(String.class, int.class);
+        Car car = declaredConstructor.newInstance("kim", 100);
+
+        System.out.println(car.testGetName());
+        System.out.println(car.testGetPrice());
     }
 }
