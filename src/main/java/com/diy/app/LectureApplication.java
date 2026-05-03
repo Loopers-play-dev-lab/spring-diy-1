@@ -13,7 +13,7 @@ public class LectureApplication {
         controllerMapping.put("/lectures", new LectureController());
 
         final DispatcherServlet servlet = new DispatcherServlet(controllerMapping);
-        final TomcatWebServer tomcatWebServer = new TomcatWebServer();
+        final TomcatWebServer tomcatWebServer = new TomcatWebServer(servlet);
         tomcatWebServer.start();
     }
 }
