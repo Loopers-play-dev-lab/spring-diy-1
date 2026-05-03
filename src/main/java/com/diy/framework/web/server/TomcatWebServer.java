@@ -6,6 +6,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.webresources.DirResourceSet;
 import org.apache.catalina.webresources.StandardRoot;
 
+import javax.servlet.http.HttpServlet;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
@@ -16,11 +17,23 @@ public class TomcatWebServer {
 
     private final Tomcat tomcat = new Tomcat();
     private final int port = 8080;
+    private final HttpServlet dispatcherServlet;
+
+    public TomcatWebServer(HttpServlet dispatcherServlet) {
+        this.dispatcherServlet = dispatcherServlet;
+    }
 
     public void start() {
         setServerContext();
-        startDaemonAwaitThread();
         startServerInternal();
+        overrideRootMapping();
+
+        for (var child : ((org.apache.catalina.Context) tomcat.getHost().findChildren()[0]).findServletMappings()) {
+            System.out.println("[mapping] " + child + " -> "
+                    + ((org.apache.catalina.Context) tomcat.getHost().findChildren()[0]).findServletMapping(child));
+        }
+
+        startDaemonAwaitThread();
     }
 
     public void startServerInternal() {
@@ -42,6 +55,10 @@ public class TomcatWebServer {
 
         context.setRequestCharacterEncoding("UTF-8");
         context.setResponseCharacterEncoding("UTF-8");
+
+        Tomcat.addServlet(context, "dispatcherServlet", dispatcherServlet);
+
+        context.addServletMappingDecoded("/", "dispatcherServlet");
 
         setServerResources(context);
     }
@@ -70,5 +87,10 @@ public class TomcatWebServer {
         awaitThread.setContextClassLoader(getClass().getClassLoader());
         awaitThread.setDaemon(false);
         awaitThread.start();
+    }
+
+    private void overrideRootMapping() {
+        Context context = (Context) tomcat.getHost().findChildren()[0];
+        context.addServletMappingDecoded("/", "dispatcherServlet");
     }
 }
