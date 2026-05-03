@@ -1,6 +1,6 @@
 package com.diy.app.ctrl;
 
-import com.diy.app.Lecture;
+import com.diy.app.Entity.Lecture;
 import com.diy.app.repository.ILectureRepository;
 import com.diy.app.repository.LectureRepositoryImpl;
 import com.diy.app.view.ModelAndView;

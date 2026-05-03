@@ -1,15 +1,14 @@
 package com.diy.app.ctrl;
 
-import com.diy.app.Lecture;
+import com.diy.app.Entity.Lecture;
+import com.diy.app.annotation.Autowired;
 import com.diy.app.repository.ILectureRepository;
 import com.diy.app.repository.LectureRepositoryImpl;
 import com.diy.app.view.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
-
 public class PutController implements Controller {
 
     private final ILectureRepository repository = new LectureRepositoryImpl();

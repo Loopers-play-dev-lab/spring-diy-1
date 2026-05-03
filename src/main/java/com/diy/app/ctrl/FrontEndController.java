@@ -26,8 +26,8 @@ public class FrontEndController extends HttpServlet {
 
         controllerMap.put("GET:/lectures", new GetController());
         controllerMap.put("POST:/lectures", new PostController());
-        controllerMap.put("PUT:/lectures", new PostController());
-        controllerMap.put("DELETE:/lectures", new PostController());
+        controllerMap.put("PUT:/lectures", new PutController());
+        controllerMap.put("DELETE:/lectures", new DelController());
     }
 
     @Override

@@ -1,12 +1,14 @@
 package com.diy.app.repository;
 
-import com.diy.app.Lecture;
+import com.diy.app.Entity.Lecture;
+import com.diy.app.annotation.Component;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
+@Component
 public class LectureRepositoryImpl implements ILectureRepository {
 
     public static Map<Long, Lecture> lectures = new HashMap<>();

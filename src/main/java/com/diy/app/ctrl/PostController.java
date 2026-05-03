@@ -1,6 +1,6 @@
 package com.diy.app.ctrl;
 
-import com.diy.app.Lecture;
+import com.diy.app.Entity.Lecture;
 import com.diy.app.repository.ILectureRepository;
 import com.diy.app.repository.LectureRepositoryImpl;
 import com.diy.app.view.ModelAndView;
@@ -20,8 +20,6 @@ public class PostController implements Controller {
         String body = new String(bytes, StandardCharsets.UTF_8);
         Lecture lecture = new ObjectMapper().readValue(body,Lecture.class);
         repository.save(lecture);
-        System.out.println(lecture);
-        System.out.println(repository.findAll());
         return new ModelAndView("redirect:/lectures");
     }
 }
