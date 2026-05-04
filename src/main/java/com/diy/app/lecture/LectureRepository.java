@@ -1,10 +1,12 @@
 package com.diy.app.lecture;
 
+import com.diy.framework.annotation.Component;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class LectureRepository {
 
     private static final Map<Long, Lecture> store = new HashMap<>();
