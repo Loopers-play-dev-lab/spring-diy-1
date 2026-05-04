@@ -1,5 +1,6 @@
 package com.diy.app.car.entity;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import org.junit.jupiter.api.DisplayName;
@@ -46,6 +47,31 @@ class ReflectionTest {
             if (method.isAnnotationPresent(PrintView.class)) {
                 System.out.println("메소드명: " + method.getName());
                 method.invoke(instance);
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("private field에 값 할당")
+    void privateFieldAccess() throws Exception {
+        Class<Car> carClass = Car.class;
+        Object instance = carClass.getDeclaredConstructor(String.class, int.class).newInstance("소나타", 3000);
+
+        Field[] allField = carClass.getDeclaredFields();
+
+        for (Field field : allField) {
+            field.setAccessible(true);
+            if (field.getName().equals("name")) {
+                field.set(instance, "벤츠");
+            } else if (field.getName().equals("price")) {
+                field.set(instance, 1000);
+            }
+        }
+
+        for (Method method : carClass.getDeclaredMethods()) {
+            if (method.getName().startsWith("test")) {
+                System.out.println("메소드명: " + method.getName());
+                System.out.println(method.invoke(instance));
             }
         }
     }
