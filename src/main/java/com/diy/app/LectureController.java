@@ -1,19 +1,20 @@
 package com.diy.app;
 
+import com.diy.framework.bean.Autowired;
 import com.diy.framework.controller.Controller;
 import com.diy.framework.enums.HttpMethod;
 import com.diy.framework.value.Model;
 import com.diy.framework.value.ModelAndView;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 
 public class LectureController implements Controller {
-    private final Map<Long, Lecture> lectureRepository = new HashMap<>();
+//    private final Map<Long, Lecture> lectureRepository = new HashMap<>();
+    @Autowired private LectureRepository lectureRepository;
 
     @Override
     public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -25,7 +26,7 @@ public class LectureController implements Controller {
     }
 
     private ModelAndView doGet(HttpServletRequest request, HttpServletResponse response) {
-        Collection<Lecture> lectures = lectureRepository.values();
+        Collection<Lecture> lectures = lectureRepository.findAll();
         Model model = new Model(Map.of("lectures", lectures));
         return ModelAndView.of("lecture-list", model);
     }
@@ -36,12 +37,12 @@ public class LectureController implements Controller {
         String name = body.get("name").toString();
         double price = Double.parseDouble(body.get("price").toString());
 
-        lectureRepository.put(id, new Lecture(id, name, price));
+        lectureRepository.save(new Lecture(id, name, price));
 
         return ModelAndView.fromViewName("redirect:/lectures");
     }
 
     private long autoIncrement() {
-        return lectureRepository.size() + 1L;
+        return lectureRepository.findAll().getLast().getId() + 1;
     }
 }

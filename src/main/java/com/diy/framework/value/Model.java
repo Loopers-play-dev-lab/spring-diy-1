@@ -3,12 +3,14 @@ package com.diy.framework.value;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
-public record Model(
-        Map<String, Object> attributes
-) {
-    public Model {
+public final class Model {
+    private final Map<String, Object> attributes;
+
+    public Model(Map<String, Object> attributes) {
         attributes = Map.copyOf(attributes);
+        this.attributes = attributes;
     }
 
     public static Model empty() {
