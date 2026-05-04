@@ -4,10 +4,11 @@ import com.diy.app.lecture.Lecture;
 import com.diy.app.lecture.LectureStorage;
 import com.diy.framework.web.Controller;
 import com.diy.framework.web.view.ModelAndView;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.nio.charset.StandardCharsets;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.nio.charset.StandardCharsets;
 
 public class LectureUpdateController implements Controller {
 
@@ -18,25 +19,45 @@ public class LectureUpdateController implements Controller {
         byte[] bodyBytes = request.getInputStream().readAllBytes();
         String body = new String(bodyBytes, StandardCharsets.UTF_8);
 
-        Lecture updated = mapper.readValue(body, Lecture.class);
+        JsonNode json = mapper.readTree(body);
+        String originalName = request.getParameter("targetName");
+        if (originalName == null || originalName.isBlank()) {
+            originalName = request.getParameter("name");
+        }
 
-        Lecture target = LectureStorage.LECTURES.stream()
-                .filter(l -> l.getId().equals(updated.getId()))
-                .findFirst()
-                .orElse(null);
+        String updatedName = json.path("name").asText("").trim();
+        int updatedPrice = json.path("price").asInt();
+        boolean updatedVisible = json.path("visible").asBoolean(false);
 
-        if (target == null) {
+        if (updatedName.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return null;
+        }
+
+        if (originalName == null || originalName.isBlank()) {
+            originalName = updatedName;
+        }
+
+        int targetIndex = LectureStorage.indexOf(originalName);
+        if (targetIndex < 0) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return null;
         }
 
-        target.setName(updated.getName());
-        target.setPrice(updated.getPrice());
+        Lecture current = LectureStorage.LECTURES.get(targetIndex);
+        boolean renamed = !current.getName().equals(updatedName);
+        if (renamed && LectureStorage.containsName(updatedName)) {
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
+            return null;
+        }
+
+        Lecture updatedLecture = new Lecture(updatedName, updatedPrice, updatedVisible);
+        LectureStorage.LECTURES.set(targetIndex, updatedLecture);
 
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(mapper.writeValueAsString(target));
+        response.getWriter().write(mapper.writeValueAsString(updatedLecture));
         return null;
     }
 }

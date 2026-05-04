@@ -10,20 +10,20 @@ public class LectureDeleteController implements Controller {
 
     @Override
     public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        String idStr = request.getParameter("id");
+        String name = request.getParameter("name");
 
-        if (idStr == null) {
+        if (name == null || name.isBlank()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return null;
         }
 
-        Long id = Long.parseLong(idStr);
-        boolean removed = LectureStorage.LECTURES.removeIf(l -> l.getId().equals(id));
-
-        if (!removed) {
+        int index = LectureStorage.indexOf(name);
+        if (index < 0) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return null;
         }
+
+        LectureStorage.LECTURES.remove(index);
 
         response.setStatus(HttpServletResponse.SC_NO_CONTENT);
         return null;

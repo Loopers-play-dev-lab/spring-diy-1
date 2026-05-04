@@ -1,40 +1,38 @@
 package com.diy.app.lecture;
 
 public class Lecture {
-    private Long id;
-    private String name;
-    private Long price;
 
-    public Lecture() {
-    }
+    private final String name;
+    private final int price;
+    private boolean visible;
 
-    public Lecture(Long id, String name, Long price) {
-        this.id = id;
+    public Lecture(final String name, final int price) {
         this.name = name;
         this.price = price;
+        this.visible = false;
     }
 
-    public Long getId() {
-        return id;
+    public Lecture(final String name, final int price, final boolean visible) {
+        this.name = name;
+        this.price = price;
+        this.visible = visible;
     }
 
+    private void changeVisible() {
+        this.visible = true;
+    }
+
+    @MethodOrder(1)
     public String getName() {
-        return name;
+        return this.name;
     }
 
-    public Long getPrice() {
-        return price;
+    @MethodOrder(2)
+    public int getPrice() {
+        return this.price;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setPrice(Long price) {
-        this.price = price;
+    public boolean isVisible() {
+        return this.visible;
     }
 }

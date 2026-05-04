@@ -4,10 +4,11 @@ import com.diy.app.lecture.Lecture;
 import com.diy.app.lecture.LectureStorage;
 import com.diy.framework.web.Controller;
 import com.diy.framework.web.view.ModelAndView;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.nio.charset.StandardCharsets;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.nio.charset.StandardCharsets;
 
 public class LectureCreateController implements Controller {
 
@@ -18,9 +19,22 @@ public class LectureCreateController implements Controller {
         byte[] bodyBytes = request.getInputStream().readAllBytes();
         String body = new String(bodyBytes, StandardCharsets.UTF_8);
 
-        Lecture lecture = mapper.readValue(body, Lecture.class);
-        long nextId = LectureStorage.LECTURES.size() + 1;
-        lecture.setId(nextId);
+        JsonNode json = mapper.readTree(body);
+        String name = json.path("name").asText("").trim();
+        int price = json.path("price").asInt();
+        boolean visible = json.path("visible").asBoolean(false);
+
+        if (name.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return null;
+        }
+
+        if (LectureStorage.containsName(name)) {
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
+            return null;
+        }
+
+        Lecture lecture = new Lecture(name, price, visible);
         LectureStorage.LECTURES.add(lecture);
 
         return new ModelAndView("redirect:/lectures");

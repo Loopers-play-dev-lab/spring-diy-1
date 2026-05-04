@@ -4,10 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LectureStorage {
+
     public static final List<Lecture> LECTURES = new ArrayList<>();
 
     static {
-        LECTURES.add(new Lecture(1L, "스프링 DIY", 30000L));
-        LECTURES.add(new Lecture(2L, "리액트 입문", 25000L));
+        LECTURES.add(new Lecture("스프링 DIY", 30000, true));
+        LECTURES.add(new Lecture("리액트 입문", 25000));
+    }
+
+    public static boolean containsName(String name) {
+        return LECTURES.stream().anyMatch(lecture -> lecture.getName().equals(name));
+    }
+
+    public static int indexOf(String name) {
+        for (int i = 0; i < LECTURES.size(); i++) {
+            if (LECTURES.get(i).getName().equals(name)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
