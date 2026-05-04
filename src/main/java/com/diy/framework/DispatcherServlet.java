@@ -1,8 +1,5 @@
 package com.diy.framework;
 
-import com.diy.app.lecture.LectureController;
-import com.diy.app.lecture.LectureRepository;
-import com.diy.app.lecture.LectureService;
 import com.diy.framework.view.JspViewResolver;
 import com.diy.framework.view.UrlBasedViewResolver;
 import com.diy.framework.view.View;
@@ -15,23 +12,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
 
-    private final Map<String, Controller> requestMapping;
+    private final Map<String, Controller> controllerMapping;
     private final List<ViewResolver> viewResolvers = new ArrayList<>();
 
-    public DispatcherServlet() {
-        LectureRepository lectureRepository = new LectureRepository();
-        LectureService lectureService = new LectureService(lectureRepository);
-        LectureController lectureController = new LectureController(lectureService);
-
-        this.requestMapping = Map.of("/lectures", lectureController);
+    public DispatcherServlet(Map<String, Controller> controllerMapping) {
+        this.controllerMapping = controllerMapping;
         this.viewResolvers.add(new UrlBasedViewResolver());
         this.viewResolvers.add(new JspViewResolver());
     }
@@ -41,7 +32,7 @@ public class DispatcherServlet extends HttpServlet {
             throws ServletException, IOException {
         String requestURI = req.getRequestURI();
 
-        Controller controller = requestMapping.get(requestURI);
+        Controller controller = controllerMapping.get(requestURI);
         if (controller == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;

@@ -18,6 +18,10 @@ public class BeanFactory {
         classes.forEach(this::registerBean);
     }
 
+    public <T> T getBean(Class<T> clazz) {
+        return (T) beans.get(clazz);
+    }
+
     private void registerBean(Class<?> clazz) {
         if (beans.containsKey(clazz)) {
             return;
