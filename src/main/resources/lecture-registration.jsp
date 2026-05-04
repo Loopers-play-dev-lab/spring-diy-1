@@ -13,6 +13,8 @@
     <input type="text" id="name" name="name" required>
     <label for="price">가격:</label>
     <input type="number" id="price" name="price" required>
+    <label for="visible">노출:</label>
+    <input type="checkbox" id="visible" name="visible">
     <button type="submit">등록</button>
 </form>
 
@@ -26,10 +28,11 @@
 
             const formData = new FormData(registrationForm);
 
-            const lecture = {};
-            formData.forEach((value, key) => {
-                lecture[key] = value;
-            });
+            const lecture = {
+                name: formData.get("name"),
+                price: Number(formData.get("price")),
+                visible: formData.get("visible") === "on"
+            };
 
             const jsonData = JSON.stringify(lecture);
 
