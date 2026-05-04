@@ -1,7 +1,9 @@
 package com.diy.framework.web.beans.factory;
 
+import com.diy.framework.annotation.Autowired;
 import com.diy.framework.annotation.Component;
 import java.lang.reflect.Constructor;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -17,12 +19,30 @@ public class BeanFactory {
     }
 
     private void registerBean(Class<?> clazz) {
+        if (beans.containsKey(clazz)) {
+            return;
+        }
+
         try {
-            Constructor<?> constructor = clazz.getDeclaredConstructor();
-            Object instance = constructor.newInstance();
-            beans.put(clazz, instance);
+            Constructor<?> constructor = resolveConstructor(clazz);
+
+            Object[] args = Arrays.stream(constructor.getParameterTypes())
+                    .map(type -> {
+                        registerBean(type);
+                        return beans.get(type);
+                    })
+                    .toArray();
+
+            beans.put(clazz, constructor.newInstance(args));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Constructor<?> resolveConstructor(Class<?> clazz) {
+        return Arrays.stream(clazz.getDeclaredConstructors())
+                .filter(constructor -> constructor.isAnnotationPresent(Autowired.class))
+                .findFirst()
+                .orElseGet(() -> clazz.getDeclaredConstructors()[0]);
     }
 }
