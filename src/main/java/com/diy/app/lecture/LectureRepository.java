@@ -1,9 +1,11 @@
 package com.diy.app.lecture;
 
+import com.diy.framework.Component;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@Component
 public class LectureRepository {
 
     private static final List<Lecture> LECTURES = new ArrayList<>();
