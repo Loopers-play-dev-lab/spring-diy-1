@@ -15,26 +15,26 @@ public class LectureRepository {
         LECTURES.add(new Lecture("리액트 입문", 25000));
     }
 
-    public static List<Lecture> findAll() {
+    public List<Lecture> findAll() {
         return Collections.unmodifiableList(LECTURES);
     }
 
-    public static void save(Lecture lecture) {
+    public void save(Lecture lecture) {
         LECTURES.add(lecture);
     }
 
-    public static boolean containsName(String name) {
+    public boolean containsName(String name) {
         return LECTURES.stream().anyMatch(lecture -> lecture.getName().equals(name));
     }
 
-    public static Lecture findByName(String name) {
+    public Lecture findByName(String name) {
         return LECTURES.stream()
                 .filter(lecture -> lecture.getName().equals(name))
                 .findFirst()
                 .orElse(null);
     }
 
-    public static boolean update(String originalName, Lecture updatedLecture) {
+    public boolean update(String originalName, Lecture updatedLecture) {
         int index = indexOf(originalName);
         if (index < 0) {
             return false;
