@@ -1,7 +1,7 @@
 package com.diy.app.lecture.controller;
 
 import com.diy.app.lecture.Lecture;
-import com.diy.app.lecture.LectureStorage;
+import com.diy.app.lecture.LectureRepository;
 import com.diy.framework.web.Controller;
 import com.diy.framework.web.view.ModelAndView;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -38,21 +38,20 @@ public class LectureUpdateController implements Controller {
             originalName = updatedName;
         }
 
-        int targetIndex = LectureStorage.indexOf(originalName);
-        if (targetIndex < 0) {
+        Lecture current = LectureRepository.findByName(originalName);
+        if (current == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return null;
         }
 
-        Lecture current = LectureStorage.LECTURES.get(targetIndex);
         boolean renamed = !current.getName().equals(updatedName);
-        if (renamed && LectureStorage.containsName(updatedName)) {
+        if (renamed && LectureRepository.containsName(updatedName)) {
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             return null;
         }
 
         Lecture updatedLecture = new Lecture(updatedName, updatedPrice, updatedVisible);
-        LectureStorage.LECTURES.set(targetIndex, updatedLecture);
+        LectureRepository.update(originalName, updatedLecture);
 
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");

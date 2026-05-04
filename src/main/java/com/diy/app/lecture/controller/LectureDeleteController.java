@@ -1,6 +1,6 @@
 package com.diy.app.lecture.controller;
 
-import com.diy.app.lecture.LectureStorage;
+import com.diy.app.lecture.LectureRepository;
 import com.diy.framework.web.Controller;
 import com.diy.framework.web.view.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
@@ -17,13 +17,11 @@ public class LectureDeleteController implements Controller {
             return null;
         }
 
-        int index = LectureStorage.indexOf(name);
-        if (index < 0) {
+        boolean deleted = LectureRepository.deleteByName(name);
+        if (!deleted) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return null;
         }
-
-        LectureStorage.LECTURES.remove(index);
 
         response.setStatus(HttpServletResponse.SC_NO_CONTENT);
         return null;

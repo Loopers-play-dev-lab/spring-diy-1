@@ -1,7 +1,7 @@
 package com.diy.app.lecture.controller;
 
 import com.diy.app.lecture.Lecture;
-import com.diy.app.lecture.LectureStorage;
+import com.diy.app.lecture.LectureRepository;
 import com.diy.framework.web.Controller;
 import com.diy.framework.web.view.ModelAndView;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -29,13 +29,13 @@ public class LectureCreateController implements Controller {
             return null;
         }
 
-        if (LectureStorage.containsName(name)) {
+        if (LectureRepository.containsName(name)) {
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             return null;
         }
 
         Lecture lecture = new Lecture(name, price, visible);
-        LectureStorage.LECTURES.add(lecture);
+        LectureRepository.save(lecture);
 
         return new ModelAndView("redirect:/lectures");
     }
