@@ -1,4 +1,4 @@
-package com.diy.app.servlet.lecture.dto;
+package com.diy.app.controller.dto;
 
 public record LectureCreateRequest(String name, Long price) {
 }
