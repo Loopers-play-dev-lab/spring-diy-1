@@ -1,7 +1,9 @@
-package com.diy.app.lecture;
+package com.diy.app.lecture.service;
 
-import com.diy.framework.Autowired;
-import com.diy.framework.Component;
+import com.diy.app.lecture.entity.Lecture;
+import com.diy.app.lecture.repository.LectureRepository;
+import com.diy.framework.web.beans.factory.Autowired;
+import com.diy.framework.web.beans.factory.Component;
 import java.util.List;
 import java.util.NoSuchElementException;
 

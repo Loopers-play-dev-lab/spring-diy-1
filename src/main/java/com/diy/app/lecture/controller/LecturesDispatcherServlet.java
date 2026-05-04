@@ -1,11 +1,7 @@
-package com.diy.app;
+package com.diy.app.lecture.controller;
 
-import com.diy.app.lecture.LectureRepository;
-import com.diy.app.lecture.LectureService;
-import com.diy.app.lecture.controller.LectureCreateController;
-import com.diy.app.lecture.controller.LectureDeleteController;
-import com.diy.app.lecture.controller.LectureListController;
-import com.diy.app.lecture.controller.LectureUpdateController;
+import com.diy.app.lecture.repository.LectureRepository;
+import com.diy.app.lecture.service.LectureService;
 import com.diy.framework.web.DispatcherServlet;
 import com.diy.framework.web.HandlerMapping;
 import javax.servlet.annotation.WebServlet;

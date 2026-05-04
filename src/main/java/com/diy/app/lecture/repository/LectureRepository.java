@@ -1,6 +1,7 @@
-package com.diy.app.lecture;
+package com.diy.app.lecture.repository;
 
-import com.diy.framework.Component;
+import com.diy.app.lecture.entity.Lecture;
+import com.diy.framework.web.beans.factory.Component;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

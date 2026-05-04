@@ -1,9 +1,9 @@
 package com.diy.app.lecture.controller;
 
-import com.diy.app.lecture.Lecture;
-import com.diy.app.lecture.LectureService;
-import com.diy.framework.Autowired;
-import com.diy.framework.Component;
+import com.diy.app.lecture.entity.Lecture;
+import com.diy.app.lecture.service.LectureService;
+import com.diy.framework.web.beans.factory.Autowired;
+import com.diy.framework.web.beans.factory.Component;
 import com.diy.framework.web.Controller;
 import com.diy.framework.web.view.ModelAndView;
 import com.fasterxml.jackson.databind.JsonNode;

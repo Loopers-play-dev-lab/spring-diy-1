@@ -1,6 +1,6 @@
 package com.diy.app.lecture;
 
-import com.diy.framework.Component;
+import com.diy.framework.web.beans.factory.Component;
 import com.diy.framework.web.beans.factory.BeanScanner;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;

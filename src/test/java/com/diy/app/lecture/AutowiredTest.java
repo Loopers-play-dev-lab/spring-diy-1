@@ -1,7 +1,7 @@
 package com.diy.app.lecture;
 
-import com.diy.framework.Autowired;
-import com.diy.framework.Component;
+import com.diy.framework.web.beans.factory.Autowired;
+import com.diy.framework.web.beans.factory.Component;
 import com.diy.framework.web.beans.factory.BeanScanner;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;

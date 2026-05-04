@@ -2,6 +2,8 @@ package com.diy.app.lecture;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.diy.app.lecture.entity.Lecture;
+import com.diy.app.lecture.entity.MethodOrder;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
