@@ -1,21 +1,17 @@
 package com.diy.module.database;
 
+import com.diy.framework.web.beans.annotations.Component;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class InMemoryDatabase {
-    private static InMemoryDatabase instance;
     public static Map<String, Object> db = new HashMap();
 
-    private InMemoryDatabase() {}
-    public static InMemoryDatabase getInstance() {
-        if (instance == null) {
-            instance = new InMemoryDatabase();
-        }
-        return instance;
-    }
+    public InMemoryDatabase() {}
 
     public void create(String key, Object value) {
         db.put(key, value);

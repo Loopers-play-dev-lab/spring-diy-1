@@ -52,6 +52,12 @@ class LectureReflectionTest {
             Constructor<Lecture> constructor = lectureClass.getDeclaredConstructor(String.class, String.class, int.class);
             Lecture lecture = constructor.newInstance(UUID.randomUUID().toString(), "test", 1111);
             for (Method method : lectureClass.getDeclaredMethods()) {
+                if (method.canAccess(lecture)) {
+                    continue;
+                }
+
+                method.setAccessible(true);
+
                 System.out.println(method.getName());
 
                 method.invoke(lecture);

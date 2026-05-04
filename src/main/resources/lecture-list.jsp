@@ -11,7 +11,7 @@
 <a href="/lecture-registration.jsp">등록</a>
 <c:forEach var="lecture" items="${lectures}">
     <div id = "${lecture.lectureId}">
-        <li>id: <a href="/lecture?lectureId=${lecture.lectureId}">${lecture.lectureId}</a></li>
+        <li>id: <a href="/lecture-registration?lectureId=${lecture.lectureId}">${lecture.lectureId}</a></li>
         <li>name: ${lecture.name}</li>
         <li>price: ${lecture.price}</li>
         <button id=`del-${lecture.lectureId}`>delete</button>

@@ -1,36 +1,34 @@
 package com.diy.config;
 
-import com.diy.app.domain.LectureRepository;
-import com.diy.app.domain.LectureService;
-import com.diy.app.domain.LectureServiceImpl;
-import com.diy.app.infrastructure.LectureInmemoryRepository;
 import com.diy.app.presentation.HomeController;
 import com.diy.app.presentation.LectureAbstractController;
-import com.diy.app.presentation.LectureController;
-import com.diy.module.database.InMemoryDatabase;
+import com.diy.app.presentation.LectureRestController;
+import com.diy.framework.web.mvc.servlet.Controller;
+import com.diy.framework.web.mvc.servlet.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class AppConfig {
+
+    public static Map<String, Controller> controllerMapping() {
+        final Map<String, Controller> controllerMap = new HashMap<>();
+        controllerMap.put("/lectures", AppConfig.lectureAbstractController());
+        controllerMap.put("/home", AppConfig.homeController());
+
+        return controllerMap;
+    }
+
+    public static Map<String,RestController> restControllerMapping() {
+        final Map<String,RestController> controllerMap = new HashMap<>();
+        controllerMap.put("/lecture", LectureRestController.getInstance());
+        return controllerMap;
+    }
     public static LectureAbstractController lectureAbstractController() {
         return LectureAbstractController.getInstance();
     }
 
-    public static LectureController lectureController() {
-        return LectureController.getInstance(lectureService());
-    }
-
     public static HomeController homeController() {
         return HomeController.getInstance();
-    }
-
-    public static LectureService lectureService() {
-        return LectureServiceImpl.getInstance(lectureRepository());
-    }
-
-    private static LectureRepository lectureRepository() {
-        return LectureInmemoryRepository.getInstance(inMemoryDatabase());
-    }
-
-    private static InMemoryDatabase inMemoryDatabase() {
-        return InMemoryDatabase.getInstance();
     }
 }
