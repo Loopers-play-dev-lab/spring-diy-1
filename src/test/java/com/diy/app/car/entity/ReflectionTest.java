@@ -77,5 +77,13 @@ class ReflectionTest {
     }
 
 
+    @Test
+    @DisplayName("인자를 가진 생성자의 인스턴스 생성")
+    void constructorWithArgs() throws Exception{
+        Class<Car> carClass = Car.class;
+        Object instance = carClass.getDeclaredConstructor(String.class, int.class).newInstance("소나타", 3000);
 
+        System.out.println(carClass.getName());
+        System.out.println(instance);
+    }
 }
