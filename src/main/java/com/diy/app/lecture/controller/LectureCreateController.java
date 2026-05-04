@@ -1,7 +1,8 @@
 package com.diy.app.lecture.controller;
 
-import com.diy.app.lecture.Lecture;
-import com.diy.app.lecture.LectureRepository;
+import com.diy.app.lecture.LectureService;
+import com.diy.framework.Autowired;
+import com.diy.framework.Component;
 import com.diy.framework.web.Controller;
 import com.diy.framework.web.view.ModelAndView;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -10,12 +11,20 @@ import java.nio.charset.StandardCharsets;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@Component
 public class LectureCreateController implements Controller {
 
+    private final LectureService lectureService;
     private final ObjectMapper mapper = new ObjectMapper();
 
+    @Autowired
+    public LectureCreateController(final LectureService lectureService) {
+        this.lectureService = lectureService;
+    }
+
     @Override
-    public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ModelAndView handleRequest(final HttpServletRequest request, final HttpServletResponse response)
+            throws Exception {
         byte[] bodyBytes = request.getInputStream().readAllBytes();
         String body = new String(bodyBytes, StandardCharsets.UTF_8);
 
@@ -24,19 +33,15 @@ public class LectureCreateController implements Controller {
         int price = json.path("price").asInt();
         boolean visible = json.path("visible").asBoolean(false);
 
-        if (name.isEmpty()) {
+        try {
+            lectureService.create(name, price, visible);
+            return new ModelAndView("redirect:/lectures");
+        } catch (IllegalArgumentException e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return null;
-        }
-
-        if (LectureRepository.containsName(name)) {
+        } catch (IllegalStateException e) {
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             return null;
         }
-
-        Lecture lecture = new Lecture(name, price, visible);
-        LectureRepository.save(lecture);
-
-        return new ModelAndView("redirect:/lectures");
     }
 }

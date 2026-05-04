@@ -18,6 +18,4 @@ class ComponentTest {
             System.out.println("생성된 빈: " + instance.getClass().getName());
         }
     }
-
-
 }

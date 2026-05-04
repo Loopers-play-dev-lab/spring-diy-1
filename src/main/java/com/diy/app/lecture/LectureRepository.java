@@ -8,55 +8,55 @@ import java.util.List;
 @Component
 public class LectureRepository {
 
-    private static final List<Lecture> LECTURES = new ArrayList<>();
+    private final List<Lecture> lectures = new ArrayList<>();
 
-    static {
-        LECTURES.add(new Lecture("스프링 DIY", 30000, true));
-        LECTURES.add(new Lecture("리액트 입문", 25000));
+    public LectureRepository() {
+        lectures.add(new Lecture("스프링 DIY", 30000, true));
+        lectures.add(new Lecture("리액트 입문", 25000));
     }
 
     public List<Lecture> findAll() {
-        return Collections.unmodifiableList(LECTURES);
+        return Collections.unmodifiableList(lectures);
     }
 
-    public void save(Lecture lecture) {
-        LECTURES.add(lecture);
+    public void save(final Lecture lecture) {
+        lectures.add(lecture);
     }
 
-    public boolean containsName(String name) {
-        return LECTURES.stream().anyMatch(lecture -> lecture.getName().equals(name));
+    public boolean containsName(final String name) {
+        return lectures.stream().anyMatch(lecture -> lecture.getName().equals(name));
     }
 
-    public Lecture findByName(String name) {
-        return LECTURES.stream()
+    public Lecture findByName(final String name) {
+        return lectures.stream()
                 .filter(lecture -> lecture.getName().equals(name))
                 .findFirst()
                 .orElse(null);
     }
 
-    public boolean update(String originalName, Lecture updatedLecture) {
+    public boolean update(final String originalName, final Lecture updatedLecture) {
         int index = indexOf(originalName);
         if (index < 0) {
             return false;
         }
 
-        LECTURES.set(index, updatedLecture);
+        lectures.set(index, updatedLecture);
         return true;
     }
 
-    public static boolean deleteByName(String name) {
+    public boolean deleteByName(final String name) {
         int index = indexOf(name);
         if (index < 0) {
             return false;
         }
 
-        LECTURES.remove(index);
+        lectures.remove(index);
         return true;
     }
 
-    private static int indexOf(String name) {
-        for (int i = 0; i < LECTURES.size(); i++) {
-            if (LECTURES.get(i).getName().equals(name)) {
+    private int indexOf(final String name) {
+        for (int i = 0; i < lectures.size(); i++) {
+            if (lectures.get(i).getName().equals(name)) {
                 return i;
             }
         }

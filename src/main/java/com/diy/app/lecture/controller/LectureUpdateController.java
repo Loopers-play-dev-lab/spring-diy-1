@@ -1,21 +1,32 @@
 package com.diy.app.lecture.controller;
 
 import com.diy.app.lecture.Lecture;
-import com.diy.app.lecture.LectureRepository;
+import com.diy.app.lecture.LectureService;
+import com.diy.framework.Autowired;
+import com.diy.framework.Component;
 import com.diy.framework.web.Controller;
 import com.diy.framework.web.view.ModelAndView;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
+import java.util.NoSuchElementException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@Component
 public class LectureUpdateController implements Controller {
 
+    private final LectureService lectureService;
     private final ObjectMapper mapper = new ObjectMapper();
 
+    @Autowired
+    public LectureUpdateController(final LectureService lectureService) {
+        this.lectureService = lectureService;
+    }
+
     @Override
-    public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ModelAndView handleRequest(final HttpServletRequest request, final HttpServletResponse response)
+            throws Exception {
         byte[] bodyBytes = request.getInputStream().readAllBytes();
         String body = new String(bodyBytes, StandardCharsets.UTF_8);
 
@@ -29,34 +40,22 @@ public class LectureUpdateController implements Controller {
         int updatedPrice = json.path("price").asInt();
         boolean updatedVisible = json.path("visible").asBoolean(false);
 
-        if (updatedName.isEmpty()) {
+        try {
+            Lecture updatedLecture = lectureService.update(originalName, updatedName, updatedPrice, updatedVisible);
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(mapper.writeValueAsString(updatedLecture));
+            return null;
+        } catch (IllegalArgumentException e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return null;
-        }
-
-        if (originalName == null || originalName.isBlank()) {
-            originalName = updatedName;
-        }
-
-        Lecture current = LectureRepository.findByName(originalName);
-        if (current == null) {
+        } catch (NoSuchElementException e) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return null;
-        }
-
-        boolean renamed = !current.getName().equals(updatedName);
-        if (renamed && LectureRepository.containsName(updatedName)) {
+        } catch (IllegalStateException e) {
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             return null;
         }
-
-        Lecture updatedLecture = new Lecture(updatedName, updatedPrice, updatedVisible);
-        LectureRepository.update(originalName, updatedLecture);
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(mapper.writeValueAsString(updatedLecture));
-        return null;
     }
 }
