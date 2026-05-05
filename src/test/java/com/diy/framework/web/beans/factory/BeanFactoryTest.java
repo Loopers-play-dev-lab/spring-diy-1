@@ -1,9 +1,12 @@
 package com.diy.framework.web.beans.factory;
 
 import com.diy.app.Lecture;
+import com.diy.app.LectureService;
+import com.diy.framework.web.annotation.Autowired;
 import com.diy.framework.web.annotation.Component;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Constructor;
 import java.util.Set;
 
 public class BeanFactoryTest {
@@ -41,5 +44,18 @@ public class BeanFactoryTest {
 
         // 조회한 빈 출력
         System.out.println(bean);
+    }
+
+    @Test
+    void Autowired_붙은_생성자_찾기() {
+        // LectureService 생성자들 가져오기
+        Constructor<?>[] constructors = LectureService.class.getDeclaredConstructors();
+
+        // Autowired 붙은 생성자 출력
+        for (Constructor<?> constructor : constructors) {
+            if (constructor.isAnnotationPresent(Autowired.class)) {
+                System.out.println(constructor);
+            }
+        }
     }
 }
