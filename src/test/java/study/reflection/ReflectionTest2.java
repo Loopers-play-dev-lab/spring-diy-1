@@ -1,5 +1,6 @@
 package study.reflection;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -52,16 +53,48 @@ public class ReflectionTest2 {
 
         Class<Lecture> lectureClass = Lecture.class;
 
+        Constructor<Lecture> declaredConstructor = lectureClass.getDeclaredConstructor(String.class, int.class);
+        Lecture lecture = declaredConstructor.newInstance("kim", 100);
+
         Method[] methods = lectureClass.getDeclaredMethods();
         for (Method method : methods) {
             if(method.getModifiers() == Modifier.PRIVATE){
-
-                Constructor<Lecture> declaredConstructor = lectureClass.getDeclaredConstructor(String.class, int.class);
-                Lecture lecture = declaredConstructor.newInstance("kim", 100);
-
                 method.setAccessible(true);
                 method.invoke(lecture);
             }
         }
     }
+
+    @Test
+    @DisplayName("요구사항5 -> 애노테이션 메서드 호출")
+    void TestGetAnnotatedMethod()
+        throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        Class<Lecture> lectureClass = Lecture.class;
+
+        Constructor<Lecture> declaredConstructor = lectureClass.getDeclaredConstructor(String.class, int.class);
+        Lecture lecture = declaredConstructor.newInstance("kim", 100);
+
+        Method[] declaredMethods = lectureClass.getDeclaredMethods();
+        for (Method declaredMethod : declaredMethods) {
+            if(declaredMethod.isAnnotationPresent(MethodOrder.class)) {
+                System.out.println(declaredMethod.invoke(lecture));
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("요구사항6 -> @MethodOrder 애너테이션 정보 조회")
+    void TestGetMethodOrderAnnotationInfo() {
+        Class<Lecture> lectureClass = Lecture.class;
+
+        Method[] declaredMethods = lectureClass.getDeclaredMethods();
+        for (Method declaredMethod : declaredMethods) {
+            if(declaredMethod.isAnnotationPresent(MethodOrder.class)) {
+                Annotation annotation = declaredMethod.getAnnotation(MethodOrder.class);
+                System.out.println(annotation.annotationType().getName());
+                System.out.println(annotation.annotationType().accessFlags());
+            }
+        }
+    }
+
 }
