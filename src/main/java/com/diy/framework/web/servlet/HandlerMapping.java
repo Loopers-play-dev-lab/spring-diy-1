@@ -1,4 +1,6 @@
-package com.diy.app.controller;
+package com.diy.framework.web.servlet;
+
+import com.diy.framework.web.mvc.Controller;
 
 import java.util.HashMap;
 import java.util.Map;
