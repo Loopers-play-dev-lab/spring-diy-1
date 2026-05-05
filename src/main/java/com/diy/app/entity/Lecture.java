@@ -5,9 +5,9 @@ import java.math.BigDecimal;
 public class Lecture {
     static Long lectureId = 1L;
 
-    final Long id;
-    final String name;
-    final BigDecimal price;
+    Long id;
+    String name;
+    BigDecimal price;
 
     public Lecture(Long id, String name, BigDecimal price) {
         this.id = id;
@@ -19,6 +19,10 @@ public class Lecture {
         this.name = name;
         this.id = lectureId++;
         this.price = price;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
