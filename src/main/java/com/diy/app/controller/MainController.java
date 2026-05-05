@@ -1,30 +1,34 @@
 package com.diy.app.controller;
 
-import com.diy.app.domain.Lecture;
-import com.diy.app.repository.LecturesRepository;
+import com.diy.app.controller.lecutre.LectureDelControllerV1;
+import com.diy.app.controller.lecutre.LectureGetControllerV1;
+import com.diy.app.controller.lecutre.LecturePostControllerV1;
+import com.diy.app.controller.lecutre.LecturePutControllerV1;
+import com.diy.framework.web.DispatcherServlet;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collection;
 
 @WebServlet("/")
 public class MainController extends HttpServlet {
+    DispatcherServlet dispatcherServlet;
 
-    @Override
-    public void init(final ServletConfig config) throws ServletException {
-        System.out.println("Register Lecture Controller");
-        super.init(config);
+    public MainController() {
+        this.dispatcherServlet = new DispatcherServlet();
+
+        this.dispatcherServlet.setGetControllerMap("/lectures", new LectureGetControllerV1());
+        this.dispatcherServlet.setPostController("/lectures", new LecturePostControllerV1());
+        this.dispatcherServlet.setPutController("/lectures", new LecturePutControllerV1());
+        this.dispatcherServlet.setDelControllerMap("/lectures", new LectureDelControllerV1());
+        this.dispatcherServlet.setGetControllerMap("/", new HomeGetControllerV1());
     }
 
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher("lecture-registration.jsp");
-        dispatcher.forward(request, response);
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        this.dispatcherServlet.service(req, resp);
     }
 }

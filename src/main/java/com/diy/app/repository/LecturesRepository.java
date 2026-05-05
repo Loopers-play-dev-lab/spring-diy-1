@@ -8,12 +8,17 @@ import java.util.Map;
 import java.util.Optional;
 
 public class LecturesRepository {
+    private static final LecturesRepository INSTANCE = new LecturesRepository();
     long id;
     private static Map<Long, Lecture> store;
 
-    public LecturesRepository() {
+    private LecturesRepository() {
         id = 0L;
         store = new HashMap<>();
+    }
+
+    public static LecturesRepository getInstance() {
+        return INSTANCE;
     }
 
     public Lecture save(Lecture lecture) {
