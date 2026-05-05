@@ -41,7 +41,7 @@ bin/
 .vscode/
 
 ### Mac OS ###
-.DS_Store\ntomcat.8080/
+.DS_Store
 
 ## tomcat
 **/tomcat.8080
