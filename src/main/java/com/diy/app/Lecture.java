@@ -2,7 +2,7 @@ package com.diy.app;
 
 import java.util.UUID;
 
-public class Lecture{
+public class Lecture {
     private String id;
     private String name;
     private int price;
