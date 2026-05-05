@@ -15,6 +15,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
+    // 리플렉션
+    implementation("org.reflections:reflections:0.10.2")
+
     // ObjectMapper
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
 
