@@ -6,8 +6,7 @@ import com.diy.framework.web.server.TomcatWebServer;
 
 public class Main {
     public static void main(String[] args) {
-        BeanStorage beanStorage = new BeanStorage();
-        beanStorage.getBeans(LectureRepository.class).forEach(System.out::println);
+        BeanStorage beanStorage = BeanStorage.getInstance();
         TomcatWebServer tomcatWebServer = new TomcatWebServer();
         tomcatWebServer.start();
     }

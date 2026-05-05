@@ -2,21 +2,16 @@ package com.diy.app.business.service;
 
 import com.diy.app.business.domain.Lecture;
 import com.diy.app.business.repository.LectureRepository;
+import com.diy.framework.beans.annotations.Autowired;
+import com.diy.framework.beans.annotations.Component;
 
 import java.util.List;
 
+@Component
 public class LectureService {
-    private static LectureService instance = null;
 
-    private static LectureRepository repository = null;
-
-    private LectureService(LectureRepository repository) {
-        this.repository = repository;
-    }
-
-    public static LectureService getInstance() {
-        return instance == null ? instance = new LectureService(LectureRepository.getInstance()) : instance;
-    }
+    @Autowired
+    private static LectureRepository repository;
 
     public List<Lecture> getAllLectures() {
         return repository.getAll();

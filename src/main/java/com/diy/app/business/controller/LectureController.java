@@ -5,21 +5,29 @@ import com.diy.app.business.service.LectureService;
 import com.diy.app.infra.dto.ModelAndView;
 import com.diy.app.infra.httpSpec.HttpMethod;
 import com.diy.app.infra.port.Controller;
+import com.diy.framework.beans.annotations.Autowired;
+import com.diy.framework.beans.annotations.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
+@Component
 public class LectureController implements Controller {
 
+    @Autowired
     private LectureService service;
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
-    public LectureController(LectureService service) {
-        this.service = service;
-        this.objectMapper = new ObjectMapper();
+    public LectureController() {
+        objectMapper = new ObjectMapper();
     }
+
+    //    public LectureController(LectureService service) {
+//        this.service = service;
+//        this.objectMapper = new ObjectMapper();
+//    }
 
     @Override
     public ModelAndView handleRequest(HttpServletRequest req, HttpServletResponse resp) throws Exception {
