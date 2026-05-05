@@ -7,4 +7,4 @@
     <meta charset="UTF-8">
     <title>Home</title>
 </head>
-<body><div><a href='/lecture'>regist</a></div></body>
+<body><div><a href='/lecture-registration'>regist</a></div></body>

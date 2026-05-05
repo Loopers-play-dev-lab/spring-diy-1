@@ -43,11 +43,6 @@ public class TomcatWebServer {
         context.setResponseCharacterEncoding("UTF-8");
 
         setServerResources(context);
-        setDependency(context);
-    }
-
-    private void setDependency(final Context context) {
-//        Tomcat.addServlet(context, "lectureServlet", new LectureServlet());
     }
 
     private void setServerResources(final Context context) {

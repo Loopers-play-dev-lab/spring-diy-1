@@ -18,6 +18,26 @@
 </form>
 
 <script>
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const lectureId = urlParams.get('lectureId');
+        if (lectureId == null || lectureId === '') {
+            return;
+        }
+
+        fetch('http://localhost:8080/lecture?lectureId=' + lectureId)
+            .then(response => {
+                return response.json()
+            })
+            .then(data => {
+                console.log(data);
+                document.getElementById("lectureId").value = data.lectureId;
+                document.getElementById("name").value = data.name;
+                document.getElementById("price").value = data.price;
+            }
+            );
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
         const registrationForm = document.getElementById("registrationForm");
         const resultDiv = document.getElementById("result");

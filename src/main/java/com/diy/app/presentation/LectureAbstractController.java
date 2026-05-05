@@ -1,10 +1,11 @@
 package com.diy.app.presentation;
 
 import com.diy.app.domain.Lecture;
-import com.diy.config.AppConfig;
+import com.diy.framework.web.beans.factory.WebApplicationContext;
 import com.diy.framework.web.mvc.servlet.AbstractController;
 import com.diy.framework.web.mvc.view.ModelAndView;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,8 +15,13 @@ public class LectureAbstractController extends AbstractController {
     private final LectureController lectureController;
     private static LectureAbstractController instance;
 
+    private static class LectureAbstractControllerHolder {
+        private static final LectureAbstractController INSTANCE = new LectureAbstractController();
+    }
+
     private LectureAbstractController() {
-        this.lectureController = AppConfig.lectureController();
+        WebApplicationContext context = WebApplicationContext.getInstance();
+        this.lectureController = (LectureController) context.getBean("LectureController");
     }
 
     public static LectureAbstractController getInstance() {
@@ -44,13 +50,13 @@ public class LectureAbstractController extends AbstractController {
     public ModelAndView doPut(Map<String, ?> params) {
         LectureRequest request = LectureRequest.from(params);
         lectureController.updateLecture(request);
-        return new ModelAndView("");
+        return new ModelAndView("none");
     }
 
     @Override
     public ModelAndView doDelete(Map<String, ?> params) {
-        String lectureId = (String) params.get("lectureId");
+        String lectureId = Arrays.toString((String[])params.get("lectureId")).replace("[", "").replace("]", "");
         lectureController.deleteLecture(lectureId);
-        return new ModelAndView("");
+        return new ModelAndView("none");
     }
 }
