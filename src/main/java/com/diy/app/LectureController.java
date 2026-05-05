@@ -1,6 +1,7 @@
 package com.diy.app;
 
 import com.diy.app.entity.Lecture;
+import com.diy.framework.web.annotation.Component;
 import com.diy.framework.web.mvc.Controller;
 import com.diy.framework.web.mvc.view.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,9 +15,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class LectureController implements Controller {
 
-    private final Map<Long, Lecture> lectureRepository = new HashMap<>();
+    private final Map<Long, Lecture> lectureRepository;
+
+    public LectureController() {
+        lectureRepository = new HashMap<>();
+        System.out.println("default constructor");
+    }
 
     @Override
     public ModelAndView handleRequest(final HttpServletRequest request, final HttpServletResponse response) throws Exception {

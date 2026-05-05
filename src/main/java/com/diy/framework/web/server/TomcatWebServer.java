@@ -1,5 +1,7 @@
 package com.diy.framework.web.server;
 
+import com.diy.framework.web.annotation.Component;
+import com.diy.framework.web.scanner.BeanScanner;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Wrapper;
@@ -9,9 +11,16 @@ import org.apache.catalina.webresources.StandardRoot;
 
 import javax.servlet.http.HttpServlet;
 import java.io.File;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Parameter;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.security.CodeSource;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 public class TomcatWebServer {
@@ -19,6 +28,7 @@ public class TomcatWebServer {
     private final Tomcat tomcat = new Tomcat();
     private final int port = 8080;
     private final HttpServlet servlet;
+    private final Set<Class<?>> components = new HashSet<>();
 
     public TomcatWebServer(final HttpServlet servlet) {
         this.servlet = servlet;
@@ -28,6 +38,25 @@ public class TomcatWebServer {
         setServerContext();
         startDaemonAwaitThread();
         startServerInternal();
+        makeBeanInstance();
+    }
+
+    private void makeBeanInstance() {
+        try {
+            for (Class<?> clazz : components) {
+                final Constructor<?> constructor = clazz.getDeclaredConstructor();
+                constructor.newInstance();
+            }
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void scanBean(final List<Class<? extends Annotation>> beans, final String... basePackages) {
+        BeanScanner beanScanner = new BeanScanner(basePackages);
+        for (Class<? extends Annotation> bean : beans) {
+            components.addAll(beanScanner.scanClassesTypeAnnotatedWith(bean));
+        }
     }
 
     public void startServerInternal() {
