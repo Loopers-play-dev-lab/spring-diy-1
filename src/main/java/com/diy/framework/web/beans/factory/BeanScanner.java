@@ -4,7 +4,6 @@ package com.diy.framework.web.beans.factory;
 import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,9 +20,5 @@ public class BeanScanner {
                 .stream()
                 .filter(type -> (!type.isAnnotation() && !type.isInterface()))
                 .collect(Collectors.toSet());
-    }
-
-    public Set<Constructor> scanConstructorsAnnotatedWith(final Class<? extends Annotation> annotation) {
-        return reflections.getConstructorsAnnotatedWith(annotation);
     }
 }
