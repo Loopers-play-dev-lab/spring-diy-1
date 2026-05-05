@@ -3,17 +3,23 @@ package com.diy.app;
 import com.diy.framework.web.annotation.Autowired;
 import com.diy.framework.web.annotation.Component;
 
+import java.util.Collection;
+
 @Component
 public class LectureService {
 
-    private final Lecture lecture;
+    private final LectureRepository lectureRepository;
 
     @Autowired
-    public LectureService(final Lecture lecture) {
-        this.lecture = lecture;
+    public LectureService(final LectureRepository lectureRepository) {
+        this.lectureRepository = lectureRepository;
     }
 
-    public Lecture getLecture() {
-        return lecture;
+    public Lecture save(final Lecture lecture) {
+        return lectureRepository.save(lecture);
+    }
+
+    public Collection<Lecture> findAll() {
+        return lectureRepository.findAll();
     }
 }

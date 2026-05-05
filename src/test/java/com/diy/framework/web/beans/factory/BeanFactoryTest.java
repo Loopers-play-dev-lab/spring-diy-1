@@ -58,6 +58,7 @@ public class BeanFactoryTest {
             }
         }
     }
+
     @Test
     void Autowired_생성자로_빈_주입하기() throws Exception {
         // BeanScanner로 Component 붙은 클래스 찾기
@@ -71,8 +72,10 @@ public class BeanFactoryTest {
         // LectureService 빈 조회
         LectureService lectureService = (LectureService) beanFactory.getBean(LectureService.class);
 
-        // 주입된 Lecture 확인
-        System.out.println(lectureService.getLecture());
-    }
+        // 주입된 Repository로 Lecture 저장 확인
+        Lecture lecture = new Lecture();
+        lectureService.save(lecture);
 
+        System.out.println(lectureService.findAll());
+    }
 }
