@@ -1,9 +1,9 @@
 package com.diy.app;
 
+import com.diy.framework.web.annotation.MethodOrder;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
-
 import java.lang.reflect.Method;
 
 public class ReflectionTest {
@@ -57,4 +57,19 @@ public class ReflectionTest {
         // 호출 결과 출력
         System.out.println(result);
     }
+
+    @Test
+    void 애너테이션으로_메서드_찾기() {
+        // Lecture 메서드들 가져오기
+        Method[] methods = Lecture.class.getDeclaredMethods();
+
+        // MethodOrder 붙은 메서드만 출력
+        for (Method method : methods) {
+            if (method.isAnnotationPresent(MethodOrder.class)) {
+                System.out.println(method);
+            }
+        }
+    }
+
+
 }

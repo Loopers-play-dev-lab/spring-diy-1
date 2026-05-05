@@ -1,5 +1,7 @@
 package com.diy.app;
 
+import com.diy.framework.web.annotation.MethodOrder;
+
 import java.math.BigDecimal;
 
 public class Lecture {
@@ -27,6 +29,7 @@ public class Lecture {
         this.id = id;
     }
 
+    @MethodOrder(1)
     private String getDisplayName() {
         return "lecture";
     }
