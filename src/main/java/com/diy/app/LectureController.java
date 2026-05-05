@@ -15,7 +15,12 @@ import java.util.Map;
 
 public class LectureController implements Controller {
 
-    private final Map<Long, Lecture> lectureRepository = new HashMap<>();
+//    private final Map<Long, Lecture> lectureRepository = new HashMap<>();
+    private final LectureRepository lectureRepository;
+
+    public LectureController(final LectureRepository lectureRepository) {
+        this.lectureRepository = lectureRepository;
+    }
 
     @Override
     public ModelAndView handleRequest(final HttpServletRequest request, final HttpServletResponse response) throws Exception {

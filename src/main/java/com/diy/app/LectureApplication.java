@@ -10,7 +10,8 @@ import java.util.Map;
 public class LectureApplication {
     public static void main(String[] args) {
         final Map<String, Controller> controllerMapping = new HashMap<>();
-        controllerMapping.put("/lectures", new LectureController());
+        final LectureRepository lectureRepository = new LectureMapRepositoryImpl();
+        controllerMapping.put("/lectures", new LectureController(lectureRepository));
 
         final DispatcherServlet servlet = new DispatcherServlet(controllerMapping);
         final TomcatWebServer tomcatWebServer = new TomcatWebServer(servlet);
