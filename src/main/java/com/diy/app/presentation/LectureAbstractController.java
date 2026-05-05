@@ -1,7 +1,7 @@
 package com.diy.app.presentation;
 
 import com.diy.app.domain.Lecture;
-import com.diy.framework.web.beans.factory.ApplicationContext;
+import com.diy.framework.web.beans.factory.WebApplicationContext;
 import com.diy.framework.web.mvc.servlet.AbstractController;
 import com.diy.framework.web.mvc.view.ModelAndView;
 
@@ -20,7 +20,7 @@ public class LectureAbstractController extends AbstractController {
     }
 
     private LectureAbstractController() {
-        ApplicationContext context = ApplicationContext.getInstance();
+        WebApplicationContext context = WebApplicationContext.getInstance();
         this.lectureController = (LectureController) context.getBean("LectureController");
     }
 

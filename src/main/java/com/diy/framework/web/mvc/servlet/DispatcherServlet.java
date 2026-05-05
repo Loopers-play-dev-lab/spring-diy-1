@@ -1,7 +1,7 @@
 package com.diy.framework.web.mvc.servlet;
 
 import com.diy.config.AppConfig;
-import com.diy.framework.web.beans.factory.ApplicationContext;
+import com.diy.framework.web.beans.factory.WebApplicationContext;
 import com.diy.framework.web.config.WebConfig;
 import com.diy.framework.web.mvc.view.ModelAndView;
 import com.diy.framework.web.mvc.view.View;
@@ -38,7 +38,7 @@ public class DispatcherServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        ApplicationContext context = ApplicationContext.getInstance();
+        WebApplicationContext context = WebApplicationContext.getInstance();
         try {
             context.setBeans();
         } catch (Exception e) {

@@ -2,7 +2,7 @@ package com.diy.app.presentation;
 
 import com.diy.app.domain.Lecture;
 import com.diy.app.domain.LectureService;
-import com.diy.framework.web.beans.factory.ApplicationContext;
+import com.diy.framework.web.beans.factory.WebApplicationContext;
 import com.diy.framework.web.mvc.servlet.RestController;
 
 import java.util.Arrays;
@@ -12,7 +12,7 @@ import java.util.Map;
 public class LectureRestController implements RestController {
     private static LectureRestController instance;
     private LectureRestController() {
-        ApplicationContext context = ApplicationContext.getInstance();
+        WebApplicationContext context = WebApplicationContext.getInstance();
         this.lectureService = (LectureService) context.getBean("LectureService");
     }
     public static LectureRestController getInstance() {
