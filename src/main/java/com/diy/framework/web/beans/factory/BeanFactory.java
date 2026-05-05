@@ -1,5 +1,8 @@
 package com.diy.framework.web.beans.factory;
 
+import com.diy.framework.web.annotation.Autowired;
+
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -16,7 +19,7 @@ public class BeanFactory {
     public void initialize(final Set<Class<?>> beanClasses) throws Exception {
         // 빈 클래스들로 객체 생성 후 저장
         for (Class<?> beanClass : beanClasses) {
-            Object bean = beanClass.getDeclaredConstructor().newInstance();
+            Object bean = createBean(beanClass);
             addBean(beanClass, bean);
         }
     }
@@ -24,5 +27,39 @@ public class BeanFactory {
     public Object getBean(final Class<?> clazz) {
         // 저장된 빈 조회
         return beans.get(clazz);
+    }
+
+    private Constructor<?> findConstructor(final Class<?> beanClass) throws NoSuchMethodException {
+        // Autowired 붙은 생성자 찾기
+        for (Constructor<?> constructor : beanClass.getDeclaredConstructors()) {
+            if (constructor.isAnnotationPresent(Autowired.class)) {
+                return constructor;
+            }
+        }
+
+        // 없으면 기본 생성자 사용
+        return beanClass.getDeclaredConstructor();
+    }
+
+    private Object createBean(final Class<?> beanClass) throws Exception {
+        // 사용할 생성자 찾기
+        Constructor<?> constructor = findConstructor(beanClass);
+
+        // 생성자 파라미터 타입 가져오기
+        Class<?>[] parameterTypes = constructor.getParameterTypes();
+
+        // 파라미터 없는 생성자면 바로 객체 생성
+        if (parameterTypes.length == 0) {
+            return constructor.newInstance();
+        }
+
+        // 생성자 파라미터에 넣을 빈들 찾기
+        Object[] parameters = new Object[parameterTypes.length];
+        for (int i = 0; i < parameterTypes.length; i++) {
+            parameters[i] = getBean(parameterTypes[i]);
+        }
+
+        // 찾은 빈들을 생성자에 넣어서 객체 생성
+        return constructor.newInstance(parameters);
     }
 }

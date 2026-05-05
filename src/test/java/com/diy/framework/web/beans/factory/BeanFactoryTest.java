@@ -58,4 +58,21 @@ public class BeanFactoryTest {
             }
         }
     }
+    @Test
+    void Autowired_생성자로_빈_주입하기() throws Exception {
+        // BeanScanner로 Component 붙은 클래스 찾기
+        BeanScanner beanScanner = new BeanScanner("com.diy.app");
+        Set<Class<?>> beanClasses = beanScanner.scanClassesTypeAnnotatedWith(Component.class);
+
+        // BeanFactory가 빈 클래스들로 객체 생성 후 저장
+        BeanFactory beanFactory = new BeanFactory();
+        beanFactory.initialize(beanClasses);
+
+        // LectureService 빈 조회
+        LectureService lectureService = (LectureService) beanFactory.getBean(LectureService.class);
+
+        // 주입된 Lecture 확인
+        System.out.println(lectureService.getLecture());
+    }
+
 }
