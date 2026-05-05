@@ -1,11 +1,10 @@
 package com.diy.app;
 
-import com.diy.framework.web.annotation.Component;
 import com.diy.framework.web.annotation.MethodOrder;
 
 import java.math.BigDecimal;
 
-@Component
+
 public class Lecture {
 
     private Long id;
