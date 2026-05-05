@@ -10,6 +10,7 @@ import java.util.Set;
 public class BeanFactory {
 
     private final Map<Class<?>, Object> beans = new HashMap<>();
+    private Set<Class<?>> beanClasses;
 
     public void addBean(final Class<?> clazz, final Object bean) {
         // 생성한 빈 저장
@@ -17,28 +18,20 @@ public class BeanFactory {
     }
 
     public void initialize(final Set<Class<?>> beanClasses) throws Exception {
+        this.beanClasses = beanClasses;
+
         // 빈 클래스들로 객체 생성 후 저장
         for (Class<?> beanClass : beanClasses) {
-            Object bean = createBean(beanClass);
-            addBean(beanClass, bean);
+            if (getBean(beanClass) == null) {
+                Object bean = createBean(beanClass);
+                addBean(beanClass, bean);
+            }
         }
     }
 
     public Object getBean(final Class<?> clazz) {
         // 저장된 빈 조회
         return beans.get(clazz);
-    }
-
-    private Constructor<?> findConstructor(final Class<?> beanClass) throws NoSuchMethodException {
-        // Autowired 붙은 생성자 찾기
-        for (Constructor<?> constructor : beanClass.getDeclaredConstructors()) {
-            if (constructor.isAnnotationPresent(Autowired.class)) {
-                return constructor;
-            }
-        }
-
-        // 없으면 기본 생성자 사용
-        return beanClass.getDeclaredConstructor();
     }
 
     private Object createBean(final Class<?> beanClass) throws Exception {
@@ -56,10 +49,37 @@ public class BeanFactory {
         // 생성자 파라미터에 넣을 빈들 찾기
         Object[] parameters = new Object[parameterTypes.length];
         for (int i = 0; i < parameterTypes.length; i++) {
-            parameters[i] = getBean(parameterTypes[i]);
+            parameters[i] = getOrCreateBean(parameterTypes[i]);
         }
 
         // 찾은 빈들을 생성자에 넣어서 객체 생성
         return constructor.newInstance(parameters);
+    }
+
+    private Object getOrCreateBean(final Class<?> beanClass) throws Exception {
+        Object bean = getBean(beanClass);
+        if (bean != null) {
+            return bean;
+        }
+
+        if (!beanClasses.contains(beanClass)) {
+            throw new IllegalArgumentException("빈 클래스를 찾을 수 없습니다: " + beanClass.getName());
+        }
+
+        bean = createBean(beanClass);
+        addBean(beanClass, bean);
+        return bean;
+    }
+
+    private Constructor<?> findConstructor(final Class<?> beanClass) throws NoSuchMethodException {
+        // Autowired 붙은 생성자 찾기
+        for (Constructor<?> constructor : beanClass.getDeclaredConstructors()) {
+            if (constructor.isAnnotationPresent(Autowired.class)) {
+                return constructor;
+            }
+        }
+
+        // 없으면 기본 생성자 사용
+        return beanClass.getDeclaredConstructor();
     }
 }
