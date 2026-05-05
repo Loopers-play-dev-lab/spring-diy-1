@@ -18,4 +18,19 @@ public class BeanScannerTest {
         // 찾은 클래스 출력
         System.out.println(classes);
     }
+
+    @Test
+    void 빈_객체_생성() throws Exception {
+        // com.diy.app 패키지 스캔 준비
+        BeanScanner beanScanner = new BeanScanner("com.diy.app");
+
+        // Component 붙은 클래스 찾기
+        Set<Class<?>> classes = beanScanner.scanClassesTypeAnnotatedWith(Component.class);
+
+        // 찾은 클래스로 객체 생성
+        for (Class<?> clazz : classes) {
+            Object bean = clazz.getDeclaredConstructor().newInstance();
+            System.out.println(bean);
+        }
+    }
 }
