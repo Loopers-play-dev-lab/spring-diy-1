@@ -2,8 +2,8 @@ package com.diy.app.controller.lecutre;
 
 import com.diy.app.domain.Lecture;
 import com.diy.app.repository.LecturesRepository;
+import com.diy.framework.web.beans.annotation.Autowired;
 import com.diy.framework.web.utils.ControllerV1;
-import com.diy.framework.web.utils.Model;
 import com.diy.framework.web.utils.RequestBodyV1;
 import com.diy.framework.web.utils.ResponseV1;
 
@@ -12,6 +12,7 @@ import java.util.Optional;
 public class LecturePutControllerV1 implements ControllerV1 {
     private final LecturesRepository lecturesRepository;
 
+    @Autowired
     public LecturePutControllerV1() {
         this.lecturesRepository = LecturesRepository.getInstance();
     }
