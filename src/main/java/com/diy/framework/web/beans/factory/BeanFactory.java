@@ -41,7 +41,11 @@ public class BeanFactory {
             Object[] args = Arrays.stream(constructor.getParameterTypes())
                     .map(type -> {
                         registerBean(type);
-                        return beans.get(type);
+                        Object bean = beans.get(type);
+                        if(bean == null){
+                            throw new RuntimeException("No Search bean");
+                        }
+                        return bean;
                     })
                     .toArray();
 
@@ -59,10 +63,10 @@ public class BeanFactory {
                 .toList();
 
         if (implementations.isEmpty()) {
-            throw new RuntimeException("No implementation found for " + interfaceType.getName());
+            throw new RuntimeException("No implementation");
         }
         if (implementations.size() > 1) {
-            throw new RuntimeException("Multiple implementations found for " + interfaceType.getName());
+            throw new RuntimeException("Multiple implementations");
         }
 
         return implementations.getFirst();
