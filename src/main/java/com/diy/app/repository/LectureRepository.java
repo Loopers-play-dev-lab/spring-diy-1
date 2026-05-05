@@ -1,11 +1,13 @@
 package com.diy.app.repository;
 
 import com.diy.app.domain.Lecture;
+import com.diy.framework.web.annotation.Component;
 
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Component
 public class LectureRepository {
 
     private final Map<String, Lecture> lectures = new ConcurrentHashMap<>();

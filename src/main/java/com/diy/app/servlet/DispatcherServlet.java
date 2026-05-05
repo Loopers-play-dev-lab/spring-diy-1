@@ -5,6 +5,10 @@ import com.diy.app.controller.LectureController;
 import com.diy.app.render.JspView;
 import com.diy.app.render.View;
 import com.diy.app.resolver.ViewResolver;
+import com.diy.framework.web.annotation.Autowired;
+import com.diy.framework.web.annotation.Component;
+import com.diy.framework.web.bean.factory.BeanFactory;
+import com.diy.framework.web.bean.factory.BeanScanner;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -15,9 +19,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
@@ -28,7 +37,50 @@ public class DispatcherServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        controllers.put("/lectures", new LectureController());
+
+        try {
+            initBeans();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        LectureController lectureController = (LectureController) BeanFactory
+                .getBeanFactory()
+                .getBean("LectureController");
+
+        controllers.put("/lectures", lectureController);
+    }
+
+    private static void initBeans() throws Exception {
+        BeanScanner scanner = new BeanScanner("com.diy.app");
+        Set<Class<?>> beans = scanner.scanClassesTypeAnnotatedWith(Component.class);
+
+        Map<String, Object> createdBeans = new HashMap<>();
+
+        // bean 생성 (기본 생성자)
+        for (Class<?> bean : beans) {
+            final Constructor<?> constructor = bean.getDeclaredConstructors()[0];
+            Object createdBean = null;
+
+            createdBean = constructor.newInstance();
+            createdBeans.put(bean.getSimpleName(), createdBean);
+        }
+
+        // Autowired 적용
+        for (Object bean : createdBeans.values()) {
+            Field[] fields = bean.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                Annotation annotation = field.getAnnotation(Autowired.class);
+                if (annotation != null) {
+                    field.setAccessible(true);
+                    field.set(bean, createdBeans.get(field.getType().getSimpleName()));
+                    field.setAccessible(false);
+                }
+            }
+        }
+
+        BeanFactory beanFactory = BeanFactory.getBeanFactory();
+        createdBeans.values().forEach(beanFactory::addBean);
     }
 
     @Override
@@ -41,8 +93,8 @@ public class DispatcherServlet extends HttpServlet {
             if (modelAndView != null) {
                 render(modelAndView, req, resp);
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (Exception ignored) {
+
         }
     }
 
