@@ -1,10 +1,7 @@
 package com.diy.app.Entity;
 
-import com.diy.app.annotation.Component;
-
 import java.math.BigDecimal;
 
-@Component
 public class Lecture {
     private  Long id;
     private  String name;

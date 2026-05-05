@@ -14,8 +14,12 @@ import java.util.List;
 @Component
 public class GetController implements Controller {
 
+    private final ILectureRepository repository;
+
     @Autowired
-    private ILectureRepository repository;
+    GetController(ILectureRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public ModelAndView handleRequest(HttpServletRequest req, HttpServletResponse resp) throws Exception {

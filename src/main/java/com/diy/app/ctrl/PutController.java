@@ -13,8 +13,13 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class PutController implements Controller {
 
+
+    private final ILectureRepository repository;
+
     @Autowired
-    private ILectureRepository repository;
+    public PutController(ILectureRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public ModelAndView handleRequest(HttpServletRequest req, HttpServletResponse resp) throws Exception {

@@ -5,6 +5,7 @@ import org.reflections.scanners.Scanners;
 import org.reflections.util.ConfigurationBuilder;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,6 +19,7 @@ public class BeanScanner {
                 .forPackages(basePackages)
                 .addScanners(
                         Scanners.TypesAnnotated,  // @Component 스캔용
+                        Scanners.ConstructorsAnnotated, // 생성자 스캔용
                         Scanners.FieldsAnnotated, // @Autowired 스캔용
                         Scanners.SubTypes         // 상속/인터페이스 스캔용
                 ));
@@ -31,5 +33,12 @@ public class BeanScanner {
     }
     public Set<Field> scanFieldTypeAnnotatedWith(Class<? extends Annotation> annotation) {
         return reflections.getFieldsAnnotatedWith(annotation);
+    }
+
+    public Set<Constructor<?>> scanConstructorTypeAnnotatedWith(Class<? extends Annotation> annotation) {
+        return reflections.getConstructorsAnnotatedWith(annotation)
+                .stream()
+                .map( c -> (Constructor<?>) c)
+                .collect(Collectors.toSet());
     }
 }

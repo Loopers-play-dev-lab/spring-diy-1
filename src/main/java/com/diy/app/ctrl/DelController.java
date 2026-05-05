@@ -15,8 +15,12 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class DelController implements Controller {
 
+    private final ILectureRepository repository;
+
     @Autowired
-    private ILectureRepository repository;
+    public DelController(ILectureRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public ModelAndView handleRequest(HttpServletRequest req, HttpServletResponse resp) throws Exception {
