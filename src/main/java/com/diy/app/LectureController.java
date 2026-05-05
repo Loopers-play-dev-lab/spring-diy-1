@@ -2,6 +2,8 @@ package com.diy.app;
 
 import com.diy.framework.view.ModelAndView;
 import com.diy.framework.web.Controller;
+import com.diy.framework.web.beans.annotation.Autowired;
+import com.diy.framework.web.beans.annotation.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.ServletException;
@@ -10,8 +12,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
+@Component
 public class LectureController implements Controller {
-    private final LectureRepository repository = new LectureRepositoryImpl();
+    private final LectureService lectureService;
+
+    @Autowired
+    public LectureController(LectureService lectureService) {
+        this.lectureService = lectureService;
+    };
 
     @Override
     public ModelAndView handleRequest(HttpServletRequest req, HttpServletResponse resp) throws Exception {
@@ -24,27 +32,27 @@ public class LectureController implements Controller {
         };
     }
 
-    protected ModelAndView doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Map<Long, Lecture> lectures = repository.findAll();
+    protected ModelAndView doGet(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        Map<Long, Lecture> lectures = lectureService.getLectures();
         Map<String, Object> model = Map.of("lectures", lectures.values());
         return new ModelAndView("lecture-list", model);
     }
 
-    protected ModelAndView doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected ModelAndView doPost(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Lecture lecture = parseJsonToLecture(req);
-        repository.save(lecture);
+        lectureService.addLecture(lecture);
         return new ModelAndView("redirect:/lectures");
     }
 
-    protected ModelAndView doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected ModelAndView doPut(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Lecture lecture = parseJsonToLecture(req);
-        repository.update(lecture);
+        lectureService.editLecture(lecture);
         return new ModelAndView("redirect:/lectures");
     }
 
-    protected ModelAndView doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected ModelAndView doDelete(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Lecture lecture = parseJsonToLecture(req);
-        repository.delete(lecture);
+        lectureService.deleteLecture(lecture);
         return new ModelAndView("redirect:/lectures");
     }
 

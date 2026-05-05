@@ -1,6 +1,6 @@
 package com.diy.app;
 
-import com.diy.framework.web.beans.factory.Component;
+import com.diy.framework.web.beans.annotation.Component;
 
 import java.util.HashMap;
 import java.util.Map;
