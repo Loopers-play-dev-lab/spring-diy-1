@@ -6,6 +6,16 @@ plugins {
 group = "com.diy"
 version = "1.0-SNAPSHOT"
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+kotlin {
+    jvmToolchain(21)
+}
+
 repositories {
     mavenCentral()
 }
