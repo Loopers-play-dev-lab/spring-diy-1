@@ -4,6 +4,7 @@ import com.diy.app.lecture.request.CreateLectureRequest;
 import com.diy.framework.Controller;
 import com.diy.framework.ModelAndView;
 
+import com.diy.framework.annotation.Component;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class LectureController implements Controller {
 
     private final LectureService lectureService;
