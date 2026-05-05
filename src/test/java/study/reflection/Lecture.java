@@ -1,6 +1,6 @@
 package study.reflection;
 
-import com.diy.framework.web.annotation.MethodOrder;
+import com.diy.framework.web.beans.annotation.MethodOrder;
 
 public class Lecture {
     private final String name;

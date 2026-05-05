@@ -5,6 +5,9 @@ import com.diy.app.controller.lecutre.LectureDelControllerV1;
 import com.diy.app.controller.lecutre.LectureGetControllerV1;
 import com.diy.app.controller.lecutre.LecturePostControllerV1;
 import com.diy.app.controller.lecutre.LecturePutControllerV1;
+import com.diy.framework.web.beans.annotation.Component;
+import com.diy.framework.web.beans.factory.BeanFactory;
+import com.diy.framework.web.beans.factory.BeanScanner;
 import com.diy.framework.web.utils.*;
 import com.diy.framework.web.view.ViewV1;
 import com.diy.framework.web.view.ViewResolve;
@@ -16,8 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
-@WebServlet("/")
 public class DispatcherServlet{
     private final Map<String, ControllerV1> getControllerMap = new HashMap<>();
     private final Map<String, ControllerV1> postControllerMap = new HashMap<>();
@@ -26,11 +29,6 @@ public class DispatcherServlet{
     private final ViewResolve viewResolve;
 
     public DispatcherServlet() {
-        this.getControllerMap.put("/lectures", new LectureGetControllerV1());
-        this.postControllerMap.put("/lectures", new LecturePostControllerV1());
-        this.putControllerMap.put("/lectures", new LecturePutControllerV1());
-        this.delControllerMap.put("/lectures", new LectureDelControllerV1());
-        this.getControllerMap.put("/", new HomeGetControllerV1());
         this.viewResolve = new ViewResolve();
     }
 

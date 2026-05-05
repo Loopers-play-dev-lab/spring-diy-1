@@ -1,17 +1,13 @@
 package study.reflection;
 
-import com.diy.framework.web.annotation.MethodOrder;
-import com.diy.framework.web.annotation.PrintView;
+import com.diy.framework.web.beans.annotation.MethodOrder;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class LectureTest {
     @Test
