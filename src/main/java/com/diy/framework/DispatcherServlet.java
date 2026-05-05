@@ -4,11 +4,8 @@ import com.diy.framework.view.JspViewResolver;
 import com.diy.framework.view.UrlBasedViewResolver;
 import com.diy.framework.view.View;
 import com.diy.framework.view.ViewResolver;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.diy.framework.view.ViewResolverComposite;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletException;
@@ -19,12 +16,20 @@ import javax.servlet.http.HttpServletResponse;
 public class DispatcherServlet extends HttpServlet {
 
     private final Map<String, Controller> controllerMapping;
-    private final List<ViewResolver> viewResolvers = new ArrayList<>();
+
+    private RequestParamParser requestParamParser;
+    private ViewResolverComposite viewResolverComposite;
 
     public DispatcherServlet(Map<String, Controller> controllerMapping) {
         this.controllerMapping = controllerMapping;
-        this.viewResolvers.add(new UrlBasedViewResolver());
-        this.viewResolvers.add(new JspViewResolver());
+    }
+
+    @Override
+    public void init() {
+        this.requestParamParser = new RequestParamParser();
+
+        List<ViewResolver> viewResolvers = List.of(new UrlBasedViewResolver(), new JspViewResolver());
+        this.viewResolverComposite = new ViewResolverComposite(viewResolvers);
     }
 
     @Override
@@ -39,43 +44,15 @@ public class DispatcherServlet extends HttpServlet {
         }
 
         try {
-            Map<String, ?> params = parseParams(req);
+            Map<String, ?> params = requestParamParser.parse(req);
             req.setAttribute("params", params);
 
             ModelAndView mav = controller.handleRequest(req, resp);
-            render(mav, req, resp);
+
+            View view = viewResolverComposite.resolve(mav.getViewName());
+            view.render(mav.getModel(), req, resp);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private Map<String, ?> parseParams(final HttpServletRequest req) throws IOException {
-        if ("application/json".equals(req.getHeader("Content-Type"))) {
-            final byte[] bodyBytes = req.getInputStream().readAllBytes();
-            final String body = new String(bodyBytes, StandardCharsets.UTF_8);
-
-            return new ObjectMapper().readValue(body, new TypeReference<Map<String, Object>>() {
-            });
-        } else {
-            return req.getParameterMap();
-        }
-    }
-
-    private void render(final ModelAndView mav, final HttpServletRequest req,
-            final HttpServletResponse resp) throws Exception {
-        final String viewName = mav.getViewName();
-        final View view = resolveViewName(viewName);
-        view.render(mav.getModel(), req, resp);
-    }
-
-    private View resolveViewName(final String viewName) {
-        for (final ViewResolver viewResolver : this.viewResolvers) {
-            final View view = viewResolver.resolveViewName(viewName);
-            if (view != null) {
-                return view;
-            }
-        }
-
-        throw new RuntimeException("View not found: " + viewName);
     }
 }
