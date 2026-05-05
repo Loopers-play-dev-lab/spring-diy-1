@@ -8,6 +8,9 @@ public class Lecture {
     String name;
     Price price;
 
+    protected Lecture() {
+    }
+
     public Lecture(String name, Price price) {
         this.id = ++idOffset;
         this.name = name;
