@@ -17,9 +17,13 @@ public class BeanContainer {
 
     private final Map<Class<?>, Object> beans = new HashMap<>();
     private final Set<Class<?>> creatingBeans = new HashSet<>();
+    private final Set<Class<?>> beanClasses;
 
     public BeanContainer(String basePackages) {
         Set<Class<?>> classes = new BeanScanner(basePackages)
+            .scanClassesTypeAnnotatedWith(Component.class);
+
+        this.beanClasses = new BeanScanner(basePackages)
             .scanClassesTypeAnnotatedWith(Component.class);
 
         for (Class<?> clazz : classes) {
@@ -94,7 +98,19 @@ public class BeanContainer {
 
     private Class<?> resolveDependencyType(Class<?> type) {
         if (type.isInterface() || Modifier.isAbstract(type.getModifiers())) {
-            throw new IllegalStateException("생성할 수 없습니다: " + type.getName());
+            List<Class<?>> candidates = beanClasses.stream()
+                .filter(type::isAssignableFrom)
+                .toList();
+
+            if (candidates.isEmpty()) {
+                throw new IllegalStateException("구현체가 없습니다: " + type.getName());
+            }
+
+            if (candidates.size() > 1) {
+                throw new IllegalStateException("구현체가 여러 개입니다: " + type.getName());
+            }
+
+            return candidates.getFirst();
         }
 
         if (!type.isAnnotationPresent(Component.class)) {
