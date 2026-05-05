@@ -1,7 +1,10 @@
 package com.diy.framework.web.beans.factory;
 
 import com.diy.app.Lecture;
+import com.diy.framework.web.annotation.Component;
 import org.junit.jupiter.api.Test;
+
+import java.util.Set;
 
 public class BeanFactoryTest {
 
@@ -17,6 +20,23 @@ public class BeanFactoryTest {
         beanFactory.addBean(Lecture.class, lecture);
 
         // Lecture 빈 조회
+        Object bean = beanFactory.getBean(Lecture.class);
+
+        // 조회한 빈 출력
+        System.out.println(bean);
+    }
+
+    @Test
+    void 빈_클래스로_객체_생성하고_저장하기() throws Exception {
+        // BeanScanner로 Component 붙은 클래스 찾기
+        BeanScanner beanScanner = new BeanScanner("com.diy.app");
+        Set<Class<?>> beanClasses = beanScanner.scanClassesTypeAnnotatedWith(Component.class);
+
+        // BeanFactory가 빈 클래스들로 객체 생성 후 저장
+        BeanFactory beanFactory = new BeanFactory();
+        beanFactory.initialize(beanClasses);
+
+        // 저장된 Lecture 빈 조회
         Object bean = beanFactory.getBean(Lecture.class);
 
         // 조회한 빈 출력
