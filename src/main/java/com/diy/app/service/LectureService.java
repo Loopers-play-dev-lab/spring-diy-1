@@ -2,12 +2,16 @@ package com.diy.app.service;
 
 import com.diy.app.domain.Lecture;
 import com.diy.app.repository.LectureRepository;
+import com.diy.framework.web.annotation.Autowired;
+import com.diy.framework.web.annotation.Component;
 
 import java.util.Map;
 
+@Component
 public class LectureService {
 
-    private final LectureRepository lectureRepository = new LectureRepository();
+    @Autowired
+    private LectureRepository lectureRepository;
 
     public Map<String, Lecture> getLectures() {
         return lectureRepository.getLectures();

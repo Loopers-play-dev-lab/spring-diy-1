@@ -3,9 +3,10 @@ package com.diy.app.controller;
 import com.diy.app.domain.Lecture;
 import com.diy.app.service.LectureService;
 import com.diy.app.servlet.ModelAndView;
+import com.diy.framework.web.annotation.Autowired;
+import com.diy.framework.web.annotation.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,10 +15,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class LectureController implements Controller {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final LectureService lectureService = new LectureService();
+
+    @Autowired
+    private LectureService lectureService;
 
     @Override
     public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
