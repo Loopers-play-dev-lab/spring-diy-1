@@ -2,14 +2,14 @@ package com.diy.app.repository.build;
 
 import com.diy.app.domain.Lecture;
 import com.diy.app.repository.LectureJpaRepository;
-import com.diy.framework.jpa.repository.JpaRepository;
+import com.diy.framework.web.beans.Component;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-// TODO: 제네릭 + 인터페이스화 시키기
+@Component
 public class LectureRepositoryImpl implements LectureJpaRepository {
 
     private static final Map<Long, Lecture> _map = new HashMap<>();
