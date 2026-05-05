@@ -6,6 +6,7 @@ public class Lecture {
     long id;
     String name;
     int price;
+    private boolean visible;
 
     public Lecture() {}
 
@@ -15,16 +16,34 @@ public class Lecture {
         this.price = price;
     }
 
+    public Lecture(final String name, final int price) {
+        this.name = name;
+        this.price = price;
+        this.visible = false;
+    }
+
+    public Lecture(final String name, final int price, final boolean visible) {
+        this.name = name;
+        this.price = price;
+        this.visible = visible;
+    }
+
     public long getId() {
         return id;
     }
 
-    public String getName() {
-        return name;
+    private void changeVisible() {
+        this.visible = true;
     }
 
+    @MethodOrder(1)
+    public String getName() {
+        return this.name;
+    }
+
+    @MethodOrder(2)
     public int getPrice() {
-        return price;
+        return this.price;
     }
 
     public void setId(long id) {
