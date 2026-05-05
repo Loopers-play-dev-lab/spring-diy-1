@@ -1,7 +1,8 @@
 package com.diy.app.controller.view;
 
-import com.diy.app.store.Lecture;
-import com.diy.app.store.LectureStore;
+import com.diy.app.repository.Lecture;
+import com.diy.app.repository.LectureRepository;
+import com.diy.framework.web.annotations.Component;
 import com.diy.framework.web.server.exceptions.MethodNotAllowedException;
 import com.diy.framework.web.server.controller.Controller;
 import com.diy.framework.web.server.servlet.views.ModelAndView;
@@ -11,9 +12,10 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@Component
 public class LectureListController implements Controller {
 
-  private final LectureStore lectureStore = new LectureStore();
+  private final LectureRepository lectureRepository = new LectureRepository();
 
   @Override
   public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) {
@@ -24,7 +26,7 @@ public class LectureListController implements Controller {
   }
 
   public ModelAndView findAll() {
-     List<Lecture> lectures = lectureStore.list();
+     List<Lecture> lectures = lectureRepository.list();
 
     Map<String, Object> model = new HashMap<>();
     model.put("lectures", lectures);

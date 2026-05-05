@@ -1,11 +1,15 @@
 package com.diy.framework.web.server.servlet;
 
-import com.diy.framework.web.server.config.BaseConfig;
-import com.diy.framework.web.server.exceptions.CustomException;
+import com.diy.app.controller.api.LectureController;
+import com.diy.app.controller.view.LectureListController;
+import com.diy.framework.web.annotations.Component;
+import com.diy.framework.web.beans.factory.BeanContainer;
 import com.diy.framework.web.server.controller.Controller;
 import com.diy.framework.web.server.controller.ControllerResolver;
+import com.diy.framework.web.server.exceptions.CustomException;
 import com.diy.framework.web.server.exceptions.NotFoundViewException;
 import com.diy.framework.web.server.servlet.utils.HttpServletUtils;
+import com.diy.framework.web.server.servlet.views.JspViewResolver;
 import com.diy.framework.web.server.servlet.views.ModelAndView;
 import com.diy.framework.web.server.servlet.views.View;
 import com.diy.framework.web.server.servlet.views.ViewResolver;
@@ -16,19 +20,28 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@Component
 @WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
+
+  private BeanContainer beanContainer;
   private ControllerResolver controllerResolver;
   private ViewResolver viewResolver;
 
   @Override
   public void init() {
-    controllerResolver = new ControllerResolver();
-    viewResolver = BaseConfig.viewResolver();
+    beanContainer = new BeanContainer("com.diy.app");
+    // 이거 너무 모양이 이상해지는데...
+    controllerResolver = new ControllerResolver(
+        beanContainer.getBean(LectureController.class),
+        beanContainer.getBean(LectureListController.class)
+    );
+    viewResolver = new JspViewResolver();
   }
 
   @Override
-  protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+  protected void service(final HttpServletRequest req, final HttpServletResponse resp)
+      throws IOException {
     String path = HttpServletUtils.getUriPath(req);
     req.setAttribute("params", HttpServletUtils.parseBody(req));
 

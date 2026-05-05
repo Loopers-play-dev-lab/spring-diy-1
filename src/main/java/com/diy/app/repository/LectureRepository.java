@@ -1,13 +1,15 @@
-package com.diy.app.store;
+package com.diy.app.repository;
 
 import com.diy.app.controller.api.LectureRequest;
+import com.diy.framework.web.annotations.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class LectureStore {
+@Component
+public class LectureRepository {
 
   private static final AtomicLong idGenerator = new AtomicLong(0);
   private static final ConcurrentMap<Long, Lecture> lectureMap = new ConcurrentHashMap<>();
