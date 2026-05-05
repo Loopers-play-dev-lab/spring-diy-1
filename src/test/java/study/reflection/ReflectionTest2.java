@@ -1,6 +1,5 @@
 package study.reflection;
 
-import com.diy.app.Lecture;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -27,10 +26,10 @@ public class ReflectionTest2 {
         throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         Class<Lecture> lectureClass = Lecture.class;
 
-        Lecture lecture = lectureClass.getDeclaredConstructor().newInstance();
-        lecture.setId(100L);
+        Constructor<Lecture> declaredConstructor = lectureClass.getDeclaredConstructor(String.class, int.class);
+        Lecture lecture = declaredConstructor.newInstance("kim", 100);
 
-        System.out.println(lecture.getId());
+        System.out.println(lecture.getPrice());
     }
 
     @Test
@@ -56,7 +55,10 @@ public class ReflectionTest2 {
         Method[] methods = lectureClass.getDeclaredMethods();
         for (Method method : methods) {
             if(method.getModifiers() == Modifier.PRIVATE){
-                Lecture lecture = lectureClass.getDeclaredConstructor().newInstance();
+
+                Constructor<Lecture> declaredConstructor = lectureClass.getDeclaredConstructor(String.class, int.class);
+                Lecture lecture = declaredConstructor.newInstance("kim", 100);
+
                 method.setAccessible(true);
                 method.invoke(lecture);
             }
