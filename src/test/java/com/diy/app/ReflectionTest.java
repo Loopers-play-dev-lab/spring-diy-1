@@ -71,5 +71,17 @@ public class ReflectionTest {
         }
     }
 
+    @Test
+    void MethodOrder_애너테이션_정보_조회() throws Exception {
+        // MethodOrder 붙은 메서드 찾기
+        Method method = Lecture.class.getDeclaredMethod("getDisplayName");
+
+        // MethodOrder 애너테이션 가져오기
+        MethodOrder methodOrder = method.getAnnotation(MethodOrder.class);
+
+        // 애너테이션 값 출력
+        System.out.println(methodOrder.value());
+    }
+
 
 }
