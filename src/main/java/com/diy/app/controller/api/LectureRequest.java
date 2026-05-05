@@ -1,6 +1,6 @@
 package com.diy.app.controller.api;
 
-import com.diy.app.store.Lecture;
+import com.diy.app.repository.Lecture;
 
 public class LectureRequest {
 

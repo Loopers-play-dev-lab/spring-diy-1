@@ -1,19 +1,25 @@
 package com.diy.app.controller.api;
 
-import com.diy.app.store.LectureStore;
-import com.diy.framework.web.server.exceptions.MethodNotAllowedException;
+import com.diy.app.repository.LectureRepository;
+import com.diy.framework.web.annotations.Autowired;
+import com.diy.framework.web.annotations.Component;
 import com.diy.framework.web.server.controller.Controller;
+import com.diy.framework.web.server.exceptions.MethodNotAllowedException;
 import com.diy.framework.web.server.servlet.views.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@Component
 public class LectureController implements Controller {
 
   private final ObjectMapper objectMapper = new ObjectMapper();
-  private final LectureStore lectureStore = new LectureStore();
+  private final LectureRepository lectureRepository;
+
+  @Autowired
+  public LectureController(LectureRepository lectureRepository) {
+    this.lectureRepository = lectureRepository;
+  }
 
   @Override
   public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) {
@@ -27,21 +33,21 @@ public class LectureController implements Controller {
 
   public ModelAndView create(HttpServletRequest req) {
     var createRequest = objectMapper.convertValue(req.getAttribute("params"), LectureRequest.Create.class);
-    lectureStore.add(createRequest);
+    lectureRepository.add(createRequest);
 
     return new ModelAndView("redirect:lecture-list");
   }
 
   public ModelAndView update(HttpServletRequest req) {
     var updateRequest = objectMapper.convertValue(req.getAttribute("params"), LectureRequest.Update.class);
-    lectureStore.update(updateRequest.toLecture());
+    lectureRepository.update(updateRequest.toLecture());
 
     return new ModelAndView("redirect:lecture-list");
   }
 
   public ModelAndView delete(HttpServletRequest req) {
     var deleteRequest = objectMapper.convertValue(req.getAttribute("params"), LectureRequest.Delete.class);
-    lectureStore.delete(deleteRequest.id());
+    lectureRepository.delete(deleteRequest.id());
 
     return new ModelAndView("redirect:lecture-list");
   }
