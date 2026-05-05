@@ -1,21 +1,20 @@
-package com.diy.app;
+package com.diy.app.dto;
+
+import com.diy.app.Lecture;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
 
-public class Lecture {
+public class LectureCreateRequest {
 
-    private Long id;
     private String name;
     private BigDecimal price;
 
-    public Lecture() {
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Lecture(Long id, String name, BigDecimal price) {
+    @JsonCreator
+    public LectureCreateRequest(
+            @JsonProperty("name") String name,
+            @JsonProperty("price") BigDecimal price) {
         if (name == null || name.isBlank()){
             throw new IllegalArgumentException("이름은 필수 입력 항목입니다.");
         }
@@ -23,28 +22,18 @@ public class Lecture {
             throw new IllegalArgumentException("가격은 0원 이상이어야 합니다.");
         }
 
-        this.id = id;
         this.name = name;
         this.price = price;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
+    public Lecture toLecture(){
+        return new Lecture(null, this.name, this.price);
     }
 
     @Override
     public String toString() {
-        return "Lecture{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
+        return "LectureCreateRequest{" +
+                "name='" + name + '\'' +
                 ", price=" + price +
                 '}';
     }
