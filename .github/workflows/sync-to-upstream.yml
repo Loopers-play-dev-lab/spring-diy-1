@@ -1,0 +1,39 @@
+name: Sync PR
+
+on:
+  pull_request:
+    branches: [yuntasha]
+    types: [closed]
+
+jobs:
+  sync:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    env:
+      PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+    steps:
+      - name: Checkout PR source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to target repo
+        run: |
+          git remote add target https://x-access-token:${{ secrets.TARGET_REPO_TOKEN }}@github.com/Loopers-play-dev-lab/spring-diy-1.git
+          git push target HEAD:refs/heads/${{ env.PR_AUTHOR }} --force
+
+      - name: Create PR on target repo
+        env:
+          GH_TOKEN: ${{ secrets.TARGET_REPO_TOKEN }}
+        run: |
+          EXISTING_PR=$(gh pr list --repo Loopers-play-dev-lab/spring-diy-1 --head "$PR_AUTHOR" --base main --json number --jq '.[0].number')
+          if [ -z "$EXISTING_PR" ]; then
+            gh pr create \
+              --repo Loopers-play-dev-lab/spring-diy-1 \
+              --head "$PR_AUTHOR" \
+              --base main \
+              --title "$PR_AUTHOR/${{ github.event.pull_request.head.ref }}" \
+              --body "${{ github.event.pull_request.body }}"
+          else
+            echo "PR #$EXISTING_PR already exists, skipped creation."
+          fi

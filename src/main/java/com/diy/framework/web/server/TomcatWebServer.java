@@ -44,6 +44,7 @@ public class TomcatWebServer {
         // url 경로와 리소스 경로 매핑 (contextPath를 /abc로 바꾸면 prefix가 붙게됨)
         final Context context = this.tomcat.addWebapp("/", absoluteResourcesPath);
 
+        // reader는 UTF-8이 자바에서 제공하는거랑 다르다
         context.setRequestCharacterEncoding("UTF-8");
         context.setResponseCharacterEncoding("UTF-8");
 
