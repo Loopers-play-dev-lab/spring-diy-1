@@ -10,19 +10,19 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LectureRepository {
     private final Map<String, Lecture> lectureRepository = new ConcurrentHashMap<>();
 
-    private List<Lecture> findAll() {
+    public List<Lecture> findAll() {
         return lectureRepository.values().stream().toList();
     }
 
-    private Lecture findById(String id) {
+    public Lecture findById(String id) {
         return lectureRepository.get(id);
     }
 
-    private void save(Lecture lecture) {
+    public void save(Lecture lecture) {
         lectureRepository.put(lecture.getId(), lecture);
     }
 
-    private void deleteById(String id) {
+    public void deleteById(String id) {
         lectureRepository.remove(id);
     }
 }
