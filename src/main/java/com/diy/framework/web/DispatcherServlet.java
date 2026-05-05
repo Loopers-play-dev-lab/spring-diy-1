@@ -27,9 +27,11 @@ public class DispatcherServlet{
     private final Map<String, ControllerV1> putControllerMap = new HashMap<>();
     private final Map<String, ControllerV1> delControllerMap = new HashMap<>();
     private final ViewResolve viewResolve;
+    private final BeanFactory beanFactory;
 
     public DispatcherServlet() {
         this.viewResolve = new ViewResolve();
+        this.beanFactory = new BeanFactory("com.diy.app");
     }
 
     public void setPostController(String path, ControllerV1 controller) {

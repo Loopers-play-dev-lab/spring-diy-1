@@ -33,8 +33,6 @@ public class MainController extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("Start DispatcherServlet");
-        BeanFactory beanFactory = new BeanFactory("com.diy.app");
         this.dispatcherServlet.service(req, resp);
     }
 }

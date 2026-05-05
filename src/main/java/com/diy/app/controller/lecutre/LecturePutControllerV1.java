@@ -1,7 +1,6 @@
 package com.diy.app.controller.lecutre;
 
 import com.diy.app.domain.Lecture;
-import com.diy.app.repository.LecturesMapRepository;
 import com.diy.app.repository.LecturesRepository;
 import com.diy.framework.web.beans.annotation.Autowired;
 import com.diy.framework.web.utils.ControllerV1;
@@ -15,7 +14,7 @@ public class LecturePutControllerV1 implements ControllerV1 {
 
     @Autowired
     public LecturePutControllerV1() {
-        this.lecturesRepository = LecturesMapRepository.getInstance();
+        this.lecturesRepository = LecturesRepository.getInstance();
     }
 
     @Override
