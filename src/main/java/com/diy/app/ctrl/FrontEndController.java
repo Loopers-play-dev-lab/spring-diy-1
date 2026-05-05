@@ -1,5 +1,6 @@
 package com.diy.app.ctrl;
 
+import com.diy.app.view.ModelAndView;
 import com.diy.app.view.View;
 import com.diy.app.view.ViewResolver;
 
@@ -21,7 +22,7 @@ public class FrontEndController extends HttpServlet {
     @Override
     public void init() throws ServletException {
         // Strategy 전략을 통해 html로 변경시 suffix, prefix만 설정
-        viewResolver = new ViewResolver("/",".html");
+        viewResolver = new ViewResolver("/",".jsp");
 
         controllerMap.put("GET:/lectures", new GetController());
         controllerMap.put("POST:/lectures", new PostController());
@@ -40,8 +41,9 @@ public class FrontEndController extends HttpServlet {
             return;
         }
         try {
-            String viewName = controller.handleRequest(req, resp);
-            // redirect 처리
+            ModelAndView mav = controller.handleRequest(req, resp);
+            String viewName = mav.getViewName();
+
             if (viewName.startsWith("redirect:")) {
                 String path = viewName.substring("redirect:".length());
                 resp.sendRedirect(req.getContextPath() + path);
@@ -49,11 +51,13 @@ public class FrontEndController extends HttpServlet {
             }
 
             View view = viewResolver.resolve(viewName);
-            view.render(req, resp);
+
+            if (view != null) {
+                view.render(mav.getModel(), req, resp);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 }

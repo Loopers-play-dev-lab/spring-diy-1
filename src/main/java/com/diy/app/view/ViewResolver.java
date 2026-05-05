@@ -11,6 +11,9 @@ public class ViewResolver {
     }
 
     public View resolve(String viewName) {
+        if (viewName.startsWith("redirect:")) {
+            return null;
+        }
         String fullpath = prefix + viewName + suffix;
 
         switch (suffix) {

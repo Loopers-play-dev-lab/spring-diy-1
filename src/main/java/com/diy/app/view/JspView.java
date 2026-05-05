@@ -2,6 +2,7 @@ package com.diy.app.view;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 public class JspView implements View {
     private final String viewPath;
@@ -11,7 +12,10 @@ public class JspView implements View {
     }
 
     @Override
-    public void render(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    public void render(Map<String, Object> model,HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        if (model != null) {
+            model.forEach(req::setAttribute);
+        }
         req.getRequestDispatcher(viewPath).forward(req, resp);
     }
 }
