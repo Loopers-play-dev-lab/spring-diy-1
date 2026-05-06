@@ -1,5 +1,7 @@
 package com.diy.app;
 
+import com.diy.framework.web.beans.factory.annotation.Autowired;
+import com.diy.framework.web.beans.factory.annotation.Component;
 import com.diy.framework.web.mvc.Controller;
 import com.diy.framework.web.mvc.view.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,9 +15,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class LectureController implements Controller {
 
-    private final Map<Long, Lecture> lectureRepository = new HashMap<>();
+    private final LectureService lectureService;
+
+    @Autowired
+    public LectureController(final LectureService lectureService) {
+        this.lectureService = lectureService;
+    }
 
     @Override
     public ModelAndView handleRequest(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
@@ -33,18 +41,17 @@ public class LectureController implements Controller {
         final String body = new String(bodyBytes, StandardCharsets.UTF_8);
 
         final Lecture lecture = new ObjectMapper().readValue(body, Lecture.class);
-
-        final long id = lectureRepository.size();
-        lectureRepository.put(id, lecture);
-        lecture.setId(id);
+        lectureService.register(lecture);
 
         return new ModelAndView("redirect:/lectures");
     }
 
     private ModelAndView doGet(final HttpServletRequest req, final HttpServletResponse resp) throws Exception {
-        final Collection<Lecture> lectures = lectureRepository.values();
+        final Collection<Lecture> lectures = lectureService.findAll();
         final Map<String, Object> model = new HashMap<>();
-        final Object lectureModels = lectures.stream().map(lecture -> Map.of("id", lecture.getId(), "name", lecture.getName(), "price", lecture.getPrice())).toList();
+        final Object lectureModels = lectures.stream()
+                .map(lecture -> Map.of("id", lecture.getId(), "name", lecture.getName(), "price", lecture.getPrice()))
+                .toList();
         model.put("lectures", lectureModels);
 
         return new ModelAndView("lecture-list", model);
