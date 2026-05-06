@@ -1,12 +1,14 @@
 package com.diy.app.repository;
 
 import com.diy.app.domain.Lecture;
+import com.diy.framework.web.bean.annotation.Repository;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+@Repository
 public class InMemoryLectureRepositoryImpl implements LectureRepository {
     private final Map<Long, Lecture> mapRepository = new ConcurrentSkipListMap<>();
     private final AtomicLong sequence = new AtomicLong(0);
