@@ -1,13 +1,18 @@
 package com.diy.app;
 
+import com.diy.framework.web.context.annotation.Component;
 import com.diy.framework.web.mvc.ModelAndView;
+
+import com.diy.framework.web.context.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.util.Map;
 
+@Component
 public class LectureController {
     private final LectureRepository lectureRepository;
 
+    @Autowired
     public LectureController(final LectureRepository lectureRepository) {
         this.lectureRepository = lectureRepository;
     }
