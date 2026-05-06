@@ -7,6 +7,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -58,16 +59,16 @@ public class BeanContainer {
                 int parameterCount = targetConstructor.getParameterCount();
                 Object[] parameters = new Object[parameterCount];
                 for (int i = 0; i < parameterCount; i++) {
+                    final int index = i;
                     Class<?> parameterClass = parameterTypes[i];
-                    Object bean = getBean(parameterClass);
-                    if (bean != null) {
-                        parameters[i] = bean;
-                    } else {
-                        createBeanWithClassType(parameterClass);
-                        parameters[i] = getBean(parameterClass);
-                    }
-                    container.put(clazz.getName(), targetConstructor.newInstance(parameters));
+                    findBean(parameterClass)
+                            .ifPresentOrElse(bean -> parameters[index] = bean,
+                                    () -> {
+                                        createBeanWithClassType(parameterClass);
+                                        parameters[index] = getBean(parameterClass);
+                                    });
                 }
+                container.put(clazz.getName(), targetConstructor.newInstance(parameters));
             }
         } catch (InvocationTargetException | InstantiationException |
                  IllegalAccessException e) {
@@ -76,12 +77,16 @@ public class BeanContainer {
     }
 
     public <T> T getBean(Class<T> clazz) {
+        return findBean(clazz)
+                .orElseThrow(() -> new IllegalArgumentException("no matched Bean Found"));
+    }
+
+    public <T> Optional<T> findBean(Class<T> clazz) {
         return container.values()
                 .stream()
                 .filter(clazz::isInstance)
                 .map(clazz::cast)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("no matched Bean Found"));
+                .findFirst();
     }
 
     public Object getBean(String name) {
