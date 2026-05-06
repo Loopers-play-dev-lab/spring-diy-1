@@ -1,10 +1,13 @@
 package com.diy.app;
 
+import com.diy.framework.web.beans.Component;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+@Component
 public class LectureRepository {
 
     private final Map<Long, Lecture> store = new ConcurrentHashMap<>();
