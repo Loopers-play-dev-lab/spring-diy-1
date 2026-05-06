@@ -8,6 +8,7 @@
     <title>강의 등록</title>
 </head>
 <body>
+<a href="/lectures">목록으로</a>
 <form id="registrationForm">
     <label for="name">이름:</label>
     <input type="text" id="name" name="name" required>
