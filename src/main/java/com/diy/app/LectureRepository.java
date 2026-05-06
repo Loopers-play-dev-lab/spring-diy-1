@@ -1,9 +1,12 @@
 package com.diy.app;
 
+import com.diy.framework.web.annotation.Component;
+
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@Component
 public class LectureRepository {
     private final Map<Integer, Lecture> lectures = new LinkedHashMap<>();
 

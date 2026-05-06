@@ -1,7 +1,7 @@
 package com.diy.study.reflection;
 
 import com.diy.app.Lecture;
-import com.diy.framework.web.annotation.MethodOrder;
+import com.diy.framework.web.context.annotation.MethodOrder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -50,7 +50,7 @@ public class ReflectionTest {
 
     @Test
     @DisplayName("@PrintView 어노테이션이 붙은 메서드의 실행 확인")
-    void testAnnotationMethodRun() throws Exception {
+    void annotationMethodRun() throws Exception {
         Class<Car> clazz = Car.class;
         Car car = clazz.getDeclaredConstructor().newInstance();
 
@@ -140,5 +140,13 @@ public class ReflectionTest {
                 }
             }
         }
+    }
+
+    @Test
+    @DisplayName("LectureRepository의 @Component 애너테이션 동작 확인")
+    void annotationTypeRun() {
+        Class<com.diy.app.LectureRepository> clazz = com.diy.app.LectureRepository.class;
+
+        assertThat(clazz.isAnnotationPresent(com.diy.framework.web.context.annotation.Component.class)).isTrue();
     }
 }
