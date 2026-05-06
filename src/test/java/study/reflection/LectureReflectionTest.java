@@ -31,7 +31,6 @@ public class LectureReflectionTest {
         String name = "Spring Framework DIY";
         int price = 99_000;
 
-        // TODO: 검사하기 vs 지금처럼 예외로 두기 - 어떤 게 좋을지 고르기
         Class<Lecture> lectureClass = Lecture.class;
         Constructor<?>[] declaredConstructors = lectureClass.getDeclaredConstructors();
 
@@ -43,9 +42,7 @@ public class LectureReflectionTest {
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
-            catch (IllegalArgumentException ignored) {
-//                lecture = Optional.empty();
-            }
+            catch (IllegalArgumentException ignored) {}
         }
     }
 

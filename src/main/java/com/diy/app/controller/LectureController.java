@@ -6,6 +6,7 @@ import com.diy.app.domain.Price;
 import com.diy.app.repository.build.LectureRepositoryImpl;
 import com.diy.framework.web.HttpMethod;
 import com.diy.framework.web.ModelAndView;
+import com.diy.framework.web.beans.Autowired;
 import com.diy.framework.web.controller.Controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,6 +25,7 @@ public class LectureController implements Controller {
     private final LectureRepositoryImpl lectureRepositoryImpl;
     private final ObjectMapper objectMapper;
 
+    @Autowired
     public LectureController(LectureRepositoryImpl lectureRepositoryImpl) {
         this.lectureRepositoryImpl = lectureRepositoryImpl;
         this.objectMapper = new ObjectMapper();
