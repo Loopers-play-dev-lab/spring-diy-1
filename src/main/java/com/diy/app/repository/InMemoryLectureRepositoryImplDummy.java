@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
-public class InMemoryLectureRepositoryImpl implements LectureRepository {
+public class InMemoryLectureRepositoryImplDummy implements LectureRepository {
     private final Map<Long, Lecture> mapRepository = new ConcurrentSkipListMap<>();
     private final AtomicLong sequence = new AtomicLong(0);
 
