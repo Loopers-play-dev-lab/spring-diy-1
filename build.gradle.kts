@@ -18,6 +18,9 @@ dependencies {
     // ObjectMapper
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
 
+    // 리플렉션
+    implementation("org.reflections:reflections:0.10.2")
+
     // 서블릿
     implementation("javax.servlet:javax.servlet-api:4.0.1")
     implementation("javax.servlet:jstl:1.2")

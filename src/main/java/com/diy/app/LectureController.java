@@ -1,6 +1,8 @@
 package com.diy.app;
 
 import com.diy.framework.web.Controller;
+import com.diy.framework.web.beans.Autowired;
+import com.diy.framework.web.beans.Component;
 import com.diy.framework.web.mvc.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -9,9 +11,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
+@Component
 public class LectureController implements Controller {
-    private final LectureRepository lectureRepository = new LectureRepositoryImpl();
+    private final LectureRepository lectureRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    public LectureController(LectureRepository lectureRepository) {
+        this.lectureRepository = lectureRepository;
+    }
 
     @Override
     public ModelAndView handleRequest(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
@@ -48,8 +56,5 @@ public class LectureController implements Controller {
         Map<String, Object> model = Map.of("lectures", lectureRepository.findAll());
         return new ModelAndView("lecture-list", model);
     }
-    
-    
-
 
 }

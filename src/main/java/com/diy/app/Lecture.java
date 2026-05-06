@@ -4,15 +4,30 @@ import java.util.Objects;
 
 public class Lecture {
     private int id;
-    private String name;
-    private int price;
+    private final String name;
+    private final int price;
+    private boolean visible;
 
-    Lecture() {}
+    public Lecture() {
+        this.name = null;
+        this.price = 0;
+        this.visible = false;
+    }
 
-    Lecture(int id, String name, int price) {
-        this.id = id;
+    public Lecture(final String name, final int price) {
         this.name = name;
         this.price = price;
+        this.visible = false;
+    }
+
+    public Lecture(final String name, final int price, final boolean visible) {
+        this.name = name;
+        this.price = price;
+        this.visible = visible;
+    }
+
+    private void changeVisible() {
+        this.visible = true;
     }
 
     public int getId() {
@@ -23,15 +38,15 @@ public class Lecture {
         this.id = id;
     }
 
+    @MethodOrder(1)
     public String getName() {
-        return name;
+        return this.name;
     }
 
+    @MethodOrder(2)
     public int getPrice() {
-        return price;
+        return this.price;
     }
-
-
 
     @Override
     public boolean equals(Object o) {

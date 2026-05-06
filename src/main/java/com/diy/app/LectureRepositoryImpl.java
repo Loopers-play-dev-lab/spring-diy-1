@@ -1,7 +1,10 @@
 package com.diy.app;
 
+import com.diy.framework.web.beans.Component;
+
 import java.util.*;
 
+@Component
 public class LectureRepositoryImpl implements LectureRepository {
 
     private static final Map<Integer, Lecture> map = new LinkedHashMap<>();
