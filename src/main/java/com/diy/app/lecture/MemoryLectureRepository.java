@@ -1,0 +1,41 @@
+package com.diy.app.lecture;
+
+import com.diy.framework.annotation.Component;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Component
+public class MemoryLectureRepository implements LectureRepository {
+
+    private static final Map<Long, Lecture> store = new HashMap<>();
+    private static long sequence = 0L;
+
+    @Override
+    public void insert(Lecture lecture) {
+        Lecture saveLecture = new Lecture(sequence++, lecture.getName(), lecture.getPrice());
+        store.put(saveLecture.getId(), saveLecture);
+    }
+
+    @Override
+    public List<Lecture> findAll() {
+        return new ArrayList<>(store.values());
+    }
+
+    @Override
+    public void update(Lecture lecture) {
+        if (!store.containsKey(lecture.getId())) {
+            throw new IllegalArgumentException(String.format("Lecture not found. id: %d", lecture.getId()));
+        }
+        store.put(lecture.getId(), lecture);
+    }
+
+    @Override
+    public void delete(Long id) {
+        if (!store.containsKey(id)) {
+            throw new IllegalArgumentException(String.format("Lecture not found. id: %d", id));
+        }
+        store.remove(id);
+    }
+}
