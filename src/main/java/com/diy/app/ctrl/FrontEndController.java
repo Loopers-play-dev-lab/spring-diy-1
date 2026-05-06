@@ -1,5 +1,7 @@
 package com.diy.app.ctrl;
 
+import com.diy.app.Main;
+import com.diy.app.utils.ApplicationContext;
 import com.diy.app.view.ModelAndView;
 import com.diy.app.view.View;
 import com.diy.app.view.ViewResolver;
@@ -21,13 +23,16 @@ public class FrontEndController extends HttpServlet {
     private ViewResolver viewResolver;
     @Override
     public void init() throws ServletException {
+        // Bean 초기화 작업
+        ApplicationContext.run(Main.class);
+
         // Strategy 전략을 통해 html로 변경시 suffix, prefix만 설정
         viewResolver = new ViewResolver("/",".jsp");
 
-        controllerMap.put("GET:/lectures", new GetController());
-        controllerMap.put("POST:/lectures", new PostController());
-        controllerMap.put("PUT:/lectures", new PostController());
-        controllerMap.put("DELETE:/lectures", new PostController());
+        controllerMap.put("GET:/lectures", (Controller) ApplicationContext.getBean("com.diy.app.ctrl.GetController"));
+        controllerMap.put("POST:/lectures", (Controller) ApplicationContext.getBean("com.diy.app.ctrl.PostController"));
+        controllerMap.put("PUT:/lectures", (Controller) ApplicationContext.getBean("com.diy.app.ctrl.PutController"));
+        controllerMap.put("DELETE:/lectures", (Controller) ApplicationContext.getBean("com.diy.app.ctrl.DelController"));
     }
 
     @Override

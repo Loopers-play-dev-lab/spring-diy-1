@@ -1,6 +1,8 @@
 package com.diy.app.ctrl;
 
-import com.diy.app.Lecture;
+import com.diy.app.Entity.Lecture;
+import com.diy.app.annotation.Autowired;
+import com.diy.app.annotation.Component;
 import com.diy.app.repository.ILectureRepository;
 import com.diy.app.repository.LectureRepositoryImpl;
 import com.diy.app.view.ModelAndView;
@@ -12,7 +14,12 @@ import java.nio.charset.StandardCharsets;
 
 public class DelController implements Controller {
 
-    private final ILectureRepository repository = new LectureRepositoryImpl();
+    private final ILectureRepository repository;
+
+    @Autowired
+    public DelController(ILectureRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public ModelAndView handleRequest(HttpServletRequest req, HttpServletResponse resp) throws Exception {
