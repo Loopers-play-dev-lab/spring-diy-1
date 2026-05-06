@@ -3,9 +3,16 @@ package com.diy.app;
 import java.math.BigDecimal;
 
 public class Lecture {
-    private final Long id;
-    private final String name;
-    private final BigDecimal price;
+    private Long id;
+    private String name;
+    private BigDecimal price;
+
+    public Lecture() {
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Lecture(Long id, String name, BigDecimal price) {
         if (name == null || name.isBlank()){

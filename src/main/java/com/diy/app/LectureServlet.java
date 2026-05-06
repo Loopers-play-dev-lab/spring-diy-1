@@ -16,7 +16,8 @@ import java.util.NoSuchElementException;
 
 @WebServlet("/lectures")
 public class LectureServlet extends HttpServlet {
-    private final LectureRepository repository = LectureRepository.getInstance();
+    //    private final LectureRepository repository = LectureRepository.getInstance();
+    private final LectureRepository repository = null;
     private final ObjectMapper om = new ObjectMapper();
 
     @Override
