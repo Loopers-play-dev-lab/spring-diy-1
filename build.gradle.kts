@@ -27,6 +27,8 @@ dependencies {
     implementation("org.apache.tomcat.embed:tomcat-embed-jasper:8.5.42")
 
     implementation(kotlin("stdlib-jdk8"))
+
+    implementation("org.reflections:reflections:0.10.2")
 }
 
 tasks.test {
