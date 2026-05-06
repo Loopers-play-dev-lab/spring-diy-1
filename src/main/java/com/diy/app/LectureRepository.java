@@ -1,6 +1,6 @@
 package com.diy.app;
 
-import com.diy.framework.web.annotation.Component;
+import com.diy.framework.web.context.annotation.Component;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
