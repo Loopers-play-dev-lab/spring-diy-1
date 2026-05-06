@@ -3,7 +3,6 @@ package com.diy.app;
 import java.math.BigDecimal;
 
 public class Lecture {
-
     private Long id;
     private String name;
     private BigDecimal price;

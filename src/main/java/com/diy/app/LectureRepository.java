@@ -1,7 +1,7 @@
 package com.diy.app;
 
-import com.diy.framework.web.mvc.Component;
 
+import com.diy.framework.web.mvc.Component;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
