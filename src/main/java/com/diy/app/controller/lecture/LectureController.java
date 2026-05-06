@@ -6,6 +6,7 @@ import com.diy.app.servlet.dto.request.LectureDelete;
 import com.diy.app.servlet.dto.request.LecturePost;
 import com.diy.app.servlet.dto.request.LectureUpdate;
 import com.diy.app.servlet.dto.response.LectureResponse;
+import com.diy.framework.web.bean.annotation.Controller;
 import com.diy.framework.web.controller.AbstractController;
 import com.diy.framework.web.server.HttpMethod;
 import com.diy.framework.web.view.ModelAndView;
@@ -19,13 +20,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Controller
 public class LectureController implements AbstractController {
 
-    private final ObjectMapper objectMapper;
+    private ObjectMapper objectMapper = new ObjectMapper();
     private final LectureRepository lectureRepository;
 
-    public LectureController(ObjectMapper objectMapper, LectureRepository lectureRepository) {
-        this.objectMapper = objectMapper;
+    public LectureController(LectureRepository lectureRepository) {
         this.lectureRepository = lectureRepository;
     }
 
