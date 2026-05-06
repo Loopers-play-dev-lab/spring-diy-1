@@ -6,6 +6,7 @@ import com.diy.app.servlet.dto.request.LectureDelete;
 import com.diy.app.servlet.dto.request.LecturePost;
 import com.diy.app.servlet.dto.request.LectureUpdate;
 import com.diy.app.servlet.dto.response.LectureResponse;
+import com.diy.framework.web.bean.annotation.Autowired;
 import com.diy.framework.web.bean.annotation.Controller;
 import com.diy.framework.web.controller.AbstractController;
 import com.diy.framework.web.server.HttpMethod;
@@ -26,7 +27,7 @@ public class LectureController implements AbstractController {
     private ObjectMapper objectMapper = new ObjectMapper();
     private final LectureRepository lectureRepository;
 
-    public LectureController(LectureRepository lectureRepository) {
+    public LectureController(@Autowired(beanValue = "InMemoryLectureRepositoryImpl") LectureRepository lectureRepository) {
         this.lectureRepository = lectureRepository;
     }
 
