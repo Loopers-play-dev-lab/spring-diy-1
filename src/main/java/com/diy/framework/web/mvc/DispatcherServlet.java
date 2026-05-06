@@ -1,6 +1,7 @@
 package com.diy.framework.web.mvc;
 
 import com.diy.app.LectureController;
+import com.diy.app.LectureRepository;
 import com.diy.framework.web.mvc.controller.Controller;
 import com.diy.framework.web.mvc.view.DefaultViewResolver;
 import com.diy.framework.web.mvc.view.View;
@@ -28,7 +29,8 @@ public class DispatcherServlet extends HttpServlet {
     @Override
     public void init(final ServletConfig config) throws ServletException {
         super.init(config);
-        final LectureController lectureController = new LectureController();
+        final LectureRepository lectureRepository = new LectureRepository();
+        final LectureController lectureController = new LectureController(lectureRepository);
         controllers.put("GET /lectures", lectureController::list);
         controllers.put("POST /lectures", lectureController::create);
         controllers.put("PUT /lectures", lectureController::update);
