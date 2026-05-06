@@ -20,8 +20,19 @@ public class BeanContainer {
         beanMap.put(clazz, o);
     }
 
-    public static Object inject(Class<?> clazz) {
-        return beanMap.get(clazz);
+    public static void inject(Set<Constructor> constructors) {
+        for (Constructor constructor : constructors) {
+            inject(constructor);
+        }
+    }
+
+    public static void inject(Constructor constructor) {
+        constructor.setAccessible(true);
+        Parameter[] parameters = constructor.getParameters();
+        for (Parameter parameter : parameters) {
+            Object o = beanMap.get(parameter.getType());
+        }
+        Class declaringClass = constructor.getDeclaringClass();
     }
 
     private static Object create(Class<?> clazz, Object... args) {

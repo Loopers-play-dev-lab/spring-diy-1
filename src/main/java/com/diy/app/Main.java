@@ -6,6 +6,7 @@ import com.diy.framework.web.beans.factory.BeanContainer;
 import com.diy.framework.web.beans.factory.BeanScanner;
 import com.diy.framework.web.server.TomcatWebServer;
 
+import java.lang.reflect.Constructor;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,7 +17,9 @@ public class Main {
 
         BeanScanner beanScanner = new BeanScanner("com.diy.app");
         Set<Class<?>> components = new HashSet<>(beanScanner.scanClassesTypeAnnotatedWith(Component.class));
-        components.addAll(beanScanner.scanClassesTypeAnnotatedWith(Autowired.class));
         BeanContainer.register(components);
+
+        Set<Constructor> autowiredConstructors = beanScanner.scanConstructorsAnnotatedWith(Autowired.class);
+        BeanContainer.inject(autowiredConstructors);
     }
 }
