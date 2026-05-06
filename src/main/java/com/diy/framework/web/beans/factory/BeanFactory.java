@@ -35,20 +35,13 @@ public class BeanFactory {
             return;
         }
 
+        if (!componentClasses.contains(clazz)) {
+            throw new RuntimeException("Not componentClass");
+        }
+
         try {
             Constructor<?> constructor = resolveConstructor(clazz);
-
-            Object[] args = Arrays.stream(constructor.getParameterTypes())
-                    .map(type -> {
-                        registerBean(type);
-                        Object bean = beans.get(type);
-                        if(bean == null){
-                            throw new RuntimeException("No Search bean");
-                        }
-                        return bean;
-                    })
-                    .toArray();
-
+            Object[] args = resolveArgs(constructor);
             Object instance = constructor.newInstance(args);
             beans.put(clazz, instance);
             Arrays.stream(clazz.getInterfaces()).forEach(i -> beans.put(i, instance));
@@ -73,9 +66,27 @@ public class BeanFactory {
     }
 
     private Constructor<?> resolveConstructor(Class<?> clazz) {
-        return Arrays.stream(clazz.getDeclaredConstructors())
+        List<Constructor<?>> constructors = Arrays.stream(clazz.getDeclaredConstructors())
                 .filter(constructor -> constructor.isAnnotationPresent(Autowired.class))
-                .findFirst()
-                .orElseGet(() -> clazz.getDeclaredConstructors()[0]);
+                .toList();
+
+        if (constructors.isEmpty()) {
+            return clazz.getDeclaredConstructors()[0];
+        }
+
+        if (constructors.size() > 1) {
+            throw new RuntimeException("Multiple constructors");
+        }
+
+        return constructors.getFirst();
+    }
+
+    private Object[] resolveArgs(Constructor<?> constructor) {
+        return Arrays.stream(constructor.getParameterTypes())
+                .map(type -> {
+                    registerBean(type);
+                    return beans.get(type);
+                })
+                .toArray();
     }
 }
