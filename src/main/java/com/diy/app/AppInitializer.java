@@ -1,6 +1,7 @@
 package com.diy.app;
 
 import com.diy.framework.web.HandlerMapping;
+import com.diy.framework.web.beans.factory.BeanFactory;
 import com.diy.framework.web.mvc.view.ViewResolver;
 import com.diy.framework.web.mvc.view.ViewResolverRegistry;
 
@@ -13,8 +14,10 @@ import java.util.List;
 public class AppInitializer implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+        BeanFactory beanFactory = new BeanFactory("com.diy.app");
+
         HandlerMapping mapping = new HandlerMapping();
-        mapping.put("/lectures", new LectureController());
+        mapping.put("/lectures", (LectureController) beanFactory.getBean(LectureController.class));
 
         ViewResolverRegistry viewResolvers = new ViewResolverRegistry(
                 List.of(

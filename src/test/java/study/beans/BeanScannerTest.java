@@ -17,8 +17,12 @@ public class BeanScannerTest {
 
         for (Class<?> clazz : beanClasses) {
             System.out.println("빈 클래스: " + clazz.getName());
-            Object instance = clazz.getDeclaredConstructor().newInstance();
-            System.out.println("빈 인스턴스: " + instance);
+            try {
+                Object instance = clazz.getDeclaredConstructor().newInstance();
+                System.out.println("빈 인스턴스: " + instance);
+            } catch (NoSuchMethodException e) {
+                System.out.println("Skip");
+            }
         }
     }
 }
