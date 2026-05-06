@@ -20,13 +20,10 @@ public class BeanContainer {
     private final Set<Class<?>> beanClasses;
 
     public BeanContainer(String basePackages) {
-        Set<Class<?>> classes = new BeanScanner(basePackages)
-            .scanClassesTypeAnnotatedWith(Component.class);
-
         this.beanClasses = new BeanScanner(basePackages)
             .scanClassesTypeAnnotatedWith(Component.class);
 
-        for (Class<?> clazz : classes) {
+        for (Class<?> clazz : this.beanClasses) {
             createBean(clazz);
         }
     }
@@ -87,7 +84,7 @@ public class BeanContainer {
         }
 
         if (autowiredConstructors.size() == 1) {
-            return autowiredConstructors.get(0);
+            return autowiredConstructors.getFirst();
         }
 
         return Arrays.stream(constructors)
