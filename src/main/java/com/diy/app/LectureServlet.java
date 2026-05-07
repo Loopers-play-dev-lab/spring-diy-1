@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,6 +18,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LectureServlet extends HttpServlet {
 
     private static final ConcurrentHashMap<Long, Lecture> lectureMap = new ConcurrentHashMap<>();
+
+    static {
+        final Lecture loopakBeL2 = Lecture.of(1L, "Loop:PAK BE L2", BigDecimal.valueOf(1300000));
+        final Lecture springDiy = Lecture.of(2L, "Spring DIY", BigDecimal.valueOf(99000));
+        lectureMap.put(1L, loopakBeL2);
+        lectureMap.put(2L, springDiy);
+    }
 
     @Override
     public void init() throws ServletException {
@@ -47,6 +55,26 @@ public class LectureServlet extends HttpServlet {
         final long lectureId = nextId();
         lectureMap.put(lectureId, lectureRequest.toLecture(lectureId));
         resp.sendRedirect("/lectures");
+    }
+
+    @Override
+    protected void doPut(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+        final var reader = new BufferedReader(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
+        final var putRequest = new ObjectMapper().readValue(reader.readLine(), LecturePutRequest.class);
+
+        final var lectureId = extractLectureId(putRequest);
+        final var target = Lecture.of(lectureId, putRequest.getName(), putRequest.getPrice());
+        lectureMap.put(lectureId, target);
+
+        resp.sendRedirect("/lectures");
+    }
+
+    private static Long extractLectureId(final LecturePutRequest putRequest) {
+        final var lectureId = putRequest.getId();
+        if (!lectureMap.containsKey(lectureId)) {
+            throw new IllegalArgumentException("Invalid Lecture Information.");
+        }
+        return lectureId;
     }
 
     @Override
