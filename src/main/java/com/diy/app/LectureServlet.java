@@ -50,6 +50,14 @@ public class LectureServlet extends HttpServlet {
     }
 
     @Override
+    protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+        System.out.println("[LectureServlet] doDelete() is called.");
+        final Long lectureId = extractLectureId(req);
+        lectureMap.remove(lectureId);
+        resp.sendRedirect("/lectures");
+    }
+
+    @Override
     public void destroy() {
         System.out.println("[LectureServlet] destroy() is called.");
         super.destroy();
@@ -57,6 +65,19 @@ public class LectureServlet extends HttpServlet {
 
     private long nextId() {
         return lectureMap.keySet().stream().mapToLong(Long::longValue).max().orElse(0L) + 1;
+    }
+
+    private Long extractLectureId(final HttpServletRequest req) {
+        final String lectureIdParam = req.getParameter("id");
+        if (lectureIdParam == null || lectureIdParam.isBlank()) {
+            throw new IllegalArgumentException("Lecture id is required.");
+        }
+
+        try {
+            return Long.valueOf(lectureIdParam);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid lecture id.");
+        }
     }
 }
 
