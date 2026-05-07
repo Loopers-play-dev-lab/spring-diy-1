@@ -49,12 +49,11 @@ public class LectureServlet extends HttpServlet {
     protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         System.out.println("[LectureServlet] doPost() is called.");
         final var reader = new BufferedReader(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
-        final var mapper = new ObjectMapper();
-        final var lectureRequest = mapper.readValue(reader.readLine(), LectureRequest.class);
+        final var lectureRequest = new ObjectMapper().readValue(reader.readLine(), LecturePostRequest.class);
 
         final long lectureId = nextId();
         lectureMap.put(lectureId, lectureRequest.toLecture(lectureId));
-        resp.sendRedirect("/lectures");
+        redirectToList(resp);
     }
 
     @Override
@@ -62,19 +61,11 @@ public class LectureServlet extends HttpServlet {
         final var reader = new BufferedReader(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
         final var putRequest = new ObjectMapper().readValue(reader.readLine(), LecturePutRequest.class);
 
-        final var lectureId = extractLectureId(putRequest);
+        final var lectureId = putRequest.getId();
         final var target = Lecture.of(lectureId, putRequest.getName(), putRequest.getPrice());
         lectureMap.put(lectureId, target);
 
-        resp.sendRedirect("/lectures");
-    }
-
-    private static Long extractLectureId(final LecturePutRequest putRequest) {
-        final var lectureId = putRequest.getId();
-        if (!lectureMap.containsKey(lectureId)) {
-            throw new IllegalArgumentException("Invalid Lecture Information.");
-        }
-        return lectureId;
+        redirectToList(resp);
     }
 
     @Override
@@ -82,7 +73,7 @@ public class LectureServlet extends HttpServlet {
         System.out.println("[LectureServlet] doDelete() is called.");
         final Long lectureId = extractLectureId(req);
         lectureMap.remove(lectureId);
-        resp.sendRedirect("/lectures");
+        redirectToList(resp);
     }
 
     @Override
@@ -106,6 +97,10 @@ public class LectureServlet extends HttpServlet {
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid lecture id.");
         }
+    }
+
+    private static void redirectToList(final HttpServletResponse resp) throws IOException {
+        resp.sendRedirect("/lectures");
     }
 }
 
