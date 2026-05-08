@@ -5,6 +5,10 @@ public class UrlBasedViewResolver implements ViewResolver {
 
     @Override
     public View resolveViewName(String viewName) {
-        return new RedirectView(viewName.replace(REDIRECT_PREFIX, ""));
+        if(viewName.startsWith(REDIRECT_PREFIX)) {
+            return new RedirectView(viewName.substring(REDIRECT_PREFIX.length()));
+        }
+
+        return null;
     }
 }
