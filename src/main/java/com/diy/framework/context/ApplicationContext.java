@@ -87,7 +87,7 @@ public class ApplicationContext {
                 .toArray(Constructor[]::new);
 
         if(autowiredConstructors.length == 0) {
-            throw new RuntimeException("Autowired 생성자가 없습니다.`");
+            throw new RuntimeException("Autowired 생성자가 없습니다.");
         }
 
         if(autowiredConstructors.length > 1) {
