@@ -1,7 +1,8 @@
 package com.diy.framework.web.servlet;
 
+import com.diy.app.LectureApplication;
 import com.diy.app.lecture.LectureController;
-import com.diy.app.lecture.LectureRepository;
+import com.diy.framework.context.ApplicationContext;
 import com.diy.framework.web.mvc.controller.Controller;
 import com.diy.framework.web.mvc.ModelAndView;
 import com.diy.framework.web.mvc.view.*;
@@ -32,7 +33,10 @@ public class DispatcherServlet extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
 
-        controllersMapping.put("/lectures", new LectureController(new LectureRepository()));
+        ApplicationContext applicationContext = new ApplicationContext(LectureApplication.class.getPackageName());
+        applicationContext.initialize();
+
+        controllersMapping.put("/lectures", (Controller) applicationContext.getBean(LectureController.class));
     }
 
     @Override

@@ -100,4 +100,8 @@ public class ApplicationContext {
     private boolean isBeanInitialized(Class<?> clazz) {
         return beans.stream().anyMatch(bean -> bean.getClass() == clazz);
     }
+
+    public Object getBean(Class<?> clazz) {
+        return beans.stream().filter(bean -> bean.getClass() == clazz).findFirst().orElseThrow();
+    }
 }
