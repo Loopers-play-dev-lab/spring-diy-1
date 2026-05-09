@@ -1,7 +1,5 @@
 package study.reflection;
 
-import com.diy.framework.web.context.annotation.MethodOrder;
-
 public class Lecture {
     private final String name;
     private final int price;

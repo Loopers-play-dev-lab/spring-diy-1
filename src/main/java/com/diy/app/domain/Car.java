@@ -1,6 +1,6 @@
 package com.diy.app.domain;
 
-import com.diy.framework.web.context.annotation.PrintView;
+import com.diy.framework.context.annotation.PrintView;
 
 public class Car {
 

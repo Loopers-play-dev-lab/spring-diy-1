@@ -1,13 +1,10 @@
-package com.diy.framework.web.context;
+package com.diy.framework.context;
 
-import com.diy.framework.web.beans.factory.BeanScanner;
-import com.diy.framework.web.context.annotation.Autowired;
-import com.diy.framework.web.context.annotation.Bean;
-import com.diy.framework.web.context.annotation.Component;
-import com.diy.framework.web.context.annotation.Configuration;
+import com.diy.framework.beans.factory.BeanScanner;
+import com.diy.framework.context.annotation.*;
+import com.diy.framework.web.utils.ControllerV2;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -16,33 +13,51 @@ public class BeanContext {
     private final BeanScanner beanScanner;
     private final Map<String, Object> beanMap;
     private final Set<String> beanNames;
+    private final Map<String, ControllerV2> controllerMap;
 
     public BeanContext(String packageName) {
         beanScanner = new BeanScanner(packageName);
         beanMap = new HashMap<String, Object>();
         beanNames = new HashSet<String>();
+        controllerMap = new HashMap<>();
         init();
     }
 
-    private void init() {
-        Set<Class<?>> configBean = beanScanner.scanClassesTypeAnnotatedWith(Configuration.class);
+    public void init() {
         Set<Class<?>> componentBean = beanScanner.scanClassesTypeAnnotatedWith(Component.class);
-
-        for (Class<?> clazz : configBean) {
-            if(clazz.isAnnotationPresent(Configuration.class)){
-                createBean(clazz);
-            }
-        }
+        Set<Class<?>> controllerBean = beanScanner.scanClassesTypeAnnotatedWith(Controller.class);
 
         for(Class<?> clazz : componentBean){
-            if(clazz.isAnnotationPresent(Configuration.class)){
-                continue;
-            }
-
             if(clazz.isAnnotationPresent(Component.class)){
                 createBean(clazz);
             }
         }
+
+        for(Class<?> clazz : controllerBean){
+            if(clazz.isAnnotationPresent(Controller.class)){
+                initController(clazz);
+            }
+        }
+    }
+
+    public Map<String, ControllerV2> getControllerMap() {
+        return controllerMap;
+    }
+
+    private void initController(Class<?> clazz) {
+        System.out.print(clazz.getName() + " ");
+        System.out.println(clazz.isAnnotationPresent(Controller.class));
+        if(!clazz.isAnnotationPresent(Controller.class)) {
+            return;
+        }
+
+        String path = clazz.getAnnotation(Controller.class).value();
+        if(controllerMap.containsKey(path)){
+            return;
+        }
+
+        ControllerV2 controllerBean = (ControllerV2) createBean(clazz);
+        controllerMap.put(path, controllerBean);
     }
 
     private Object createBean(Class<?> clazz) {
@@ -135,7 +150,7 @@ public class BeanContext {
         return autowiredConstructors[0];
     }
 
-    public static String toBeanName(Class<?> clazz) {
+    private static String toBeanName(Class<?> clazz) {
         String name = clazz.getSimpleName();
         return Character.toLowerCase(name.charAt(0)) + name.substring(1);
     }

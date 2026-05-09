@@ -1,8 +1,8 @@
 package com.diy.app.repository;
 
 import com.diy.app.domain.Lecture;
-import com.diy.framework.web.context.annotation.Autowired;
-import com.diy.framework.web.context.annotation.Component;
+import com.diy.framework.context.annotation.Autowired;
+import com.diy.framework.context.annotation.Component;
 
 import java.util.Collection;
 import java.util.HashMap;

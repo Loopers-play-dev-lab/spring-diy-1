@@ -1,8 +1,8 @@
 package com.diy.app.config;
 
 import com.diy.app.domain.Car;
-import com.diy.framework.web.context.annotation.Bean;
-import com.diy.framework.web.context.annotation.Component;
+import com.diy.framework.context.annotation.Bean;
+import com.diy.framework.context.annotation.Component;
 
 @Component
 public class TestConfig {

@@ -1,7 +1,5 @@
 package study.reflection;
 
-import com.diy.framework.web.context.annotation.PrintView;
-
 public class Car {
 
     private String name;
