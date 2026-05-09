@@ -1,6 +1,6 @@
 package study.reflection;
 
-import com.diy.framework.web.beans.annotation.PrintView;
+import com.diy.framework.web.context.annotation.PrintView;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

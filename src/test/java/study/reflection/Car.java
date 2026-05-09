@@ -1,6 +1,6 @@
 package study.reflection;
 
-import com.diy.framework.web.beans.annotation.PrintView;
+import com.diy.framework.web.context.annotation.PrintView;
 
 public class Car {
 

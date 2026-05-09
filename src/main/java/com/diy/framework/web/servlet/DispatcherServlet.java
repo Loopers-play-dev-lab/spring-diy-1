@@ -1,25 +1,16 @@
-package com.diy.framework.web;
+package com.diy.framework.web.servlet;
 
-import com.diy.app.controller.HomeGetControllerV1;
-import com.diy.app.controller.lecutre.LectureDelControllerV1;
-import com.diy.app.controller.lecutre.LectureGetControllerV1;
-import com.diy.app.controller.lecutre.LecturePostControllerV1;
-import com.diy.app.controller.lecutre.LecturePutControllerV1;
-import com.diy.framework.web.beans.annotation.Component;
-import com.diy.framework.web.beans.factory.BeanFactory;
-import com.diy.framework.web.beans.factory.BeanScanner;
+import com.diy.framework.web.context.BeanContext;
 import com.diy.framework.web.utils.*;
 import com.diy.framework.web.view.ViewV1;
 import com.diy.framework.web.view.ViewResolve;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class DispatcherServlet{
     private final Map<String, ControllerV1> getControllerMap = new HashMap<>();
@@ -27,11 +18,9 @@ public class DispatcherServlet{
     private final Map<String, ControllerV1> putControllerMap = new HashMap<>();
     private final Map<String, ControllerV1> delControllerMap = new HashMap<>();
     private final ViewResolve viewResolve;
-    private final BeanFactory beanFactory;
 
     public DispatcherServlet() {
         this.viewResolve = new ViewResolve();
-        this.beanFactory = new BeanFactory("com.diy.app");
     }
 
     public void setPostController(String path, ControllerV1 controller) {

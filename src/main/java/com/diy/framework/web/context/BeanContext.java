@@ -1,7 +1,8 @@
-package com.diy.framework.web.beans.factory;
+package com.diy.framework.web.context;
 
-import com.diy.framework.web.beans.annotation.Autowired;
-import com.diy.framework.web.beans.annotation.Component;
+import com.diy.framework.web.beans.factory.BeanScanner;
+import com.diy.framework.web.context.annotation.Autowired;
+import com.diy.framework.web.context.annotation.Component;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -10,17 +11,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class BeanFactory {
+public class BeanContext {
     private BeanScanner beanScanner;
     private Map<String, Object> beanMap;
 
-    public BeanFactory(String packageName) {
+    public BeanContext(String packageName) {
         beanScanner = new BeanScanner(packageName);
         beanMap = new HashMap<String, Object>();
-        startBean();
+        init();
     }
 
-    private void startBean() {
+    private void init() {
         Set<Class<?>> bean = beanScanner.scanClassesTypeAnnotatedWith(Component.class);
 
         for(Class<?> clazz : bean){
@@ -35,11 +36,12 @@ public class BeanFactory {
             return beanMap.get(clazz.getTypeName());
         }
 
-        Constructor<?> constructor = getConstructor(clazz);
+        Constructor<?> constructor = getBeanConstructor(clazz);
+        Object[] params = resolveConstructorArguments(constructor, clazz);
         try {
-            Object bean = injectBean(constructor, clazz);
+            Object bean = constructor.newInstance(params);
             beanMap.put(clazz.getTypeName(), bean);
-        } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
 
@@ -47,7 +49,7 @@ public class BeanFactory {
         return beanMap.get(clazz.getTypeName());
     }
 
-    private Object injectBean(Constructor<?> constructor, Class<?> bean) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    private Object[] resolveConstructorArguments(Constructor<?> constructor, Class<?> bean) {
         Object[] params = new Object[constructor.getParameterCount()];
         Field[] fields = bean.getDeclaredFields();
 
@@ -55,14 +57,12 @@ public class BeanFactory {
             params[i] = createBean(fields[i].getType());
         }
 
-        return constructor.newInstance(params);
+        return params;
     }
 
-    private Constructor<?> getConstructor(Class<?> clazz){
-        System.out.println(clazz.getTypeName() + " : 생성자");
+    private Constructor<?> getBeanConstructor(Class<?> clazz){
         Constructor<?>[] constructors = clazz.getDeclaredConstructors();
         for(Constructor<?> constructor : constructors){
-            System.out.println(constructor.getName() + " : " + constructor.getParameterCount());
             if(constructor.isAnnotationPresent(Autowired.class)){
                 return constructor;
             }

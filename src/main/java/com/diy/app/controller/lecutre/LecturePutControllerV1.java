@@ -2,7 +2,7 @@ package com.diy.app.controller.lecutre;
 
 import com.diy.app.domain.Lecture;
 import com.diy.app.repository.LecturesRepository;
-import com.diy.framework.web.beans.annotation.Autowired;
+import com.diy.framework.web.context.annotation.Autowired;
 import com.diy.framework.web.utils.ControllerV1;
 import com.diy.framework.web.utils.RequestBodyV1;
 import com.diy.framework.web.utils.ResponseV1;
