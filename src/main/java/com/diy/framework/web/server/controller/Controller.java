@@ -1,6 +1,6 @@
 package com.diy.framework.web.server.controller;
 
-import com.diy.framework.web.server.servlet.views.ModelAndView;
+import com.diy.framework.web.servlet.views.ModelAndView;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

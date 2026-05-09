@@ -1,4 +1,4 @@
-package com.diy.framework.web.server.servlet.views;
+package com.diy.framework.web.servlet.views;
 
 @FunctionalInterface
 public interface ViewResolver {

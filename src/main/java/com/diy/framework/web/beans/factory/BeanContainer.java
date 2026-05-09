@@ -1,33 +1,39 @@
 package com.diy.framework.web.beans.factory;
 
-import com.diy.framework.web.annotations.Autowired;
-import com.diy.framework.web.annotations.Component;
+import com.diy.framework.web.beans.annotations.Autowired;
+import com.diy.framework.web.beans.annotations.Component;
+import com.diy.framework.web.server.exceptions.CannotCreateBeanException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 public class BeanContainer {
 
-  private static final Map<Class<?>, Object> BEAN_CONTAINER = new HashMap<>();
+  private final Set<Class<?>> beanClasses = new HashSet<>();
+  private final Map<Class<?>, Object> beans = new HashMap<>();
 
   public BeanContainer(String basePackages) {
-    Set<Class<?>> classes = new BeanScanner(basePackages)
-        .scanClassesTypeAnnotatedWith(Component.class);
+    beanClasses.addAll(
+        new BeanScanner(basePackages)
+            .scanClassesTypeAnnotatedWith(Component.class)
+    );
 
-    for (Class<?> clazz : classes) {
+    for (Class<?> clazz : beanClasses) {
+      if (isBeanInitialized(clazz)) continue;
       createBean(clazz);
     }
   }
 
   public <T> T getBean(Class<T> clazz) {
-    return (T) BEAN_CONTAINER.get(clazz);
+    return (T) beans.get(clazz);
   }
 
   private Object createBean(Class<?> clazz) {
-    if (BEAN_CONTAINER.containsKey(clazz)) {
-      return BEAN_CONTAINER.get(clazz);
+    if (beans.containsKey(clazz)) {
+      return beans.get(clazz);
     }
 
     Constructor<?> constructor = resolveConstructor(clazz);
@@ -35,12 +41,12 @@ public class BeanContainer {
 
     try {
       if (paramCount == 0) {
-        Object newInstance = constructor.newInstance();
-        BEAN_CONTAINER.put(clazz, constructor.newInstance());
+        beans.put(clazz, constructor.newInstance());
       }
 
+      validateConstructorParams(constructor);
       Object[] params = createConstructorParams(constructor);
-      BEAN_CONTAINER.put(clazz, constructor.newInstance(params));
+      beans.put(clazz, constructor.newInstance(params));
     } catch (InvocationTargetException e) {
       throw new RuntimeException(e);
     } catch (InstantiationException e) {
@@ -49,7 +55,15 @@ public class BeanContainer {
       throw new RuntimeException(e);
     }
 
-    return BEAN_CONTAINER.get(clazz);
+    return beans.get(clazz);
+  }
+
+  private void validateConstructorParams(Constructor<?> constructor) {
+    for (int i = 0; i < constructor.getParameterCount(); i++) {
+      if (!beanClasses.contains(constructor.getParameterTypes()[i])) {
+        throw new CannotCreateBeanException(constructor, i);
+      }
+    }
   }
 
   private Object[] createConstructorParams(Constructor<?> constructor) {
@@ -57,10 +71,10 @@ public class BeanContainer {
 
     for (int i = 0; i < constructor.getParameterCount(); i++) {
       Class<?> param = constructor.getParameterTypes()[i];
-      if (!BEAN_CONTAINER.containsKey(param)) {
+      if (!beans.containsKey(param)) {
         createBean(param);
       }
-      params[i] = BEAN_CONTAINER.get(param);
+      params[i] = beans.get(param);
     }
 
     return params;
@@ -88,4 +102,7 @@ public class BeanContainer {
     return clazz.getDeclaredConstructors()[maxIndex];
   }
 
+  private boolean isBeanInitialized(Class<?> parameterType) {
+    return beans.containsKey(parameterType);
+  }
 }

@@ -1,7 +1,7 @@
 package com.diy.app.repository;
 
 import com.diy.app.controller.api.LectureRequest;
-import com.diy.framework.web.annotations.Component;
+import com.diy.framework.web.beans.annotations.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;

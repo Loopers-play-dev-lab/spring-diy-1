@@ -2,10 +2,10 @@ package com.diy.app.controller.view;
 
 import com.diy.app.repository.Lecture;
 import com.diy.app.repository.LectureRepository;
-import com.diy.framework.web.annotations.Component;
-import com.diy.framework.web.server.exceptions.MethodNotAllowedException;
+import com.diy.framework.web.beans.annotations.Component;
 import com.diy.framework.web.server.controller.Controller;
-import com.diy.framework.web.server.servlet.views.ModelAndView;
+import com.diy.framework.web.server.exceptions.MethodNotAllowedException;
+import com.diy.framework.web.servlet.views.ModelAndView;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

@@ -1,11 +1,11 @@
 package com.diy.app.controller.api;
 
 import com.diy.app.repository.LectureRepository;
-import com.diy.framework.web.annotations.Autowired;
-import com.diy.framework.web.annotations.Component;
+import com.diy.framework.web.beans.annotations.Autowired;
+import com.diy.framework.web.beans.annotations.Component;
 import com.diy.framework.web.server.controller.Controller;
 import com.diy.framework.web.server.exceptions.MethodNotAllowedException;
-import com.diy.framework.web.server.servlet.views.ModelAndView;
+import com.diy.framework.web.servlet.views.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
