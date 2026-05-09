@@ -26,6 +26,9 @@ dependencies {
     implementation("org.apache.tomcat.embed:tomcat-embed-core:8.5.42")
     implementation("org.apache.tomcat.embed:tomcat-embed-jasper:8.5.42")
 
+    // reflection
+    implementation("org.reflections:reflections:0.10.2")
+
     implementation(kotlin("stdlib-jdk8"))
 }
 

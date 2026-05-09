@@ -4,7 +4,8 @@ import com.diy.app.controller.lecutre.LectureDelControllerV1;
 import com.diy.app.controller.lecutre.LectureGetControllerV1;
 import com.diy.app.controller.lecutre.LecturePostControllerV1;
 import com.diy.app.controller.lecutre.LecturePutControllerV1;
-import com.diy.framework.web.DispatcherServlet;
+import com.diy.framework.web.context.BeanContext;
+import com.diy.framework.web.servlet.DispatcherServlet;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,7 +16,7 @@ import java.io.IOException;
 
 @WebServlet("/")
 public class MainController extends HttpServlet {
-    DispatcherServlet dispatcherServlet;
+    private final DispatcherServlet dispatcherServlet;
 
     public MainController() {
         this.dispatcherServlet = new DispatcherServlet();
