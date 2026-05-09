@@ -7,17 +7,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ControllerResolver {
+
   private final Map<String, Controller> controllerMap;
 
-  public ControllerResolver() {
+  public ControllerResolver(
+      LectureController lectureController,
+      LectureListController lectureListController
+  ) {
     controllerMap = new HashMap<>();
-    controllerMap.put("/lectures", new LectureController());
-    controllerMap.put("/lecture-list", new LectureListController());
+    controllerMap.put("/lectures", lectureController);
+    controllerMap.put("/lecture-list", lectureListController);
   }
 
   public Controller resolve(String path) {
     var controller = controllerMap.get(path);
-    if (controller == null) throw new NotFoundException();
+    if (controller == null) {
+      throw new NotFoundException();
+    }
     return controller;
   }
 

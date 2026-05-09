@@ -1,34 +1,33 @@
-package com.diy.framework.web.server.servlet;
+package com.diy.framework.web.servlet;
 
-import com.diy.framework.web.server.config.BaseConfig;
-import com.diy.framework.web.server.exceptions.CustomException;
 import com.diy.framework.web.server.controller.Controller;
 import com.diy.framework.web.server.controller.ControllerResolver;
+import com.diy.framework.web.server.exceptions.CustomException;
 import com.diy.framework.web.server.exceptions.NotFoundViewException;
-import com.diy.framework.web.server.servlet.utils.HttpServletUtils;
-import com.diy.framework.web.server.servlet.views.ModelAndView;
-import com.diy.framework.web.server.servlet.views.View;
-import com.diy.framework.web.server.servlet.views.ViewResolver;
+import com.diy.framework.web.servlet.utils.HttpServletUtils;
+import com.diy.framework.web.servlet.views.JspViewResolver;
+import com.diy.framework.web.servlet.views.ModelAndView;
+import com.diy.framework.web.servlet.views.View;
+import com.diy.framework.web.servlet.views.ViewResolver;
 import java.io.IOException;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
+
   private ControllerResolver controllerResolver;
   private ViewResolver viewResolver;
 
-  @Override
-  public void init() {
-    controllerResolver = new ControllerResolver();
-    viewResolver = BaseConfig.viewResolver();
+  public DispatcherServlet(ControllerResolver controllerResolver) {
+    this.controllerResolver = controllerResolver;
+    viewResolver = new JspViewResolver();
   }
 
   @Override
-  protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+  protected void service(final HttpServletRequest req, final HttpServletResponse resp)
+      throws IOException {
     String path = HttpServletUtils.getUriPath(req);
     req.setAttribute("params", HttpServletUtils.parseBody(req));
 

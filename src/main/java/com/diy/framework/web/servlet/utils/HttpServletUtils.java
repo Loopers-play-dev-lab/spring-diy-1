@@ -1,4 +1,4 @@
-package com.diy.framework.web.server.servlet.utils;
+package com.diy.framework.web.servlet.utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

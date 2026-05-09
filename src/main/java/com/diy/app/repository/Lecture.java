@@ -1,4 +1,4 @@
-package com.diy.app.store;
+package com.diy.app.repository;
 
 public class Lecture {
 
