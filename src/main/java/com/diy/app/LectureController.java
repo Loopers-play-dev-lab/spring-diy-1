@@ -1,9 +1,7 @@
 package com.diy.app;
 
 import com.diy.framework.web.server.Controller;
-import com.diy.framework.web.server.mv.HtmlViewResolver;
-import com.diy.framework.web.server.mv.Model;
-import com.diy.framework.web.server.mv.View;
+import com.diy.framework.web.server.mv.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,47 +26,56 @@ public class LectureController implements Controller {
     }
 
     @Override
-    public void handleRequest(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+    public ModelAndView handleRequest(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
         switch (request.getMethod()) {
-            case "GET" -> doGet(request, response);
-            case "POST" -> doPost(request, response);
-            case "PUT" -> doPut(request, response);
-            case "DELETE" -> doDelete(request, response);
-            default -> response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            case "GET" -> {
+                return doGet(request, response);
+            }
+            case "POST" -> {
+                return doPost(request, response);
+            }
+            case "PUT" -> {
+                return doPut(request, response);
+            }
+            case "DELETE" -> {
+                return doDelete(request, response);
+            }
+            default -> {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                throw new RuntimeException("404 Not Found");
+            }
         }
     }
 
-    private void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws Exception {
+    private ModelAndView doGet(final HttpServletRequest req, final HttpServletResponse resp) throws Exception {
         System.out.println("[LectureController] doGet() is called.");
-        Model model = new Model(Map.of("lectures", lectureRepository.values()));
-        View view = new HtmlViewResolver().resolve("lecture-list");
-        view.render(req, resp, model);
+        return new ModelAndView("lecture-list", Map.of("lectures", lectureRepository.values()));
     }
 
-    private void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+    private ModelAndView doPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         System.out.println("[LectureController] doPost() is called.");
         final var lectureRequest = new ObjectMapper().readValue(readRequestBodyAsString(req), LecturePostRequest.class);
         final long lectureId = nextId();
         lectureRepository.put(lectureId, lectureRequest.toLecture(lectureId));
-        redirectToList(resp);
+        return new ModelAndView("redirect:/lectures");
     }
 
 
-    private void doPut(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+    private ModelAndView doPut(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         System.out.println("[LectureController] doPut() is called.");
         final var putRequest = new ObjectMapper().readValue(readRequestBodyAsString(req), LecturePutRequest.class);
         final var lectureId = putRequest.getId();
         final var target = Lecture.of(lectureId, putRequest.getName(), putRequest.getPrice());
         lectureRepository.put(lectureId, target);
-        redirectToList(resp);
+        return new ModelAndView("redirect:/lectures");
     }
 
 
-    private void doDelete(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+    private ModelAndView doDelete(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         System.out.println("[LectureController] doDelete() is called.");
         final Long lectureId = extractLectureId(req);
         lectureRepository.remove(lectureId);
-        redirectToList(resp);
+        return new ModelAndView("redirect:/lectures");
     }
 
     @NotNull
@@ -92,9 +99,5 @@ public class LectureController implements Controller {
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid lecture id.");
         }
-    }
-
-    private static void redirectToList(final HttpServletResponse resp) throws IOException {
-        resp.sendRedirect("/lectures");
     }
 }

@@ -1,6 +1,9 @@
 package com.diy.framework.web.server;
 
 import com.diy.app.LectureController;
+import com.diy.framework.web.server.mv.JspViewResolver;
+import com.diy.framework.web.server.mv.ModelAndView;
+import com.diy.framework.web.server.mv.ViewResolver;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -13,6 +16,7 @@ import java.util.Map;
 public class DispatchServlet extends HttpServlet {
 
     private static Map<String, Controller> controllers;
+    private static final ViewResolver viewResolver = new JspViewResolver();
 
     @Override
     public void init() {
@@ -36,9 +40,19 @@ public class DispatchServlet extends HttpServlet {
 
         try {
             System.out.println("[DispatcherServlet] request URI: " + uri + ", controller: " + controller);
-            controller.handleRequest(req, resp);
+            final var mav = controller.handleRequest(req, resp);
+            render(req, resp, mav);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void render(final HttpServletRequest req, final HttpServletResponse resp, final ModelAndView mav) throws Exception {
+        final var viewName = mav.getViewName();
+        final var view = viewResolver.resolve(viewName);
+        if (view == null) {
+            throw new RuntimeException("[DispatcherServlet] view not found: " + viewName);
+        }
+        view.render(req, resp, mav);
     }
 }

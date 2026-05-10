@@ -5,5 +5,5 @@ import javax.servlet.http.HttpServletResponse;
 
 @FunctionalInterface
 public interface View {
-    void render(final HttpServletRequest req, final HttpServletResponse resp, final Model model) throws Exception;
+    void render(final HttpServletRequest req, final HttpServletResponse resp, final ModelAndView mav) throws Exception;
 }

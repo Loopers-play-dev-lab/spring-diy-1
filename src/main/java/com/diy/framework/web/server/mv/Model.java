@@ -25,6 +25,10 @@ public class Model {
         return this.attributes.get(attributeName);
     }
 
+    public void setAttributes(final Map<String, Object> attributes) {
+        this.attributes.putAll(attributes);
+    }
+
     public void setAttribute(final String attributeName, final Object value) {
         attributes.put(attributeName, value);
     }

@@ -22,9 +22,9 @@ public class HtmlView implements View {
     }
 
     @Override
-    public void render(final HttpServletRequest req, final HttpServletResponse resp, final Model model) throws Exception {
-        System.out.println("[HtmlView] render");
-        final var viewFile = readViewFile(req, model);
+    public void render(final HttpServletRequest req, final HttpServletResponse resp, final ModelAndView mav) throws Exception {
+        System.out.println("[HtmlView] render is called.");
+        final var viewFile = readViewFile(req, mav.getModel());
         resp.setContentType("text/html;charset=utf-8");
         final var writer = resp.getWriter();
         writer.print(viewFile);
