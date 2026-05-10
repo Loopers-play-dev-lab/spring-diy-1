@@ -1,6 +1,7 @@
 package com.diy.app;
 
 import com.diy.framework.web.server.Controller;
+import com.diy.framework.web.server.JspView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,14 +15,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class LectureController implements Controller {
 
-    private static final ConcurrentHashMap<Long, Lecture> lectureMap = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Long, Lecture> lectureRepository = new ConcurrentHashMap<>();
 
     static {
         System.out.println("[LectureController] initialized.");
         final Lecture loopakBeL2 = Lecture.of(1L, "Loop:PAK BE L2", BigDecimal.valueOf(1300000));
         final Lecture springDiy = Lecture.of(2L, "Spring DIY", BigDecimal.valueOf(99000));
-        lectureMap.put(1L, loopakBeL2);
-        lectureMap.put(2L, springDiy);
+        lectureRepository.put(1L, loopakBeL2);
+        lectureRepository.put(2L, springDiy);
     }
 
     @Override
@@ -37,15 +38,16 @@ public class LectureController implements Controller {
 
     private void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("[LectureController] doGet() is called.");
-        req.setAttribute("lectures", lectureMap.values());
-        req.getRequestDispatcher("/lecture-list.jsp").forward(req, resp);
+        req.setAttribute("lectures", lectureRepository.values());
+        JspView view = new JspView("/lecture-list.jsp");
+        view.render(req, resp);
     }
 
     private void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         System.out.println("[LectureController] doPost() is called.");
         final var lectureRequest = new ObjectMapper().readValue(readRequestBodyAsString(req), LecturePostRequest.class);
         final long lectureId = nextId();
-        lectureMap.put(lectureId, lectureRequest.toLecture(lectureId));
+        lectureRepository.put(lectureId, lectureRequest.toLecture(lectureId));
         redirectToList(resp);
     }
 
@@ -55,7 +57,7 @@ public class LectureController implements Controller {
         final var putRequest = new ObjectMapper().readValue(readRequestBodyAsString(req), LecturePutRequest.class);
         final var lectureId = putRequest.getId();
         final var target = Lecture.of(lectureId, putRequest.getName(), putRequest.getPrice());
-        lectureMap.put(lectureId, target);
+        lectureRepository.put(lectureId, target);
         redirectToList(resp);
     }
 
@@ -63,7 +65,7 @@ public class LectureController implements Controller {
     private void doDelete(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         System.out.println("[LectureController] doDelete() is called.");
         final Long lectureId = extractLectureId(req);
-        lectureMap.remove(lectureId);
+        lectureRepository.remove(lectureId);
         redirectToList(resp);
     }
 
@@ -74,7 +76,7 @@ public class LectureController implements Controller {
     }
 
     private long nextId() {
-        return lectureMap.keySet().stream().mapToLong(Long::longValue).max().orElse(0L) + 1;
+        return lectureRepository.keySet().stream().mapToLong(Long::longValue).max().orElse(0L) + 1;
     }
 
     private Long extractLectureId(final HttpServletRequest req) {
