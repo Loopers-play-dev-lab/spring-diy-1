@@ -1,13 +1,16 @@
 package com.diy.framework.web.beans.factory;
 
 import com.diy.framework.web.beans.annotations.Autowired;
+import com.diy.framework.web.beans.annotations.Bean;
 import com.diy.framework.web.beans.annotations.Component;
+import com.diy.framework.web.beans.annotations.Configuration;
 import com.diy.framework.web.config.Environment;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -45,8 +48,25 @@ public class ApplicationContext {
     private BeanScanner beanScanner;
     private Environment environment;
 
+    public void setConfigurations() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
+        Set<Class<?>> configurations = beanScanner.scanClassesTypeAnnotatedWith(Configuration.class);
+
+        for (Class<?> clazz : configurations) {
+            Object clazzObject = clazz.getDeclaredConstructor().newInstance();
+            for (Method method : clazz.getDeclaredMethods()) {
+                if (!method.isAnnotationPresent(Bean.class)) {
+                    continue;
+                }
+                Object o = method.invoke(clazzObject);
+                String methodName = method.getName();
+                methodName = methodName.substring(0, 1).toUpperCase() + methodName.substring(1);
+                beans.put(methodName, o);
+            }
+        }
+    }
+
     public void setBeans() throws Exception {
-        classSet = beanScanner.scanClassesTypeAnnotatedWith(Component.class);
+        classSet = beanScanner.doComponentScan(Component.class);
         setBeansInterfaces();
 
         LinkedList<Class<?>> classQueue = new LinkedList<>(classSet);
@@ -69,6 +89,30 @@ public class ApplicationContext {
             setInterfaces(clazz, o);
         }
         setAutowiredField(classSet, Autowired.class);
+    }
+
+    public Map<String, Object> getControllerMap(final Class<? extends Annotation> annotation) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Set<Class<?>> classes = beanScanner.scanClassesTypeAnnotatedWith(annotation);
+
+        Map<String, Object> controllerMap = new HashMap<>();
+        for (Class<?> clazz : classes) {
+            Object controller = beans.get(clazz.getSimpleName());
+            Annotation clazzAnnotation = clazz.getAnnotation(annotation);
+            if (clazzAnnotation == null) continue;
+            Method method = clazzAnnotation.annotationType().getDeclaredMethod("url");
+
+            controllerMap.put((String) method.invoke(clazzAnnotation), controller);
+        }
+        return controllerMap;
+    }
+
+    public List<Object> getBeans(String beanName) {
+        List<Object> list = new LinkedList<>();
+        for (String key : beans.keySet()) {
+            if (!key.contains(beanName)) continue;
+            list.add(beans.get(key));
+        }
+        return list;
     }
 
     public Object getBean(String beanName) {

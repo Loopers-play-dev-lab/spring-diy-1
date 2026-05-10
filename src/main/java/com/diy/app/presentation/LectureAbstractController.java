@@ -1,8 +1,7 @@
 package com.diy.app.presentation;
 
 import com.diy.app.domain.Lecture;
-import com.diy.framework.web.beans.factory.ApplicationContext;
-import com.diy.framework.web.mvc.servlet.AbstractController;
+import com.diy.framework.web.beans.annotations.Controller;
 import com.diy.framework.web.mvc.view.ModelAndView;
 
 import java.util.Arrays;
@@ -10,28 +9,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-public class LectureAbstractController extends AbstractController {
+@Controller(url = "/lectures")
+public class LectureAbstractController {
     private final LectureController lectureController;
-    private static LectureAbstractController instance;
 
-    private static class LectureAbstractControllerHolder {
-        private static final LectureAbstractController INSTANCE = new LectureAbstractController();
+    public LectureAbstractController(LectureController lectureController) {
+        this.lectureController = lectureController;
     }
 
-    private LectureAbstractController() {
-        ApplicationContext context = ApplicationContext.getInstance();
-        this.lectureController = (LectureController) context.getBean("LectureController");
-    }
+    public ModelAndView handleRequest(String method, Map<String, ?> params) throws IllegalArgumentException {
+        System.out.println("AbstractController handleRequest method : " + method);
 
-    public static LectureAbstractController getInstance() {
-        if (instance == null) {
-            instance = new LectureAbstractController();
+        switch (method) {
+            case "GET" : return doGet(params);
+            case "POST" : return doPost(params);
+            case "PUT" : return doPut(params);
+            case "DELETE" : return doDelete(params);
+            default : throw new IllegalArgumentException("Method not supported");
         }
-        return instance;
     }
 
-    @Override
     public ModelAndView doGet(Map<String, ?> params) {
         List<Lecture> lectures = lectureController.getLectures();
         Map<String, Object> model = new HashMap<>();
@@ -39,21 +36,18 @@ public class LectureAbstractController extends AbstractController {
         return new ModelAndView("lecture-list", model);
     }
 
-    @Override
     public ModelAndView doPost(Map<String, ?> params) {
         LectureRequest request = LectureRequest.from(params);
         lectureController.addLecture(request);
         return new ModelAndView("redirect:/lectures");
     }
 
-    @Override
     public ModelAndView doPut(Map<String, ?> params) {
         LectureRequest request = LectureRequest.from(params);
         lectureController.updateLecture(request);
         return new ModelAndView("none");
     }
 
-    @Override
     public ModelAndView doDelete(Map<String, ?> params) {
         String lectureId = Arrays.toString((String[])params.get("lectureId")).replace("[", "").replace("]", "");
         lectureController.deleteLecture(lectureId);

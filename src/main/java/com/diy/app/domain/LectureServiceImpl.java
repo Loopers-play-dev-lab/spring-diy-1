@@ -1,12 +1,12 @@
 package com.diy.app.domain;
 
 import com.diy.app.presentation.LectureRequest;
-import com.diy.framework.web.beans.annotations.Component;
+import com.diy.framework.web.beans.annotations.Service;
 
 import java.util.List;
 import java.util.UUID;
 
-@Component
+@Service
 public class LectureServiceImpl implements LectureService{
     private final LectureRepository lectureRepository;
 

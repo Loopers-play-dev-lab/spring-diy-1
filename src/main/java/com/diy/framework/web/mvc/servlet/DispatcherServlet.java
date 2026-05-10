@@ -1,8 +1,8 @@
 package com.diy.framework.web.mvc.servlet;
 
-import com.diy.config.AppConfig;
+import com.diy.framework.web.beans.annotations.Controller;
+import com.diy.framework.web.beans.annotations.RestController;
 import com.diy.framework.web.beans.factory.ApplicationContext;
-import com.diy.framework.web.config.WebConfig;
 import com.diy.framework.web.mvc.view.ModelAndView;
 import com.diy.framework.web.mvc.view.View;
 import com.diy.framework.web.mvc.view.ViewResolver;
@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,27 +27,23 @@ import java.util.Map;
 
 @WebServlet(urlPatterns = "/")
 public class DispatcherServlet extends HttpServlet {
-    private final Map<String, Controller> controllerMap = new HashMap<>();
-    private final Map<String, RestController> restControllerMap = new HashMap<>();
-    private final List<ViewResolver> viewResolvers;
-
-    public DispatcherServlet() {
-        viewResolvers = new ArrayList<>();
-        viewResolvers.add(WebConfig.urlBasedViewResolver());
-        viewResolvers.add(WebConfig.jspViewResolver());
-    }
+    private final Map<String, Object> controllerMap = new HashMap<>();
+    private final Map<String, Object> restControllerMap = new HashMap<>();
+    private final List<ViewResolver> viewResolvers = new ArrayList<>();
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         ApplicationContext context = ApplicationContext.getInstance();
         try {
+            context.setConfigurations();
             context.setBeans();
+            controllerMap.putAll(context.getControllerMap(Controller.class));
+            restControllerMap.putAll(context.getControllerMap(RestController.class));
+            viewResolvers.addAll(context.getBeans("ViewResolver").stream().map(ViewResolver.class::cast).toList());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        controllerMap.putAll(AppConfig.controllerMapping());
-        restControllerMap.putAll(AppConfig.restControllerMapping());
     }
 
     @Override
@@ -54,11 +52,22 @@ public class DispatcherServlet extends HttpServlet {
         System.out.println("DispatcherServlet service");
 
         String uri = req.getRequestURI();
-        Controller controller = controllerMap.get(uri);
-        RestController restController = restControllerMap.get(uri);
+        Object controller = controllerMap.get(uri);
+        Object restController = restControllerMap.get(uri);
 
         if (controller == null && restController != null) {
-            Object result = restController.handleRequest(req.getMethod(), params);
+            Method method = null;
+            Object result = null;
+            try {
+                method = restController.getClass().getMethod("handleRequest", String.class, Map.class);
+                result = method.invoke(restController, req.getMethod(), params);
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
             resp.setContentType("application/json");
             resp.setCharacterEncoding("UTF-8");
             PrintWriter writer = resp.getWriter();
@@ -79,7 +88,8 @@ public class DispatcherServlet extends HttpServlet {
             return;
         }
         try {
-            ModelAndView mav = controller.handleRequest(req.getMethod(), params);
+            Method method = controller.getClass().getMethod("handleRequest", String.class, Map.class);
+            ModelAndView mav = (ModelAndView) method.invoke(controller, req.getMethod(), params);
             render(mav, req, resp);
         } catch (Exception e) {
             throw new RuntimeException(e);

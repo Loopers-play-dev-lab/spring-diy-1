@@ -14,9 +14,8 @@ public class Environment {
         try (InputStream in = Files.newInputStream(Paths.get("src/main/resources/application.yml"))) {
             // YML 데이터를 Map으로 로드
             Map<String, Object> obj = yaml.load(in);
-            env.putAll(obj);
-
-            Queue<String> queue = new LinkedList<>(obj.keySet());
+            Set<String> keys = obj.keySet();
+            Queue<String> queue = new LinkedList<>(keys);
 
             while (!queue.isEmpty()) {
                 String key = queue.poll();
@@ -26,6 +25,7 @@ public class Environment {
                     obj.putAll(map);
                     queue.addAll(map.keySet());
                     env.put(key, map.keySet());
+                    continue;
                 }
                 env.put(key, value);
             }
@@ -40,17 +40,29 @@ public class Environment {
     public String[] getPackages() {
         List<String> packages = new LinkedList<>();
 
-        Queue<String> queue = new LinkedList<>(Arrays.asList(getEnv("package").toString().split(",")));
-
-        while (!queue.isEmpty()) {
-            String value = queue.poll();
-            if (env.containsKey(value)) {
-                queue.addAll(Arrays.asList(getEnv(value).toString().split(",")));
-                continue;
-            }
-            packages.add(value);
+        Queue<Object> queue = new LinkedList<>();
+        Object packageNames = env.get("package");
+        if (packageNames instanceof Set<?>) {
+            queue.addAll((Set<?>) packageNames);
         }
 
-        return packages.toArray(new String[0]);
+
+        while (!queue.isEmpty()) {
+            Object value = queue.poll();
+            Object o = env.get(value.toString());
+            if (o == null) {
+                packages.add(value.toString());
+                continue;
+            }
+            if (o instanceof Set<?> set) {
+                queue.addAll(set);
+                continue;
+            }
+            if (o instanceof String) {
+                packages.add(o.toString());
+            }
+        }
+
+        return packages.toArray(String[]::new);
     }
 }

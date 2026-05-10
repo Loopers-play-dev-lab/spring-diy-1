@@ -3,21 +3,16 @@ package com.diy.app.infrastructure;
 import com.diy.app.domain.Lecture;
 import com.diy.app.domain.LectureRepository;
 import com.diy.framework.web.beans.annotations.Autowired;
-import com.diy.framework.web.beans.annotations.Component;
+import com.diy.framework.web.beans.annotations.Repository;
 import com.diy.module.database.InMemoryDatabase;
 
 import java.util.List;
 import java.util.UUID;
 
-@Component
+@Repository
 public class LectureInmemoryRepository implements LectureRepository {
-//    private final InMemoryDatabase database;
     @Autowired
     private InMemoryDatabase database;
-
-//    public LectureInmemoryRepository(InMemoryDatabase database) {
-//        this.database = database;
-//    }
 
     @Override
     public void add(Lecture lecture) {
