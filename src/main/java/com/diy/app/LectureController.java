@@ -1,25 +1,23 @@
 package com.diy.app;
 
+import com.diy.framework.web.server.Controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentHashMap;
 
-@WebServlet("/lectures")
-public class LectureServlet extends HttpServlet {
+public class LectureController implements Controller {
 
     private static final ConcurrentHashMap<Long, Lecture> lectureMap = new ConcurrentHashMap<>();
 
     static {
+        System.out.println("[LectureController] initialized.");
         final Lecture loopakBeL2 = Lecture.of(1L, "Loop:PAK BE L2", BigDecimal.valueOf(1300000));
         final Lecture springDiy = Lecture.of(2L, "Spring DIY", BigDecimal.valueOf(99000));
         lectureMap.put(1L, loopakBeL2);
@@ -27,59 +25,52 @@ public class LectureServlet extends HttpServlet {
     }
 
     @Override
-    public void init() throws ServletException {
-        System.out.println("[LectureServlet] init() is called.");
-        super.init();
+    public void handleRequest(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+        switch (request.getMethod()) {
+            case "GET" -> doGet(request, response);
+            case "POST" -> doPost(request, response);
+            case "PUT" -> doPut(request, response);
+            case "DELETE" -> doDelete(request, response);
+            default -> response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
     }
 
-    @Override
-    protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("[LectureServlet] service() is called.");
-        super.service(req, resp);
-    }
-
-    @Override
-    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("[LectureServlet] doGet() is called.");
+    private void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+        System.out.println("[LectureController] doGet() is called.");
         req.setAttribute("lectures", lectureMap.values());
         req.getRequestDispatcher("/lecture-list.jsp").forward(req, resp);
     }
 
-    @Override
-    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        System.out.println("[LectureServlet] doPost() is called.");
-        final var reader = new BufferedReader(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
-        final var lectureRequest = new ObjectMapper().readValue(reader.readLine(), LecturePostRequest.class);
-
+    private void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+        System.out.println("[LectureController] doPost() is called.");
+        final var lectureRequest = new ObjectMapper().readValue(readRequestBodyAsString(req), LecturePostRequest.class);
         final long lectureId = nextId();
         lectureMap.put(lectureId, lectureRequest.toLecture(lectureId));
         redirectToList(resp);
     }
 
-    @Override
-    protected void doPut(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        final var reader = new BufferedReader(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
-        final var putRequest = new ObjectMapper().readValue(reader.readLine(), LecturePutRequest.class);
 
+    private void doPut(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+        System.out.println("[LectureController] doPut() is called.");
+        final var putRequest = new ObjectMapper().readValue(readRequestBodyAsString(req), LecturePutRequest.class);
         final var lectureId = putRequest.getId();
         final var target = Lecture.of(lectureId, putRequest.getName(), putRequest.getPrice());
         lectureMap.put(lectureId, target);
-
         redirectToList(resp);
     }
 
-    @Override
-    protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("[LectureServlet] doDelete() is called.");
+
+    private void doDelete(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+        System.out.println("[LectureController] doDelete() is called.");
         final Long lectureId = extractLectureId(req);
         lectureMap.remove(lectureId);
         redirectToList(resp);
     }
 
-    @Override
-    public void destroy() {
-        System.out.println("[LectureServlet] destroy() is called.");
-        super.destroy();
+    @NotNull
+    private String readRequestBodyAsString(final HttpServletRequest req) throws IOException {
+        final var bytes = req.getInputStream().readAllBytes();
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 
     private long nextId() {
@@ -103,4 +94,3 @@ public class LectureServlet extends HttpServlet {
         resp.sendRedirect("/lectures");
     }
 }
-
