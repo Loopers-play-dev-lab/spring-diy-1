@@ -1,9 +1,9 @@
 package com.diy.app;
 
 import com.diy.framework.web.server.Controller;
-import com.diy.framework.web.server.HtmlViewResolver;
-import com.diy.framework.web.server.Model;
-import com.diy.framework.web.server.View;
+import com.diy.framework.web.server.mv.HtmlViewResolver;
+import com.diy.framework.web.server.mv.Model;
+import com.diy.framework.web.server.mv.View;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class LectureController implements Controller {
@@ -39,8 +40,7 @@ public class LectureController implements Controller {
 
     private void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws Exception {
         System.out.println("[LectureController] doGet() is called.");
-        Model model = new Model();
-        model.setAttribute("lectures", lectureRepository.values());
+        Model model = new Model(Map.of("lectures", lectureRepository.values()));
         View view = new HtmlViewResolver().resolve("lecture-list");
         view.render(req, resp, model);
     }
