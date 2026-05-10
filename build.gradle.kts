@@ -30,6 +30,8 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
     implementation("org.reflections:reflections:0.10.2")
+
+    implementation("org.yaml:snakeyaml:2.2")
 }
 
 tasks.test {

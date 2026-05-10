@@ -2,6 +2,7 @@ package com.diy.framework.web.beans.factory;
 
 import com.diy.framework.web.beans.annotations.Autowired;
 import com.diy.framework.web.beans.annotations.Component;
+import com.diy.framework.web.config.Environment;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -27,7 +28,8 @@ public class ApplicationContext {
             try {
                 if (instance == null) {
                     instance = new ApplicationContext();
-                    instance.beanScanner = new BeanScanner(BASE_PACKAGE_NAME, MODULE_PACKAGE_NAME);
+                    instance.environment = new Environment();
+                    instance.beanScanner = new BeanScanner(instance.environment.getPackages());
                 }
             } finally {
                 lock.unlock();
@@ -36,14 +38,12 @@ public class ApplicationContext {
         return instance;
     }
 
-    private static final String BASE_PACKAGE_NAME = "com.diy.app";
-    private static final String MODULE_PACKAGE_NAME = "com.diy.module";
-
     private final Map<String, Object> beans = new ConcurrentHashMap<>();
     private Set<Class<?>> classSet = new HashSet<>();
     private final Map<String, Class<?>> beanInterfaces = new HashMap<>();
 
     private BeanScanner beanScanner;
+    private Environment environment;
 
     public void setBeans() throws Exception {
         classSet = beanScanner.scanClassesTypeAnnotatedWith(Component.class);

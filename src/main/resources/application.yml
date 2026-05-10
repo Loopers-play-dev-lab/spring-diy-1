@@ -1,0 +1,4 @@
+package:
+  base: "com.diy.app"
+  module: "com.diy.module"
+  framework: "com.diy.framework"
