@@ -29,10 +29,10 @@ public class FrontEndController extends HttpServlet {
         // Strategy 전략을 통해 html로 변경시 suffix, prefix만 설정
         viewResolver = new ViewResolver("/",".jsp");
 
-        controllerMap.put("GET:/lectures", (Controller) ApplicationContext.getBean("com.diy.app.ctrl.GetController"));
-        controllerMap.put("POST:/lectures", (Controller) ApplicationContext.getBean("com.diy.app.ctrl.PostController"));
-        controllerMap.put("PUT:/lectures", (Controller) ApplicationContext.getBean("com.diy.app.ctrl.PutController"));
-        controllerMap.put("DELETE:/lectures", (Controller) ApplicationContext.getBean("com.diy.app.ctrl.DelController"));
+        controllerMap.put("GET:/lectures", ApplicationContext.getBean(GetController.class));
+        controllerMap.put("POST:/lectures",ApplicationContext.getBean(PostController.class));
+        controllerMap.put("PUT:/lectures", ApplicationContext.getBean(PutController.class));
+        controllerMap.put("DELETE:/lectures", ApplicationContext.getBean(DelController.class));
     }
 
     @Override

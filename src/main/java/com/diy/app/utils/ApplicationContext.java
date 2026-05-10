@@ -13,30 +13,31 @@ public class ApplicationContext {
     private static BeanFactory beanFactory;
 
 
+
     public static void run(Class<?> main) {
         final String basePackage = main.getPackage().getName();
         BeanScanner beanScanner = new BeanScanner(basePackage);
         BeanFactory factory = new BeanFactory();
         DependencyInjector injector = new DependencyInjector(factory);
 
-        // 1. 컴포넌트 스캔 및 빈 생성 및 등록
-        Set<Class<?>> componentClasses = beanScanner.scanClassesTypeAnnotatedWith(Component.class);
-        factory.createBean(componentClasses);
         ApplicationContext.beanFactory = factory;
-        // 2. 생성자 스캔 및 의존성 주입
+
+        // 1. 빈 생성 대상 스캔
+        Set<Class<?>> components = beanScanner.scanClassesTypeAnnotatedWith(Component.class);
         Set<Constructor<?>> constructors = beanScanner.scanConstructorTypeAnnotatedWith(Autowired.class);
-        injector.constructorInject(constructors);
-        ApplicationContext.beanFactory = factory;
-        // 3. 필드 스캔 및 의존성 주입
         Set<Field> fields = beanScanner.scanFieldTypeAnnotatedWith(Autowired.class);
+
+        // 2. 팩토리에게 빈 생성 위임
+        factory.createBean(components,constructors, injector);
+
+        // 3. 필드 스캔 및 의존성 주입
         injector.fieldInject(fields);
-        ApplicationContext.beanFactory = factory;
     }
 
-    public static Object getBean(String name) {
+    public static <T> T getBean(Class<T> type) {
         if (beanFactory == null) {
             throw new IllegalStateException("ApplicationContext가 초기화되지 않았습니다. run()을 먼저 호출하세요.");
         }
-        return beanFactory.getBean(name);
+        return (T) beanFactory.getBeanByType(type);
     }
 }

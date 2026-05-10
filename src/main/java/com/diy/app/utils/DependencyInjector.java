@@ -21,9 +21,9 @@ public class DependencyInjector {
         for (Field field : fields) {
             try {
                 // 주입 대상 (어디에 꽂을 것인가)
-                Object target = beanFactory.getBean(field.getDeclaringClass().getName());
+                Object target = beanFactory.getBeanByType(field.getDeclaringClass());
                 // 주입될 값 (무엇을 꽂을 것인가)
-                Object value = beanFactory.getBean(field.getType().getName());
+                Object value = beanFactory.getBeanByType(field.getType());
 
                 if (target != null && value != null) {
                     field.setAccessible(true);
@@ -36,24 +36,19 @@ public class DependencyInjector {
         }
     }
 
-    // 생성자 주입 방법
-    public void constructorInject(Set<Constructor<?>> constructors) {
-        for (Constructor<?> constructor : constructors) {
-            try {
-                Class<?> clazz = constructor.getDeclaringClass();
-
-                // 생성자 파라미터 타입 조회
-                Object[] args = Arrays.stream(constructor.getParameterTypes()).map(type -> beanFactory.getBean(type.getName())).toArray();
-                constructor.setAccessible(true);
-                Object instance = constructor.newInstance(args);
-                beanFactory.registerBean(clazz, instance);
-                for (Class<?> iface : clazz.getInterfaces()) {
-                    beanFactory.registerBean(iface, instance);
-                }
-                constructor.setAccessible(false);
-            } catch (Exception e) {
-                throw new IllegalStateException(constructor.getName() + "생성자 주입 중 오류 발생" + e.getMessage(), e);
-            }
+    // 생성자 주입 인스턴스 생성
+    public Object createInstanceByConsturctor(Constructor<?> constructor) {
+        try {
+            // 생성자 파라미터 타입 조회
+            Object[] args = Arrays.stream(constructor.getParameterTypes())
+                                    .map(beanFactory :: getBeanByType)
+                                    .toArray();
+            constructor.setAccessible(true);
+            Object instance = constructor.newInstance(args);
+            constructor.setAccessible(false);
+            return instance;
+        } catch (Exception e) {
+            throw new IllegalStateException(constructor.getDeclaringClass().getSimpleName() + " 빈 생성 중 오류 발생: " + e.getMessage(), e);
         }
     }
 }

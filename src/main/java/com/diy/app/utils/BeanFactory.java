@@ -9,42 +9,62 @@ public class BeanFactory {
     private final Map<String, Object> singletonObjects = new HashMap<>();
     private final Map<Class<?>, List<Object>> beanNamesByType = new HashMap<>();
 
-    public void createBean(Set<Class<?>> componentClasses){
+    // 빈 네이밍 규칙
+    private String determineBeanName(Class<?> clazz) {
+        String shortName = clazz.getSimpleName();
+        return java.beans.Introspector.decapitalize(shortName);
+    }
+    public void createBean(Set<Class<?>> componentClasses, Set<Constructor<?>> constructors, DependencyInjector injector){
         for (Class<?> clazz : componentClasses) {
             // @Autowired가 없는 클래스 먼저 생성
-            boolean constructorAutowired = Arrays.stream(clazz.getDeclaredConstructors()).anyMatch(constructor -> constructor.isAnnotationPresent(Autowired.class));
-            if (!constructorAutowired) {
-                try {
-                    Constructor<?> defaultConstructor = clazz.getDeclaredConstructor();
-                    defaultConstructor.setAccessible(true);
-                    Object instance = defaultConstructor.newInstance();
-                    registerBean(clazz, instance);
-                    defaultConstructor.setAccessible(false);
-                } catch (Exception e) {
-                    throw new IllegalStateException(clazz.getName() + " 빈 생성 중 오류 발생: " + e.getMessage(), e);
-                }
+            boolean hasAutowired = Arrays.stream(clazz.getDeclaredConstructors())
+                    .anyMatch(constructor -> constructor.isAnnotationPresent(Autowired.class));
+            if (!hasAutowired) {
+                createDefaultInstance(clazz);
             }
         }
-    }
-    public void registerBean(Class<?> clazz, Object instance) {
-        String beanName = clazz.getName();
-        // 중복 생성 방지 (인터페이스 혹은 상속의 경우)
-        if(!singletonObjects.containsKey(beanName)){
-            singletonObjects.put(beanName, instance);
+        for (Constructor<?> constructor : constructors) {
+            String beanName = determineBeanName(constructor.getDeclaringClass());
+            // 1. 빈 등록 여부 확인
+            if(singletonObjects.containsKey(beanName)) continue;
+
+            // 2. 실제 인스턴스 생성
+            Object instance = injector.createInstanceByConsturctor(constructor);
+
+            registerBean(beanName, instance);
         }
-        Class<?> current = clazz;
+    }
+    private void createDefaultInstance(Class<?> clazz) {
+        try {
+            Constructor<?> defaultConstructor = clazz.getDeclaredConstructor();
+            defaultConstructor.setAccessible(true);
+            Object instance = defaultConstructor.newInstance();
+            registerBean(determineBeanName(clazz), instance);
+            defaultConstructor.setAccessible(false);
+        } catch (Exception e) {
+            throw new IllegalStateException(clazz.getName() + " 빈 생성 중 오류 발생: " + e.getMessage(), e);
+        }
+    }
+    public void registerBean(String beanName, Object instance) {
+        // 중복 생성 방지 (인터페이스 혹은 상속의 경우)
+        if(singletonObjects.containsKey(beanName)){
+            throw new IllegalStateException("이미 존재하는 빈 이름: " + beanName);
+        }
+        singletonObjects.put(beanName, instance);
+
+        Class<?> current = instance.getClass();
         // Object class 전까지 부모 클래스 탐색
         while (current != null && !current.equals(Object.class)) {
-            addTypeIndex(current,beanName);
+            addTypeIndex(current,instance);
 
             for(Class<?> iface : current.getInterfaces()){
-                addTypeIndex(iface,beanName);
+                addTypeIndex(iface,instance);
             }
             current = current.getSuperclass();
         }
     }
-    private void addTypeIndex(Class<?> type , String beanName) {
-        beanNamesByType.computeIfAbsent(type, k -> new ArrayList<>()).add(beanName);
+    private void addTypeIndex(Class<?> type , Object instance) {
+        beanNamesByType.computeIfAbsent(type, k -> new ArrayList<>()).add(instance);
     }
     public Object getBean(String name) {
         return singletonObjects.get(name);
@@ -60,7 +80,19 @@ public class BeanFactory {
      *
       * @return Map<Class<?>, List<Object>>
      */
-    public Map<Class<?>, List<Object>> getBeanNamesByType() {
+    public Map<Class<?>, List<Object>> getTypeIndexMap() {
         return Collections.unmodifiableMap(beanNamesByType); // 읽기 전용 Map
+    }
+
+    public Object getBeanByType(Class<?> type) {
+        List<Object> beans = beanNamesByType.get(type);
+        if(beans == null || beans.isEmpty()) return null;
+
+        if(beans.size() > 1) {
+            throw new IllegalStateException(
+                    type.getSimpleName() + "타입의 빈이" + beans.size() + "개 스캔되어 어떤 빈을 주입할지 결정할 수 없습니다"
+            );
+        }
+        return beans.get(0);
     }
 }
