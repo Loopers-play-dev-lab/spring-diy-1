@@ -46,9 +46,9 @@ public class DependencyInjector {
                 Object[] args = Arrays.stream(constructor.getParameterTypes()).map(type -> beanFactory.getBean(type.getName())).toArray();
                 constructor.setAccessible(true);
                 Object instance = constructor.newInstance(args);
-                beanFactory.registerBean(clazz.getName(), instance);
+                beanFactory.registerBean(clazz, instance);
                 for (Class<?> iface : clazz.getInterfaces()) {
-                    beanFactory.registerBean(iface.getName(), instance);
+                    beanFactory.registerBean(iface, instance);
                 }
                 constructor.setAccessible(false);
             } catch (Exception e) {

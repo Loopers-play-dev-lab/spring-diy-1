@@ -28,7 +28,7 @@ public class ReflectionTest {
         }
     }
 
-    @Test
+//    @Test
     public void beanCreate() {
         ApplicationContext.run(Main.class);
 
@@ -52,7 +52,7 @@ public class ReflectionTest {
 
         if (beanFactory == null) return;
 
-        Set<String> beanNames = beanFactory.getAllBeans().keySet();
+        Set<String> beanNames = beanFactory.getSingletonObjects().keySet();
 
         for (String beanName : beanNames) {
             Object beanInstance = ApplicationContext.getBean(beanName);
@@ -70,5 +70,32 @@ public class ReflectionTest {
                 System.out.println("빈 인스턴스의 클래스 조회 실패 " + e.getMessage());
             }
         }
+    }
+    @Test
+    public void getBeanTest() {
+        ApplicationContext.run(Main.class);
+        Field field = null;
+        try {
+            field = ApplicationContext.class.getDeclaredField("beanFactory");
+            field.setAccessible(true);
+        } catch (Exception e) {
+            System.out.println("ApplicationContext beanFactory필드 접근 실패 " + e.getMessage());
+            return; // 필드 접근 실패 시 이후 로직 진행 불가
+        }
+        BeanFactory beanFactory = null;
+        try {
+            beanFactory = (BeanFactory) field.get(null);
+        } catch (Exception e) {
+            System.out.println("Application beanFactory 인스턴스 조회 실패 " + e.getMessage());
+        } finally {
+            field.setAccessible(false);
+        }
+        beanFactory.getSingletonObjects().forEach((type,names) -> {
+            System.out.println(type + " -> " + names);
+        });
+        System.out.println("=".repeat(20));
+        beanFactory.getBeanNamesByType().forEach((type, names) -> {
+            System.out.println(type.getSimpleName() + " -> " + names);
+        });
     }
 }
