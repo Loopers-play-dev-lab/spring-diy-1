@@ -1,4 +1,4 @@
-package com.diy.framework.web.server;
+package com.diy.framework.web.server.mv;
 
 import com.diy.app.Lecture;
 

@@ -1,4 +1,4 @@
-package com.diy.framework.web.server;
+package com.diy.framework.web.server.mv;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
