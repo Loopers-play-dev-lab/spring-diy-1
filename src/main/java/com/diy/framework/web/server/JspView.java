@@ -14,7 +14,12 @@ public class JspView implements View {
     }
 
     @Override
-    public void render(final HttpServletRequest req, final HttpServletResponse resp) throws Exception {
+    public void render(final HttpServletRequest req, final HttpServletResponse resp, final Model model) throws Exception {
+        System.out.println("[JspView] render");
+        final var attributes = model.getAttributes();
+        for (String key : attributes.keySet()) {
+            req.setAttribute(key, attributes.get(key));
+        }
         req.getRequestDispatcher(viewName).forward(req, resp);
     }
 }
