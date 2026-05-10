@@ -3,22 +3,16 @@ package com.diy.app.presentation;
 
 import com.diy.app.domain.Lecture;
 import com.diy.app.domain.LectureService;
+import com.diy.framework.web.beans.annotations.Component;
 
 import java.util.List;
 
+@Component
 public class LectureController {
     private final LectureService lectureService;
 
-    private static LectureController instance;
-    private LectureController(LectureService lectureService){
+    public LectureController(LectureService lectureService) {
         this.lectureService = lectureService;
-    }
-
-    public static LectureController getInstance(LectureService lectureService){
-        if (instance == null) {
-            instance = new LectureController(lectureService);
-        }
-        return instance;
     }
 
     public void addLecture(LectureRequest request) {

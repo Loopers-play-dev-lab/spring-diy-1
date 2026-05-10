@@ -1,22 +1,17 @@
 package com.diy.app.domain;
 
 import com.diy.app.presentation.LectureRequest;
-import com.diy.app.presentation.LectureResponse;
+import com.diy.framework.web.beans.annotations.Component;
 
 import java.util.List;
 import java.util.UUID;
 
+@Component
 public class LectureServiceImpl implements LectureService{
     private final LectureRepository lectureRepository;
-    private static LectureServiceImpl instance;
-    private LectureServiceImpl(LectureRepository lectureRepository) {
+
+    public LectureServiceImpl(LectureRepository lectureRepository) {
         this.lectureRepository = lectureRepository;
-    }
-    public static LectureServiceImpl getInstance(LectureRepository lectureRepository) {
-        if (instance == null) {
-            instance = new LectureServiceImpl(lectureRepository);
-        }
-        return instance;
     }
 
     @Override
