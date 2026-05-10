@@ -1,11 +1,10 @@
 package com.diy.app;
 
 import com.diy.framework.web.server.Controller;
-import com.diy.framework.web.server.JspView;
+import com.diy.framework.web.server.HtmlView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -36,10 +35,10 @@ public class LectureController implements Controller {
         }
     }
 
-    private void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    private void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws Exception {
         System.out.println("[LectureController] doGet() is called.");
         req.setAttribute("lectures", lectureRepository.values());
-        JspView view = new JspView("/lecture-list.jsp");
+        HtmlView view = new HtmlView("lecture-list");
         view.render(req, resp);
     }
 
