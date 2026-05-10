@@ -1,7 +1,7 @@
 package com.diy.app;
 
 import com.diy.framework.web.server.Controller;
-import com.diy.framework.web.server.HtmlView;
+import com.diy.framework.web.server.HtmlViewResolver;
 import com.diy.framework.web.server.Model;
 import com.diy.framework.web.server.View;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,7 +41,7 @@ public class LectureController implements Controller {
         System.out.println("[LectureController] doGet() is called.");
         Model model = new Model();
         model.setAttribute("lectures", lectureRepository.values());
-        View view = new HtmlView("lecture-list");
+        View view = new HtmlViewResolver().resolve("lecture-list");
         view.render(req, resp, model);
     }
 

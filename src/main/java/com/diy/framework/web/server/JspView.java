@@ -10,7 +10,7 @@ public class JspView implements View {
         if (viewName == null || viewName.isBlank()) {
             throw new IllegalArgumentException("viewName is required");
         }
-        this.viewName = "/" + viewName + ".jsp";
+        this.viewName = viewName;
     }
 
     @Override

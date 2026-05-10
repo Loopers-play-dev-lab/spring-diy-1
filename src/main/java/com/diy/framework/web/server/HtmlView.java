@@ -18,7 +18,7 @@ public class HtmlView implements View {
         if (viewName == null || viewName.isBlank()) {
             throw new IllegalArgumentException("viewName is required");
         }
-        this.viewName = "/" + viewName + ".html";
+        this.viewName = viewName;
     }
 
     @Override
