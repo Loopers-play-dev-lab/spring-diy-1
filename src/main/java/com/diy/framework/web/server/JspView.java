@@ -1,21 +1,20 @@
 package com.diy.framework.web.server;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
-public class JspView {
+public class JspView implements View {
     private final String viewName;
 
     public JspView(final String viewName) {
         if (viewName == null || viewName.isBlank()) {
             throw new IllegalArgumentException("viewName is required");
         }
-        this.viewName = viewName;
+        this.viewName = "/" + viewName + ".jsp";
     }
 
-    public void render(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    @Override
+    public void render(final HttpServletRequest req, final HttpServletResponse resp) throws Exception {
         req.getRequestDispatcher(viewName).forward(req, resp);
     }
 }

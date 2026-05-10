@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
-public class HtmlView {
+public class HtmlView implements View {
     private final String viewName;
 
     public HtmlView(final String viewName) {
@@ -18,7 +18,8 @@ public class HtmlView {
         this.viewName = "/" + viewName + ".html";
     }
 
-    public void render(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+    @Override
+    public void render(final HttpServletRequest req, final HttpServletResponse resp) throws Exception {
         final var viewFile = readViewFile(req);
         resp.setContentType("text/html;charset=utf-8");
         final var writer = resp.getWriter();
