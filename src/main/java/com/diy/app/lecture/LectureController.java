@@ -1,5 +1,7 @@
 package com.diy.app.lecture;
 
+import com.diy.framework.context.annotation.Autowired;
+import com.diy.framework.context.annotation.Component;
 import com.diy.framework.web.mvc.controller.Controller;
 import com.diy.framework.web.mvc.ModelAndView;
 import com.diy.framework.web.mvc.model.Model;
@@ -9,9 +11,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@Component
 public class LectureController implements Controller{
     private final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private final LectureRepository lectureRepository = new LectureRepository();
+    private final LectureRepository lectureRepository;
+
+    @Autowired
+    public LectureController(LectureRepository lectureRepository) {
+        this.lectureRepository = lectureRepository;
+    }
 
     @Override
     public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {

@@ -1,14 +1,14 @@
 package com.diy.app.lecture;
 
+import com.diy.framework.context.annotation.Component;
+
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
+@Component
 public class LectureRepository {
     private final Map<Long, Lecture> lectureTable = new HashMap<>();
     private final AtomicLong sequence = new AtomicLong();
-
-    public LectureRepository() {
-    }
 
     public Collection<Lecture> findAll() {
         return lectureTable.values();

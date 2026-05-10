@@ -13,7 +13,11 @@ repositories {
 dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.assertj:assertj-core:3.27.7")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // reflection
+    implementation("org.reflections:reflections:0.10.2")
 
     // ObjectMapper
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
