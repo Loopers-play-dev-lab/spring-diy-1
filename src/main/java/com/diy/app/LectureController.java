@@ -2,6 +2,7 @@ package com.diy.app;
 
 import com.diy.framework.web.server.Controller;
 import com.diy.framework.web.server.HtmlView;
+import com.diy.framework.web.server.Model;
 import com.diy.framework.web.server.View;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
@@ -38,9 +39,10 @@ public class LectureController implements Controller {
 
     private void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws Exception {
         System.out.println("[LectureController] doGet() is called.");
-        req.setAttribute("lectures", lectureRepository.values());
+        Model model = new Model();
+        model.setAttribute("lectures", lectureRepository.values());
         View view = new HtmlView("lecture-list");
-        view.render(req, resp);
+        view.render(req, resp, model);
     }
 
     private void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
