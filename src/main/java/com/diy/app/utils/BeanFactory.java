@@ -1,19 +1,36 @@
 package com.diy.app.utils;
 
 import com.diy.app.annotation.Autowired;
+import com.diy.app.annotation.Bean;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.*;
 
 public class BeanFactory {
     private final Map<String, Object> singletonObjects = new HashMap<>();
     private final Map<Class<?>, List<Object>> beanNamesByType = new HashMap<>();
 
-    // 빈 네이밍 규칙
+    /***********************************************************
+    * naming 규칙 영역                                           *
+    ***********************************************************/
+    // 빈 네이밍 규칙 (@Component)
     private String determineBeanName(Class<?> clazz) {
         String shortName = clazz.getSimpleName();
         return java.beans.Introspector.decapitalize(shortName);
     }
+    private String determineMethodBeanName(Method method) {
+        Bean beanAnn = method.getAnnotation(Bean.class);
+
+        if (!beanAnn.name().isEmpty()) return beanAnn.name();
+        if (!beanAnn.value().isEmpty()) return beanAnn.value();
+
+        return java.beans.Introspector.decapitalize(method.getName());
+    }
+
+    /***********************************************************
+     * Bean 생성/등록 영역                                         *
+     ***********************************************************/
     public void createBean(Set<Class<?>> componentClasses, Set<Constructor<?>> constructors, DependencyInjector injector){
         for (Class<?> clazz : componentClasses) {
             // @Autowired가 없는 클래스 먼저 생성
@@ -34,15 +51,27 @@ public class BeanFactory {
             registerBean(beanName, instance);
         }
     }
+    public void createBeanMethods (Set<Method> methods, DependencyInjector injector) {
+        for (Method method : methods) {
+            String beanName = determineMethodBeanName(method);
+            if(singletonObjects.containsKey(beanName)) continue;
+
+            Object instance = injector.invokeBeanMethod(method);
+            registerBean(beanName, instance);
+        }
+    }
     private void createDefaultInstance(Class<?> clazz) {
+        Constructor<?> defaultConstructor = null;
         try {
-            Constructor<?> defaultConstructor = clazz.getDeclaredConstructor();
+            defaultConstructor= clazz.getDeclaredConstructor();
             defaultConstructor.setAccessible(true);
             Object instance = defaultConstructor.newInstance();
             registerBean(determineBeanName(clazz), instance);
             defaultConstructor.setAccessible(false);
         } catch (Exception e) {
             throw new IllegalStateException(clazz.getName() + " 빈 생성 중 오류 발생: " + e.getMessage(), e);
+        } finally {
+            if (defaultConstructor != null) defaultConstructor.setAccessible(false);
         }
     }
     public void registerBean(String beanName, Object instance) {
@@ -66,6 +95,10 @@ public class BeanFactory {
     private void addTypeIndex(Class<?> type , Object instance) {
         beanNamesByType.computeIfAbsent(type, k -> new ArrayList<>()).add(instance);
     }
+    /***********************************************************
+     * Bean 조회 영역                                           *
+     ***********************************************************/
+
     public Object getBean(String name) {
         return singletonObjects.get(name);
     }

@@ -1,6 +1,7 @@
 package com.diy.app.utils;
 
 import com.diy.app.annotation.Autowired;
+import com.diy.app.annotation.Bean;
 import com.diy.app.annotation.Component;
 
 import java.lang.reflect.Constructor;
@@ -26,11 +27,15 @@ public class ApplicationContext {
         Set<Class<?>> components = beanScanner.scanClassesTypeAnnotatedWith(Component.class);
         Set<Constructor<?>> constructors = beanScanner.scanConstructorTypeAnnotatedWith(Autowired.class);
         Set<Field> fields = beanScanner.scanFieldTypeAnnotatedWith(Autowired.class);
+        Set<Method> methods = beanScanner.scanMethodTypeAnnotatedWith(Bean.class);
 
         // 2. 팩토리에게 빈 생성 위임
         factory.createBean(components,constructors, injector);
 
-        // 3. 필드 스캔 및 의존성 주입
+        // 3. Configuration의 빈 메서드 실행
+        factory.createBeanMethods(methods, injector);
+
+        // 4. 필드 스캔 및 의존성 주입
         injector.fieldInject(fields);
     }
 

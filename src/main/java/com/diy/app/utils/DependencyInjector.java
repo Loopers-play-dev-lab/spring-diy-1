@@ -5,6 +5,7 @@ import com.diy.app.annotation.Autowired;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -49,6 +50,20 @@ public class DependencyInjector {
             return instance;
         } catch (Exception e) {
             throw new IllegalStateException(constructor.getDeclaringClass().getSimpleName() + " 빈 생성 중 오류 발생: " + e.getMessage(), e);
+        }
+    }
+
+    //Bean 메서드 실행
+    public Object invokeBeanMethod(Method method) {
+        try{
+            Object configInstance = beanFactory.getBeanByType(method.getDeclaringClass());
+
+            Object[] args = Arrays.stream(method.getParameterTypes())
+                                    .map(beanFactory::getBeanByType)
+                                    .toArray();
+            return method.invoke(configInstance, args);
+        } catch (Exception e) {
+            throw new IllegalStateException("@Bean 메서드 실행 실패: " + method.getName() + e);
         }
     }
 }
