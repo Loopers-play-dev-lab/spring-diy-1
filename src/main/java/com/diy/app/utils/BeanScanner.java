@@ -49,7 +49,6 @@ public class BeanScanner {
     public Set<Method> scanMethodTypeAnnotatedWith(Class<? extends Annotation> annotation) {
         return reflections.getMethodsAnnotatedWith(annotation)
                 .stream()
-                .peek(m -> System.out.println("[Scanner] Found Method: " + m.getName() + " in " + m.getDeclaringClass().getSimpleName()))
                 .filter(method -> method.getDeclaringClass().isAnnotationPresent(Configuration.class))
                 .collect(Collectors.toSet());
     }

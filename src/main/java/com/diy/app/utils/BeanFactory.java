@@ -3,9 +3,11 @@ package com.diy.app.utils;
 import com.diy.app.annotation.Autowired;
 import com.diy.app.annotation.Bean;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class BeanFactory {
     private final Map<String, Object> singletonObjects = new HashMap<>();
@@ -127,5 +129,21 @@ public class BeanFactory {
             );
         }
         return beans.get(0);
+    }
+    public List<Object> getBeansByType(Class<?> type) {
+        List<Object> beans = beanNamesByType.get(type);
+        if (beans == null) return Collections.emptyList();
+        return beans;
+    }
+    /**
+     * (@Controller)가 붙은 빈 조회
+     * @return List<Object>
+     */
+    public List<Object> getBeansByAnnotation(Class<? extends Annotation> annotation) {
+        return singletonObjects.values().stream()
+                .filter(bean-> {
+                    return bean.getClass().isAnnotationPresent(annotation); //메타 어노테이션이 전파되지 않게 필터링
+                })
+                .collect(Collectors.toList());
     }
 }

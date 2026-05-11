@@ -4,10 +4,12 @@ import com.diy.app.annotation.Autowired;
 import com.diy.app.annotation.Bean;
 import com.diy.app.annotation.Component;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 public class ApplicationContext {
@@ -44,5 +46,17 @@ public class ApplicationContext {
             throw new IllegalStateException("ApplicationContext가 초기화되지 않았습니다. run()을 먼저 호출하세요.");
         }
         return (T) beanFactory.getBeanByType(type);
+    }
+    public static <T> List<T> getBeans(Class<T> type) {
+        if (beanFactory == null) {
+            throw new IllegalStateException("ApplicationContext가 초기화되지 않았습니다.");
+        }
+        return (List<T>) beanFactory.getBeansByType(type);
+    }
+    public static List <Object> getBeansByAnnotation (Class<? extends Annotation> annotation){
+        if (beanFactory == null) {
+            throw new IllegalStateException("ApplicationContext가 초기화되지 않았습니다.");
+        }
+        return (List<Object>) beanFactory.getBeansByAnnotation(annotation);
     }
 }
