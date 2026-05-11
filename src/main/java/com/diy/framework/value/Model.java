@@ -22,4 +22,8 @@ public final class Model {
         next.put(key, value);
         return new Model(next);
     }
+
+    public Map<String, Object> attributes() {
+        return attributes;
+    }
 }

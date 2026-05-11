@@ -1,16 +1,17 @@
 package com.diy.framework.view;
 
 public enum ViewType {
-    JSP(".jsp")
-    ;
+    JSP(".jsp"),
+    REDIRECT("redirect:"),
+    MUSTACHE(".mustache");
 
-    private final String extension;
+    private final String marker;
 
-    ViewType(String extension) {
-        this.extension = extension;
+    public final String getMarker() {
+        return this.marker;
     }
 
-    String getExtension() {
-        return extension;
+    ViewType(String marker) {
+        this.marker = marker;
     }
 }
