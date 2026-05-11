@@ -2,11 +2,10 @@ package com.diy.app;
 
 import com.diy.framework.view.ModelAndView;
 import com.diy.framework.web.Controller;
-import com.diy.framework.web.beans.annotation.Autowired;
-import com.diy.framework.web.beans.annotation.Component;
+import com.diy.framework.context.annotation.Autowired;
+import com.diy.framework.context.annotation.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

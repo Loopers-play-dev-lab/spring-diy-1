@@ -1,7 +1,7 @@
 package com.diy.app;
 
-import com.diy.framework.web.beans.annotation.Autowired;
-import com.diy.framework.web.beans.annotation.Component;
+import com.diy.framework.context.annotation.Autowired;
+import com.diy.framework.context.annotation.Component;
 
 import java.util.Map;
 
