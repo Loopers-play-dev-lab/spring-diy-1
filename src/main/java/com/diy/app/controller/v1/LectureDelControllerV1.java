@@ -1,4 +1,4 @@
-package com.diy.app.controller.lecutre;
+package com.diy.app.controller.v1;
 
 import com.diy.app.repository.LecturesRepository;
 import com.diy.framework.web.utils.ControllerV1;

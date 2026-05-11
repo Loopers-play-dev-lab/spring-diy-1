@@ -2,10 +2,12 @@ package com.diy.framework.web.server;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.webresources.DirResourceSet;
 import org.apache.catalina.webresources.StandardRoot;
 
+import javax.servlet.http.HttpServlet;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
@@ -16,6 +18,11 @@ public class TomcatWebServer {
 
     private final Tomcat tomcat = new Tomcat();
     private final int port = 8080;
+    private final HttpServlet servlet;
+
+    public TomcatWebServer(final HttpServlet servlet) {
+        this.servlet = servlet;
+    }
 
     public void start() {
         setServerContext();
@@ -43,7 +50,16 @@ public class TomcatWebServer {
         context.setRequestCharacterEncoding("UTF-8");
         context.setResponseCharacterEncoding("UTF-8");
 
-        setServerResources(context);
+        setDispatcherServlet(context);
+    }
+
+    private void setDispatcherServlet(final Context context) {
+        final Wrapper sw = Tomcat.addServlet(
+                context,
+                "dispatcherServlet",
+                servlet
+        );
+        sw.addMapping("/");
     }
 
     private void setServerResources(final Context context) {

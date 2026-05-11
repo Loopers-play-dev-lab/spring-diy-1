@@ -1,4 +1,6 @@
-package study.reflection;
+package com.diy.app.domain;
+
+import com.diy.framework.context.annotation.PrintView;
 
 public class Car {
 

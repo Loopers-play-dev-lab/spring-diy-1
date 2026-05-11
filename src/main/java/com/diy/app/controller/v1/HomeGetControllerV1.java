@@ -1,8 +1,9 @@
-package com.diy.app.controller;
+package com.diy.app.controller.v1;
 
 import com.diy.framework.web.utils.ControllerV1;
 import com.diy.framework.web.utils.RequestBodyV1;
 import com.diy.framework.web.utils.ResponseV1;
+
 
 public class HomeGetControllerV1 implements ControllerV1 {
     @Override
