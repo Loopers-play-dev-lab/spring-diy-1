@@ -1,18 +1,21 @@
 package com.diy.app.ctrl;
 
-import com.diy.app.Lecture;
+import com.diy.app.Entity.Lecture;
+import com.diy.app.annotation.Autowired;
+import com.diy.app.annotation.Component;
 import com.diy.app.repository.ILectureRepository;
 import com.diy.app.repository.LectureRepositoryImpl;
-import com.diy.app.view.JspView;
 import com.diy.app.view.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
+@Component
 public class GetController implements Controller {
 
-    private final ILectureRepository repository = new LectureRepositoryImpl();
+    @Autowired
+    private ILectureRepository repository;
 
     @Override
     public ModelAndView handleRequest(HttpServletRequest req, HttpServletResponse resp) throws Exception {

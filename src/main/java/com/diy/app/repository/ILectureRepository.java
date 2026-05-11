@@ -1,6 +1,6 @@
 package com.diy.app.repository;
 
-import com.diy.app.Lecture;
+import com.diy.app.Entity.Lecture;
 
 import java.util.List;
 

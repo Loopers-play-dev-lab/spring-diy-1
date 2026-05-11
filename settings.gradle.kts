@@ -5,3 +5,4 @@ pluginManagement {
 }
 
 rootProject.name = "spring-diy-template"
+include("src:main:test.java.study.reflection")

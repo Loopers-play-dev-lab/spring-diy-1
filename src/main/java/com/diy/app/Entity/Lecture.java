@@ -1,4 +1,4 @@
-package com.diy.app;
+package com.diy.app.Entity;
 
 import java.math.BigDecimal;
 
@@ -9,7 +9,9 @@ public class Lecture {
 
     public Lecture() {}
     public Lecture(Long id, String name, BigDecimal price) {
-
+        this.id = id;
+        this.name = name;
+        this.price = price;
     }
 
     public Long getId() {
@@ -36,8 +38,7 @@ public class Lecture {
         this.price = price;
     }
 
-    @Override
-    public String toString() {
+    private String printView() {
         return "Lecture{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
