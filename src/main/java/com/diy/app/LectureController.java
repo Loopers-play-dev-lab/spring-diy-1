@@ -1,5 +1,7 @@
 package com.diy.app;
 
+import com.diy.framework.bean.Autowired;
+import com.diy.framework.bean.Component;
 import com.diy.framework.controller.Controller;
 import com.diy.framework.enums.HttpMethod;
 import com.diy.framework.value.Model;
@@ -12,11 +14,17 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class LectureController implements Controller {
-    private final Map<Long, Lecture> lectureRepository = new HashMap<>();
+
+    private final LectureRepository lectureRepository;
+
+    @Autowired
+    public LectureController(LectureRepository lectureRepository) {
+        this.lectureRepository = lectureRepository;
+    }
 
     @Override
     public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -28,7 +36,7 @@ public class LectureController implements Controller {
     }
 
     private ModelAndView doGet(HttpServletRequest request, HttpServletResponse response) {
-        Collection<Lecture> lectures = lectureRepository.values();
+        Collection<Lecture> lectures = lectureRepository.findAll();
         Model model = new Model(Map.of("lectures", lectures));
         return ModelAndView.of("lecture-list", model);
     }
@@ -38,16 +46,12 @@ public class LectureController implements Controller {
         final String body = new String(bodyData, StandardCharsets.UTF_8);
         Map<String, Object> data = new ObjectMapper().readValue(body, new TypeReference<>() {});
 
-        long id = autoIncrement();
+        long id = lectureRepository.nextId();
         String name = data.get("name").toString();
         double price = Double.parseDouble(data.get("price").toString());
 
-        lectureRepository.put(id, new Lecture(id, name, price));
+        lectureRepository.save(new Lecture(id, name, price));
 
         return ModelAndView.fromViewName("redirect:/lectures");
-    }
-
-    private long autoIncrement() {
-        return lectureRepository.isEmpty() ? 1 : lectureRepository.values().stream().toList().getLast().getId() + 1;
     }
 }
