@@ -2,6 +2,8 @@ package com.diy.app.ctrl;
 
 import com.diy.app.Main;
 import com.diy.app.utils.ApplicationContext;
+import com.diy.app.utils.HandlerExecution;
+import com.diy.app.utils.HandlerMapping;
 import com.diy.app.view.ModelAndView;
 import com.diy.app.view.View;
 import com.diy.app.view.ViewResolver;
@@ -19,7 +21,7 @@ import java.util.Map;
 @WebServlet("/")
 public class FrontEndController extends HttpServlet {
 
-    private final Map<String, Controller> controllerMap = new HashMap<>();
+    private HandlerMapping handlerMapping;
     private ViewResolver viewResolver;
     @Override
     public void init() throws ServletException {
@@ -28,11 +30,8 @@ public class FrontEndController extends HttpServlet {
 
         // Strategy 전략을 통해 html로 변경시 suffix, prefix만 설정
         viewResolver = new ViewResolver("/",".jsp");
-
-        controllerMap.put("GET:/lectures", (Controller) ApplicationContext.getBean("com.diy.app.ctrl.GetController"));
-        controllerMap.put("POST:/lectures", (Controller) ApplicationContext.getBean("com.diy.app.ctrl.PostController"));
-        controllerMap.put("PUT:/lectures", (Controller) ApplicationContext.getBean("com.diy.app.ctrl.PutController"));
-        controllerMap.put("DELETE:/lectures", (Controller) ApplicationContext.getBean("com.diy.app.ctrl.DelController"));
+        handlerMapping = ApplicationContext.getBean(HandlerMapping.class);
+        handlerMapping.initalize();
     }
 
     @Override
@@ -40,13 +39,13 @@ public class FrontEndController extends HttpServlet {
         req.setCharacterEncoding(StandardCharsets.UTF_8.name());
         String method = req.getMethod();
         String uri = req.getRequestURI();
-        Controller controller = controllerMap.get(method + ":" + uri);
-        if (controller == null) {
+        HandlerExecution handler =  handlerMapping.getHandler(method, uri);
+        if (handler == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
         try {
-            ModelAndView mav = controller.handleRequest(req, resp);
+            ModelAndView mav = handler.handle(req, resp);
             String viewName = mav.getViewName();
 
             if (viewName.startsWith("redirect:")) {
