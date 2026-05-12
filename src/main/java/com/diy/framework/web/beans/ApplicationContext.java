@@ -1,7 +1,9 @@
 package com.diy.framework.web.beans;
 
+import com.diy.app.AppConfig;
 import com.diy.framework.web.beans.factory.BeanScanner;
 import com.diy.framework.web.beans.factory.annotation.Autowired;
+import com.diy.framework.web.beans.factory.annotation.Bean;
 import com.diy.framework.web.beans.factory.annotation.Component;
 
 import java.lang.reflect.Constructor;
@@ -28,7 +30,22 @@ public class ApplicationContext {
             }
 
             Object bean = createInstance(clazz);
-            saveBean(bean);
+            Arrays.stream(clazz.getMethods()).forEach(method -> {
+                boolean hasBean = method.isAnnotationPresent(Bean.class);
+                if (hasBean) {
+                    String beanName = method.getDeclaredAnnotation(Bean.class).value();
+                    if (beanName == null) {
+                        beanName = method.getReturnType().getName();
+                    }
+                    try {
+                        Object methodResult = method.invoke(bean);
+                        saveBean(beanName, methodResult);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+            saveBean(bean.getClass().getName(), bean);
         });
     }
 
@@ -88,7 +105,7 @@ public class ApplicationContext {
             }
 
             Object bean = createInstance(parameterType);
-            saveBean(bean);
+            saveBean(bean.getClass().getName(), bean);
 
             return bean;
         }).toArray();
@@ -98,8 +115,8 @@ public class ApplicationContext {
         return beanMap.values().stream().anyMatch(bean -> bean.getClass().equals(parameterType));
     }
 
-    private void saveBean(Object bean) {
-        beanMap.put(bean.getClass().getName(), bean);
+    private void saveBean(String beanName, Object bean) {
+        beanMap.put(beanName, bean);
     }
 
 //    public void register(Set<Class<?>> clazzSet) {
