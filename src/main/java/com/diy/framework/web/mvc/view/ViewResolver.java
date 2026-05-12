@@ -1,4 +1,4 @@
-package com.diy.framework.view;
+package com.diy.framework.web.mvc.view;
 
 public interface ViewResolver {
 

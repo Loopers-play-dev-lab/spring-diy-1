@@ -1,4 +1,4 @@
-package com.diy.framework;
+package com.diy.framework.web.mvc.view;
 
 import java.util.Collections;
 import java.util.HashMap;
