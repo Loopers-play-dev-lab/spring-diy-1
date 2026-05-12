@@ -12,8 +12,6 @@ import java.util.Set;
 
 public class Main {
     public static void main(String[] args) {
-        final TomcatWebServer tomcat = new TomcatWebServer();
-        tomcat.start();
 
         BeanScanner beanScanner = new BeanScanner("com.diy.app");
         Set<Class<?>> components = new HashSet<>(beanScanner.scanClassesTypeAnnotatedWith(Component.class));
@@ -21,5 +19,8 @@ public class Main {
 
         Set<Constructor> autowiredConstructors = beanScanner.scanConstructorsAnnotatedWith(Autowired.class);
         BeanContainer.inject(autowiredConstructors);
+
+        final TomcatWebServer tomcat = new TomcatWebServer();
+        tomcat.start();
     }
 }

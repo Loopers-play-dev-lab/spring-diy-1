@@ -26,6 +26,7 @@ public class LectureController implements Controller {
     private final ObjectMapper objectMapper;
 
     public @Autowired LectureController(LectureRepositoryImpl lectureRepositoryImpl) {
+        this.lectureRepositoryImpl = lectureRepositoryImpl;
         this.objectMapper = new ObjectMapper();
     }
 
