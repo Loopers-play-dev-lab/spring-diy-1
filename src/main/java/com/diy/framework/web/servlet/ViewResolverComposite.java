@@ -1,5 +1,7 @@
-package com.diy.framework.view;
+package com.diy.framework.web.servlet;
 
+import com.diy.framework.web.mvc.view.View;
+import com.diy.framework.web.mvc.view.ViewResolver;
 import java.util.List;
 import java.util.Objects;
 

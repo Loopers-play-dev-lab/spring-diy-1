@@ -1,4 +1,4 @@
-package com.diy.framework.annotation;
+package com.diy.framework.context.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

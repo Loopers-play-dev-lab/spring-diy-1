@@ -1,10 +1,11 @@
-package com.diy.framework;
+package com.diy.framework.web.servlet;
 
-import com.diy.framework.view.JspViewResolver;
-import com.diy.framework.view.UrlBasedViewResolver;
-import com.diy.framework.view.View;
-import com.diy.framework.view.ViewResolver;
-import com.diy.framework.view.ViewResolverComposite;
+import com.diy.framework.web.mvc.view.ModelAndView;
+import com.diy.framework.web.mvc.view.JspViewResolver;
+import com.diy.framework.web.mvc.view.UrlBasedViewResolver;
+import com.diy.framework.web.mvc.view.View;
+import com.diy.framework.web.mvc.view.ViewResolver;
+import com.diy.framework.web.mvc.Controller;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;

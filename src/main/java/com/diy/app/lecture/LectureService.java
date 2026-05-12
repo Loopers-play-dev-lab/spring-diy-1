@@ -2,8 +2,8 @@ package com.diy.app.lecture;
 
 import com.diy.app.lecture.request.CreateLectureRequest;
 
-import com.diy.framework.annotation.Autowired;
-import com.diy.framework.annotation.Component;
+import com.diy.framework.context.annotation.Autowired;
+import com.diy.framework.context.annotation.Component;
 import java.util.List;
 
 @Component

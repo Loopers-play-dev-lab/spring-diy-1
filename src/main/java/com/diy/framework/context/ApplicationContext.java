@@ -1,7 +1,8 @@
-package com.diy.framework.web.beans.factory;
+package com.diy.framework.context;
 
-import com.diy.framework.annotation.Autowired;
-import com.diy.framework.annotation.Component;
+import com.diy.framework.context.annotation.Autowired;
+import com.diy.framework.context.annotation.Component;
+import com.diy.framework.beans.factory.BeanScanner;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,12 +10,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class BeanFactory {
+public class ApplicationContext {
 
     private final Map<Class<?>, Object> beans = new HashMap<>();
     private final Set<Class<?>> componentClasses;
 
-    public BeanFactory(String... basePackages) {
+    public ApplicationContext(String... basePackages) {
         BeanScanner scanner = new BeanScanner(basePackages);
         componentClasses = scanner.scanClassesTypeAnnotatedWith(Component.class);
         componentClasses.forEach(this::registerBean);

@@ -1,10 +1,10 @@
 package com.diy.app.lecture;
 
 import com.diy.app.lecture.request.CreateLectureRequest;
-import com.diy.framework.Controller;
-import com.diy.framework.ModelAndView;
+import com.diy.framework.web.mvc.Controller;
+import com.diy.framework.web.mvc.view.ModelAndView;
 
-import com.diy.framework.annotation.Component;
+import com.diy.framework.context.annotation.Component;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

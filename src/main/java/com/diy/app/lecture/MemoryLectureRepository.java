@@ -1,6 +1,6 @@
 package com.diy.app.lecture;
 
-import com.diy.framework.annotation.Component;
+import com.diy.framework.context.annotation.Component;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
