@@ -1,9 +1,8 @@
 package com.diy.framework.context;
 
 import com.diy.framework.beans.factory.BeanScanner;
-import com.diy.framework.context.annotation.Autowired;
-import com.diy.framework.context.annotation.Component;
-
+import com.diy.framework.context.annotation.*;
+import com.diy.framework.web.mvc.controller.Controller;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -12,7 +11,7 @@ public class ApplicationContext {
 
     private final String basePackage;
     private final Set<Class<?>> beanClasses = new HashSet<>();
-    private final List<Object> beans = new ArrayList<>();
+    private final Map<String, Object> beans = new HashMap<>();
 
     public ApplicationContext(String basePackage) {
         this.basePackage = basePackage;
@@ -24,10 +23,13 @@ public class ApplicationContext {
 
         for(Class<?> clazz : beanClasses) {
             if(isBeanInitialized(clazz)) {
-                return;
+                continue;
             }
 
-            saveBean(createInstance(clazz));
+            Object bean = createInstance(clazz);
+            saveBean(resolveBeanName(clazz), bean);
+
+            registerExternalBeans(clazz, bean);
         }
     }
 
@@ -40,7 +42,6 @@ public class ApplicationContext {
             final Object[] parameters = getConstructorParameters(constructor);
 
             return constructor.newInstance(parameters);
-
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }   finally {
@@ -56,19 +57,17 @@ public class ApplicationContext {
         }
 
         return parameterTypes.stream().map(parameterType -> {
+            String beanName = resolveBeanName(parameterType);
+
             if(isBeanInitialized(parameterType)) {
-                return beans.stream().filter(bean -> bean.getClass() == parameterType).findFirst().orElseThrow();
+                return beans.get(beanName);
             }
 
             Object bean = createInstance(parameterType);
-            saveBean(bean);
+            saveBean(beanName, bean);
 
             return bean;
         }).toArray();
-    }
-
-    private void saveBean(Object bean) {
-        beans.add(bean);
     }
 
     private Constructor<?> findConstructor(Class<?> clazz) {
@@ -97,11 +96,53 @@ public class ApplicationContext {
         return autowiredConstructors[0];
     }
 
+    private void saveBean(String name, Object bean) {
+        if(beans.containsKey(name)) {
+            throw new RuntimeException("동일한 이름의 빈이 이미 존재합니다.");
+        }
+
+        beans.put(name, bean);
+    }
+
+    private String resolveBeanName(Class<?> clazz) {
+        String clazzName = clazz.getSimpleName();
+        return clazzName.substring(0, 1).toLowerCase() + clazzName.substring(1);
+    }
+
     private boolean isBeanInitialized(Class<?> clazz) {
-        return beans.stream().anyMatch(bean -> bean.getClass() == clazz);
+        return beans.containsKey(resolveBeanName(clazz));
+    }
+
+    private void registerExternalBeans(Class<?> clazz, Object bean) {
+        Arrays.stream(clazz.getDeclaredMethods())
+                .filter(m -> m.isAnnotationPresent(Bean.class))
+                .forEach(method -> {
+                    try {
+                        method.setAccessible(true);
+                        saveBean(method.getDeclaredAnnotation(Bean.class).name(), method.invoke(bean));
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        throw new RuntimeException(e);
+                    } finally {
+                        method.setAccessible(false);
+                    }
+                });
     }
 
     public Object getBean(Class<?> clazz) {
-        return beans.stream().filter(bean -> bean.getClass() == clazz).findFirst().orElseThrow();
+        return beans.get(resolveBeanName(clazz));
+    }
+
+    public Object getBean(String name) {
+        return beans.get(name);
+    }
+
+    public Map<String, Controller> getControllersMapping() {
+        Map<String, Controller> controllersMapping = new HashMap<>();
+
+        beans.values().stream()
+                .filter(bean -> bean.getClass().isAnnotationPresent(RequestMapping.class)).toList()
+                .forEach(bean -> controllersMapping.put(bean.getClass().getDeclaredAnnotation(RequestMapping.class).path(), (Controller) bean));
+
+        return controllersMapping;
     }
 }

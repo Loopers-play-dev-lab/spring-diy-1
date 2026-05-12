@@ -2,9 +2,14 @@ package com.diy.framework.context;
 
 import com.diy.framework.context.fixture.autowired.Repository;
 import com.diy.framework.context.fixture.autowired.Service;
+import com.diy.framework.context.fixture.bean.DataSource;
+import com.diy.framework.context.fixture.controller.LectureController;
 import com.diy.framework.context.fixture.defaults.DefaultConstructorContext;
+import com.diy.framework.web.mvc.controller.Controller;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -44,5 +49,28 @@ class ApplicationContextTest {
 
         assertThat(service).isInstanceOf(Service.class).isNotNull();
         assertThat(((Service) service).getRepository()).isInstanceOf(repository.getClass()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("@RequestMapping의 path를 key로, Controller 빈을 value로 자동 매핑하는 Map을 반환한다.")
+    void controllerMapping() {
+        ApplicationContext applicationContext = new ApplicationContext("com.diy.framework.context.fixture.controller");
+        applicationContext.initialize();
+
+        Map<String, Controller> controllersMapping = applicationContext.getControllersMapping();
+
+        assertThat(controllersMapping).hasSize(1);
+        assertThat(controllersMapping.get("/lectures")).isInstanceOf(LectureController.class).isNotNull();
+    }
+
+    @Test
+    @DisplayName("@Bean이 붙은 메서드로 외부 인스턴스를 반환받아 빈으로 등록한다.")
+    void registerExternalBean() {
+        ApplicationContext applicationContext = new ApplicationContext("com.diy.framework.context.fixture.bean");
+        applicationContext.initialize();
+
+        Object ob = applicationContext.getBean("dataSource");
+
+        assertThat(ob).isInstanceOf(DataSource.class).isNotNull();
     }
 }
