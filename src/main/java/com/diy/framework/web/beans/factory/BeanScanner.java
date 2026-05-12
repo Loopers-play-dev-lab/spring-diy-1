@@ -10,7 +10,7 @@ public class BeanScanner {
     private final Reflections reflections;
 
     public BeanScanner(final String... basePackages) {
-        reflections = new Reflections(basePackages);
+        reflections = new Reflections((Object[]) basePackages);
     }
 
     public Set<Class<?>> scanClassesTypeAnnotatedWith(final Class<? extends Annotation> annotation) {
