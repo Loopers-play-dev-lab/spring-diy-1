@@ -4,6 +4,7 @@ import com.diy.app.application.LectureService;
 import com.diy.app.domain.Lecture;
 import com.diy.app.controller.dto.LectureCreateRequest;
 import com.diy.app.controller.dto.LectureUpdateRequest;
+import com.diy.framework.web.component.Component;
 import com.diy.framework.web.view.ModelAndView;
 import com.diy.framework.web.controller.Controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
