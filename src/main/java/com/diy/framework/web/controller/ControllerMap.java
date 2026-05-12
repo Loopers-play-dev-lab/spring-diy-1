@@ -1,17 +1,17 @@
 package com.diy.framework.web.controller;
 
-import com.diy.app.controller.LectureController;
-import com.diy.app.repository.build.LectureRepositoryImpl;
-
+import java.util.HashMap;
 import java.util.Map;
 
 public class ControllerMap {
 
-    private final Map<String, Controller> _map = Map.of(
-            "/lectures", new LectureController(new LectureRepositoryImpl())
-    );
+    private static Map<String, Controller> _map = new HashMap<>();
 
     private final Map<String, Controller> map = _map;
+
+    public void put(String path, Controller controller) {
+        _map.put(path, controller);
+    }
 
     public Controller find(String key) {
         if (map == null || !map.containsKey(key)) {

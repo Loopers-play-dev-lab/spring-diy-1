@@ -1,4 +1,4 @@
-package com.diy.framework.web.beans;
+package com.diy.framework.web.beans.factory.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

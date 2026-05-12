@@ -2,7 +2,7 @@ package com.diy.app.repository.build;
 
 import com.diy.app.domain.Lecture;
 import com.diy.app.repository.LectureJpaRepository;
-import com.diy.framework.web.beans.Component;
+import com.diy.framework.web.beans.factory.annotation.Component;
 
 import java.util.Collection;
 import java.util.HashMap;
