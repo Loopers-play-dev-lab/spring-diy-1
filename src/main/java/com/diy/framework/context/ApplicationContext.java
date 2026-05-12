@@ -7,6 +7,7 @@ import com.diy.framework.web.beans.factory.BeanScanner;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -123,5 +124,9 @@ public class ApplicationContext {
 
     public <T> T getBean(Class<T> clazz) {
         return clazz.cast(beans.get(clazz.getSimpleName()));
+    }
+
+    public Map<String, Object> getBeans() {
+        return Collections.unmodifiableMap(beans);
     }
 }
