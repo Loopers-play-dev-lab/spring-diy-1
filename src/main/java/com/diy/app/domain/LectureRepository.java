@@ -5,6 +5,9 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.diy.framework.web.component.Component;
+
+@Component
 public class LectureRepository {
 
   // Home 에서 사용하기 위해, static 으로 설정

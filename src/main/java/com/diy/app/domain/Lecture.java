@@ -23,4 +23,13 @@ public class Lecture {
     public Long getPrice() {
         return price;
     }
+
+	private void printAll(){
+		System.out.println(id + " " + name + " " + price);
+	}
+
+	@Deprecated
+	public void annotationTest(){
+		System.out.println("annotationTest");
+	}
 }
