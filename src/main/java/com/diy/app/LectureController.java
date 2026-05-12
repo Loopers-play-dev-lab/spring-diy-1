@@ -1,8 +1,6 @@
 package com.diy.app;
 
 import com.diy.framework.bean.Autowired;
-import com.diy.framework.bean.Bean;
-import com.diy.framework.bean.Component;
 import com.diy.framework.controller.Controller;
 import com.diy.framework.enums.HttpMethod;
 import com.diy.framework.value.Model;
@@ -17,20 +15,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
 
-@Component
+@com.diy.framework.bean.Controller
 public class LectureController implements Controller {
 
     private final LectureRepository lectureRepository;
-
-    @Bean
-    public ObjectMapper objectMapper() {
-        System.out.println("Bean initialize!!");
-        return new ObjectMapper();
-    }
+    private final ObjectMapperConfiguration objectMapperConfiguration;
 
     @Autowired
-    public LectureController(LectureRepository lectureRepository) {
+    public LectureController(LectureRepository lectureRepository, ObjectMapperConfiguration objectMapperConfiguration) {
         this.lectureRepository = lectureRepository;
+        this.objectMapperConfiguration = objectMapperConfiguration;
     }
 
     @Override

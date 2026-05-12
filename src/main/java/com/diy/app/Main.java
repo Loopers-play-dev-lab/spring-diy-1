@@ -18,6 +18,7 @@ public class Main {
         final ApplicationContext applicationContext = new ApplicationContext(Main.class.getPackageName());
         applicationContext.initialize();
 
+        System.out.println("Total = " + applicationContext.getBeans().size());
         final Map<String, Controller> controllers = Map.of("/lectures", applicationContext.getBean(LectureController.class));
         final List<ViewResolver> viewResolvers = Stream.of(ViewType.REDIRECT, ViewType.JSP)
                 .map(ViewResolverFactory::of)

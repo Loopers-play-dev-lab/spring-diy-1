@@ -19,6 +19,8 @@ public class ApplicationContext {
     public void initialize() {
         final BeanScanner beanScanner = new BeanScanner(basePackage);
         beanClasses.addAll(beanScanner.scanClassesTypeAnnotatedWith(Component.class));
+        beanClasses.addAll(beanScanner.scanClassesTypeAnnotatedWith(Controller.class));
+        beanClasses.addAll(beanScanner.scanClassesTypeAnnotatedWith(Repository.class));
 
         addComponents();
         addBeans(beanScanner);
@@ -59,7 +61,7 @@ public class ApplicationContext {
     }
 
     public List<Object> getBeans() {
-        return List.copyOf(beans);
+        return beans;
     }
 
     private Object createInstance(final Class<?> clazz) {

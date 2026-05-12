@@ -1,6 +1,7 @@
 package com.diy.framework.bean;
 
 import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -10,8 +11,8 @@ import java.util.stream.Collectors;
 public class BeanScanner {
     private final Reflections reflections;
 
-    public BeanScanner(final String... basePackages) {
-        this.reflections = new Reflections(basePackages);
+    public BeanScanner(final String basePackage) {
+        this.reflections = new Reflections(basePackage, Scanners.TypesAnnotated, Scanners.MethodsAnnotated);
     }
 
     public Set<Class<?>> scanClassesTypeAnnotatedWith(final Class<? extends Annotation> annotation) {

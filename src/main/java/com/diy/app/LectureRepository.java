@@ -1,6 +1,7 @@
 package com.diy.app;
 
 import com.diy.framework.bean.Component;
+import com.diy.framework.bean.Repository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-@Component
+@Repository
 public class LectureRepository {
 
     private final Map<Long, Lecture> lectures = new HashMap<>();
