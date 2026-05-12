@@ -1,6 +1,8 @@
 package com.diy.framework.bean;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.List;
 
@@ -18,6 +20,26 @@ public class ApplicationContext {
         final BeanScanner beanScanner = new BeanScanner(basePackage);
         beanClasses.addAll(beanScanner.scanClassesTypeAnnotatedWith(Component.class));
 
+        addComponents();
+        addBeans(beanScanner);
+    }
+
+    private void addBeans(BeanScanner beanScanner) {
+        final Set<Method> beanMethods = beanScanner.scanMethodsAnnotatedWith(Bean.class);
+        beanMethods.forEach(method -> {
+            Object configBean = getBean(method.getDeclaringClass());
+            try {
+                Object produce = method.invoke(configBean);
+                if (produce != null) {
+                    saveBean(produce);
+                }
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    private void addComponents() {
         beanClasses.forEach(clazz -> {
             if (isBeanInitialized(clazz)) {
                 return;
@@ -34,6 +56,10 @@ public class ApplicationContext {
                 .map(clazz::cast)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Bean not found"));
+    }
+
+    public List<Object> getBeans() {
+        return List.copyOf(beans);
     }
 
     private Object createInstance(final Class<?> clazz) {
@@ -82,7 +108,7 @@ public class ApplicationContext {
 
         return parameterTypes.stream().map(parameterType -> {
             if (isBeanInitialized(parameterType)) {
-                return beans.stream().findFirst().get();
+                return getBean(parameterType);
             }
 
             final Object bean = createInstance(parameterType);
@@ -93,7 +119,7 @@ public class ApplicationContext {
     }
 
     private boolean isBeanInitialized(Class<?> beanClass) {
-        return beans.stream().anyMatch(bean -> beanClass.getClass().equals(beanClass));
+        return beans.stream().anyMatch(beanClass::isInstance);
     }
 
     private void saveBean(Object bean) {

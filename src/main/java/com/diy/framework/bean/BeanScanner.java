@@ -3,6 +3,7 @@ package com.diy.framework.bean;
 import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,5 +19,9 @@ public class BeanScanner {
                 .stream()
                 .filter(type -> (!type.isAnnotation() && !type.isInterface()))
                 .collect(Collectors.toSet());
+    }
+
+    public Set<Method> scanMethodsAnnotatedWith(final Class<? extends Annotation> annotation) {
+        return reflections.getMethodsAnnotatedWith(annotation);
     }
 }

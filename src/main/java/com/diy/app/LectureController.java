@@ -1,6 +1,7 @@
 package com.diy.app;
 
 import com.diy.framework.bean.Autowired;
+import com.diy.framework.bean.Bean;
 import com.diy.framework.bean.Component;
 import com.diy.framework.controller.Controller;
 import com.diy.framework.enums.HttpMethod;
@@ -20,6 +21,12 @@ import java.util.Map;
 public class LectureController implements Controller {
 
     private final LectureRepository lectureRepository;
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        System.out.println("Bean initialize!!");
+        return new ObjectMapper();
+    }
 
     @Autowired
     public LectureController(LectureRepository lectureRepository) {
