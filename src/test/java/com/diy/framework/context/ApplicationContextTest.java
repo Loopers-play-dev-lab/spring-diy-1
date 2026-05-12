@@ -2,6 +2,7 @@ package com.diy.framework.context;
 
 import com.diy.framework.context.fixture.autowired.Repository;
 import com.diy.framework.context.fixture.autowired.Service;
+import com.diy.framework.context.fixture.bean.DataSource;
 import com.diy.framework.context.fixture.controller.LectureController;
 import com.diy.framework.context.fixture.defaults.DefaultConstructorContext;
 import com.diy.framework.web.mvc.controller.Controller;
@@ -60,5 +61,16 @@ class ApplicationContextTest {
 
         assertThat(controllersMapping).hasSize(1);
         assertThat(controllersMapping.get("/lectures")).isInstanceOf(LectureController.class).isNotNull();
+    }
+
+    @Test
+    @DisplayName("@Bean이 붙은 메서드로 외부 인스턴스를 반환받아 빈으로 등록한다.")
+    void registerExternalBean() {
+        ApplicationContext applicationContext = new ApplicationContext("com.diy.framework.context.fixture.bean");
+        applicationContext.initialize();
+
+        Object ob = applicationContext.getBean("dataSource");
+
+        assertThat(ob).isInstanceOf(DataSource.class).isNotNull();
     }
 }
