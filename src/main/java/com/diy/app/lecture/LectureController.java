@@ -2,6 +2,7 @@ package com.diy.app.lecture;
 
 import com.diy.framework.context.annotation.Autowired;
 import com.diy.framework.context.annotation.Component;
+import com.diy.framework.context.annotation.RequestMapping;
 import com.diy.framework.web.mvc.controller.Controller;
 import com.diy.framework.web.mvc.ModelAndView;
 import com.diy.framework.web.mvc.model.Model;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
+@RequestMapping(path = "/lectures")
 public class LectureController implements Controller{
     private final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final LectureRepository lectureRepository;

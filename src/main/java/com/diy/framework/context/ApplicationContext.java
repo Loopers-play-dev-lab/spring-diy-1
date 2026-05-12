@@ -1,9 +1,8 @@
 package com.diy.framework.context;
 
 import com.diy.framework.beans.factory.BeanScanner;
-import com.diy.framework.context.annotation.Autowired;
-import com.diy.framework.context.annotation.Component;
-
+import com.diy.framework.context.annotation.*;
+import com.diy.framework.web.mvc.controller.Controller;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -103,5 +102,15 @@ public class ApplicationContext {
 
     public Object getBean(Class<?> clazz) {
         return beans.stream().filter(bean -> bean.getClass() == clazz).findFirst().orElseThrow();
+    }
+
+    public Map<String, Controller> getControllersMapping() {
+        Map<String, Controller> controllersMapping = new HashMap<>();
+
+        beans.stream()
+                .filter(bean -> bean.getClass().isAnnotationPresent(RequestMapping.class)).toList()
+                .forEach(object -> controllersMapping.put(object.getClass().getDeclaredAnnotation(RequestMapping.class).path(), (Controller) object));
+
+        return controllersMapping;
     }
 }
