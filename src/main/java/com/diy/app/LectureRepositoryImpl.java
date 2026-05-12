@@ -1,8 +1,11 @@
 package com.diy.app;
 
+import com.diy.framework.web.beans.annotation.Component;
+
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class LectureRepositoryImpl implements LectureRepository {
     private static final Map<Long, Lecture> lectures = new HashMap<>();
     private static long seq = 0;
