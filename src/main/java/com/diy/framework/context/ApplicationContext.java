@@ -1,32 +1,60 @@
 package com.diy.framework.context;
 
-import com.diy.framework.context.annotation.Autowired;
-import com.diy.framework.context.annotation.Component;
 import com.diy.framework.beans.factory.BeanScanner;
+import com.diy.framework.context.annotation.Autowired;
+import com.diy.framework.context.annotation.Bean;
+import com.diy.framework.context.annotation.Component;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class ApplicationContext {
 
-    private final Map<Class<?>, Object> beans = new HashMap<>();
-    private final Set<Class<?>> componentClasses;
+    private final String[] basePackages;
+
+    private final Set<Class<?>> componentClasses = new HashSet<>();
+    private final Map<String, Object> beans = new HashMap<>();
+    private final Map<Class<?>, List<String>> beanNamesByType = new HashMap<>();
 
     public ApplicationContext(String... basePackages) {
-        BeanScanner scanner = new BeanScanner(basePackages);
-        componentClasses = scanner.scanClassesTypeAnnotatedWith(Component.class);
-        componentClasses.forEach(this::registerBean);
+        this.basePackages = basePackages;
     }
 
-    public <T> T getBean(Class<T> clazz) {
-        return (T) beans.get(clazz);
+    public void initialize() {
+        BeanScanner beanScanner = new BeanScanner(basePackages);
+        componentClasses.addAll(beanScanner.scanClassesTypeAnnotatedWith(Component.class));
+        componentClasses.forEach(this::registerBean);
+        componentClasses.forEach(this::registerBeanMethods);
+    }
+
+    public Object getBean(String name) {
+        Object bean = beans.get(name);
+        if (bean == null) {
+            throw new RuntimeException("Bean not found");
+        }
+        return bean;
+    }
+
+    public <T> T getBean(Class<T> type) {
+        List<String> names = beanNamesByType.get(type);
+        if (names == null || names.isEmpty()) {
+            throw new RuntimeException("Bean not found");
+        }
+        if (names.size() > 1) {
+            throw new RuntimeException("Multiple beans of same type");
+        }
+        return type.cast(beans.get(names.getFirst()));
     }
 
     private void registerBean(Class<?> clazz) {
-        if (beans.containsKey(clazz)) {
+        String beanName = toBeanName(clazz);
+        if (beans.containsKey(beanName)) {
             return;
         }
 
@@ -44,23 +72,57 @@ public class ApplicationContext {
             Constructor<?> constructor = resolveConstructor(clazz);
             Object[] args = resolveArgs(constructor);
             Object instance = constructor.newInstance(args);
-            beans.put(clazz, instance);
-            Arrays.stream(clazz.getInterfaces()).forEach(i -> beans.put(i, instance));
+            putBean(beanName, clazz, instance);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
+    private void registerBeanMethods(Class<?> clazz) {
+        Arrays.stream(clazz.getDeclaredMethods())
+                .filter(method -> method.isAnnotationPresent(Bean.class))
+                .forEach(method -> {
+                    String beanName = resolveBeanName(method);
+                    if (beans.containsKey(beanName)) {
+                        return;
+                    }
+                    try {
+                        Object factory = getBean(clazz);
+                        Object instance = method.invoke(factory);
+                        putBean(beanName, method.getReturnType(), instance);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+    }
+
+    private String resolveBeanName(Method method) {
+        String value = method.getAnnotation(Bean.class).value();
+        return value.isEmpty() ? method.getName() : value;
+    }
+
+    private void putBean(String beanName, Class<?> clazz, Object instance) {
+        beans.put(beanName, instance);
+        beanNamesByType.computeIfAbsent(clazz, c -> new ArrayList<>()).add(beanName);
+        Arrays.stream(clazz.getInterfaces())
+                .forEach(i -> beanNamesByType.computeIfAbsent(i, k -> new ArrayList<>()).add(beanName));
+    }
+
+    private String toBeanName(Class<?> clazz) {
+        String simpleName = clazz.getSimpleName();
+        return Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1);
+    }
+
     private Class<?> resolveImplementation(Class<?> interfaceType) {
         List<Class<?>> implementations = componentClasses.stream()
-                .filter(interfaceType::isAssignableFrom)
+                .filter(c -> !c.isInterface() && interfaceType.isAssignableFrom(c))
                 .toList();
 
         if (implementations.isEmpty()) {
-            throw new RuntimeException("No implementation");
+            throw new RuntimeException("Bean not found");
         }
         if (implementations.size() > 1) {
-            throw new RuntimeException("Multiple implementations");
+            throw new RuntimeException("Multiple implementations found");
         }
 
         return implementations.getFirst();
@@ -68,17 +130,18 @@ public class ApplicationContext {
 
     private Constructor<?> resolveConstructor(Class<?> clazz) {
         List<Constructor<?>> constructors = Arrays.stream(clazz.getDeclaredConstructors())
-                .filter(constructor -> constructor.isAnnotationPresent(Autowired.class))
+                .filter(c -> c.isAnnotationPresent(Autowired.class))
                 .toList();
 
         if (constructors.isEmpty()) {
-            return clazz.getDeclaredConstructors()[0];
+            return Arrays.stream(clazz.getDeclaredConstructors())
+                    .filter(c -> c.getParameterCount() == 0)
+                    .findFirst()
+                    .orElse(clazz.getDeclaredConstructors()[0]);
         }
-
         if (constructors.size() > 1) {
-            throw new RuntimeException("Multiple constructors");
+            throw new RuntimeException("Multiple @Autowired constructors");
         }
-
         return constructors.getFirst();
     }
 
@@ -86,7 +149,7 @@ public class ApplicationContext {
         return Arrays.stream(constructor.getParameterTypes())
                 .map(type -> {
                     registerBean(type);
-                    return beans.get(type);
+                    return getBean(type);
                 })
                 .toArray();
     }

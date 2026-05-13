@@ -11,6 +11,8 @@ import java.util.Map;
 public class Main {
     public static void main(String[] args) {
         ApplicationContext applicationContext = new ApplicationContext("com.diy.app");
+        applicationContext.initialize();
+
         LectureController lectureController = applicationContext.getBean(LectureController.class);
 
         Map<String, Controller> controllerMapping = new HashMap<>();
