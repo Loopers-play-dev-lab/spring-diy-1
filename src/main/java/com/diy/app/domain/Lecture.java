@@ -1,11 +1,19 @@
 package com.diy.app.domain;
 
+import com.diy.framework.jpa.annotation.Entity;
+import com.diy.framework.jpa.annotation.GeneratedValue;
+import com.diy.framework.jpa.annotation.Id;
+
 // TODO: Entity, Id 등 인터페이스화 -> 어노테이션으로 만들기
+@Entity
 public class Lecture {
     private static long idOffset = 0L;
 
+    @Id @GeneratedValue
     Long id;
+
     String name;
+
     Price price;
 
     protected Lecture() {
