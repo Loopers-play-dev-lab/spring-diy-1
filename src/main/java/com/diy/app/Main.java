@@ -11,6 +11,7 @@ public class Main {
     public static void main(String[] args) {
 
         BeanContainer beanContainer = new BeanContainer(Main.class.getPackageName());
+        beanContainer.init();
 
         ControllerResolver controllerResolver = new ControllerResolver(
             beanContainer.getBean(LectureController.class),

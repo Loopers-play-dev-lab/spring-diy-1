@@ -13,11 +13,15 @@ import javax.servlet.http.HttpServletResponse;
 @Component
 public class LectureController implements Controller {
 
-  private final ObjectMapper objectMapper = new ObjectMapper();
+  private final ObjectMapper objectMapper;
   private final LectureRepository lectureRepository;
 
   @Autowired
-  public LectureController(LectureRepository lectureRepository) {
+  public LectureController(
+      ObjectMapper objectMapper,
+      LectureRepository lectureRepository
+  ) {
+    this.objectMapper = objectMapper;
     this.lectureRepository = lectureRepository;
   }
 
