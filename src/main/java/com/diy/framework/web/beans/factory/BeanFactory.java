@@ -66,13 +66,15 @@ public class BeanFactory {
     //빈 어노테이션이 붙은 메소드 찾기
     private void createBeanInstance(Method method, Object instance)
             throws InvocationTargetException, IllegalAccessException {
-        Annotation[] annotations = method.getAnnotations();
 
-        for(Annotation annotation : annotations){
-            if (annotation.toString().equals("Bean")){
-               method.invoke(instance);
-               return;
-            }
+        if (method.isAnnotationPresent(Bean.class)) {
+            Object beanInstance = method.invoke(instance);
+
+            beans.put(beanInstance.getClass(), beanInstance);
+
+            Bean annotation = method.getAnnotation(Bean.class);
+            String beanName = annotation.value().isEmpty() ? method.getName() : annotation.value();
+            beansByName.put(beanName, beanInstance);
         }
     }
 

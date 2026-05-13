@@ -6,6 +6,7 @@ import com.diy.app.lecture.service.LectureService;
 import com.diy.framework.web.beans.factory.BeanFactory;
 import com.diy.framework.web.beans.factory.BeanScanner;
 import com.diy.framework.web.beans.factory.Component;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
@@ -30,5 +31,13 @@ class ComponentTest {
         BeanFactory beanFactory = new BeanFactory("com.diy");
         Object bean = beanFactory.getBean("lectureService");
         assertThat(bean).isInstanceOf(LectureService.class);
+    }
+
+    @Test
+    @DisplayName("@Bean 메서드로 등록된 빈 조회")
+    void Bean_메서드로_등록된_빈_조회() throws InvocationTargetException, IllegalAccessException {
+        BeanFactory beanFactory = new BeanFactory("com.diy");
+        Object bean = beanFactory.getBean("objectMapper");
+        assertThat(bean).isInstanceOf(ObjectMapper.class);
     }
 }
