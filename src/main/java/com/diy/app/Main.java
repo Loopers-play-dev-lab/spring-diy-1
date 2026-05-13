@@ -1,24 +1,15 @@
 package com.diy.app;
 
-import com.diy.app.lecture.LectureController;
-import com.diy.framework.web.mvc.Controller;
-import com.diy.framework.web.servlet.DispatcherServlet;
 import com.diy.framework.context.ApplicationContext;
 import com.diy.framework.web.server.TomcatWebServer;
-import java.util.HashMap;
-import java.util.Map;
+import com.diy.framework.web.servlet.DispatcherServlet;
 
 public class Main {
     public static void main(String[] args) {
-        ApplicationContext applicationContext = new ApplicationContext("com.diy.app");
+        ApplicationContext applicationContext = new ApplicationContext(Main.class.getPackageName());
         applicationContext.initialize();
 
-        LectureController lectureController = applicationContext.getBean(LectureController.class);
-
-        Map<String, Controller> controllerMapping = new HashMap<>();
-        controllerMapping.put("/lectures", lectureController);
-
-        DispatcherServlet dispatcherServlet = new DispatcherServlet(controllerMapping);
+        DispatcherServlet dispatcherServlet = new DispatcherServlet(applicationContext.getHandlerMap());
         TomcatWebServer webServer = new TomcatWebServer(dispatcherServlet);
         webServer.start();
     }

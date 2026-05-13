@@ -4,6 +4,8 @@ import com.diy.framework.beans.factory.BeanScanner;
 import com.diy.framework.context.annotation.Autowired;
 import com.diy.framework.context.annotation.Bean;
 import com.diy.framework.context.annotation.Component;
+import com.diy.framework.web.mvc.Controller;
+import com.diy.framework.web.mvc.annotation.RequestMapping;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -21,6 +23,7 @@ public class ApplicationContext {
     private final Set<Class<?>> componentClasses = new HashSet<>();
     private final Map<String, Object> beans = new HashMap<>();
     private final Map<Class<?>, List<String>> beanNamesByType = new HashMap<>();
+    private final Map<String, Controller> handlerMap = new HashMap<>();
 
     public ApplicationContext(String... basePackages) {
         this.basePackages = basePackages;
@@ -31,6 +34,7 @@ public class ApplicationContext {
         componentClasses.addAll(beanScanner.scanClassesTypeAnnotatedWith(Component.class));
         componentClasses.forEach(this::registerBean);
         componentClasses.forEach(this::registerBeanMethods);
+        componentClasses.forEach(this::registerHandlerMapping);
     }
 
     public Object getBean(String name) {
@@ -41,15 +45,8 @@ public class ApplicationContext {
         return bean;
     }
 
-    public <T> T getBean(Class<T> type) {
-        List<String> names = beanNamesByType.get(type);
-        if (names == null || names.isEmpty()) {
-            throw new RuntimeException("Bean not found");
-        }
-        if (names.size() > 1) {
-            throw new RuntimeException("Multiple beans of same type");
-        }
-        return type.cast(beans.get(names.getFirst()));
+    public Map<String, Controller> getHandlerMap() {
+        return handlerMap;
     }
 
     private void registerBean(Class<?> clazz) {
@@ -94,6 +91,18 @@ public class ApplicationContext {
                         throw new RuntimeException(e);
                     }
                 });
+    }
+
+    private void registerHandlerMapping(Class<?> clazz) {
+        if (!clazz.isAnnotationPresent(RequestMapping.class)) {
+            return;
+        }
+
+        Object bean = beans.get(toBeanName(clazz));
+        if (bean instanceof Controller controller) {
+            String url = clazz.getAnnotation(RequestMapping.class).value();
+            handlerMap.put(url, controller);
+        }
     }
 
     private String resolveBeanName(Method method) {
@@ -152,5 +161,16 @@ public class ApplicationContext {
                     return getBean(type);
                 })
                 .toArray();
+    }
+
+    private <T> T getBean(Class<T> type) {
+        List<String> names = beanNamesByType.get(type);
+        if (names == null || names.isEmpty()) {
+            throw new RuntimeException("Bean not found");
+        }
+        if (names.size() > 1) {
+            throw new RuntimeException("Multiple beans of same type");
+        }
+        return type.cast(beans.get(names.getFirst()));
     }
 }
