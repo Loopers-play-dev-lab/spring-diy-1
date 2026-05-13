@@ -6,6 +6,7 @@ import com.diy.app.lecture.service.LectureService;
 import com.diy.framework.web.beans.factory.BeanFactory;
 import com.diy.framework.web.beans.factory.BeanScanner;
 import com.diy.framework.web.beans.factory.Component;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,7 @@ class ComponentTest {
 
     @Test
     @DisplayName("이름으로 빈 조회")
-    void 이름으로_조회() {
+    void 이름으로_조회() throws InvocationTargetException, IllegalAccessException {
         BeanFactory beanFactory = new BeanFactory("com.diy");
         Object bean = beanFactory.getBean("lectureService");
         assertThat(bean).isInstanceOf(LectureService.class);

@@ -1,6 +1,10 @@
 package com.diy.framework.web.beans.factory;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,11 +16,17 @@ public class BeanFactory {
     private final Map<Class<?>, Object> beans = new HashMap<>();
     private final Map<String, Object> beansByName = new HashMap<>();
 
-    public BeanFactory(final String... basePackages) {
+    public BeanFactory(final String... basePackages) throws InvocationTargetException, IllegalAccessException {
         BeanScanner scanner = new BeanScanner(basePackages);
         Set<Class<?>> classes = scanner.scanClassesTypeAnnotatedWith(Component.class); //프레임워크 컴파일 시점 클래스 객체 수집-> 클래스 객체 @component 붙어있는 애들 찾기
         for (Class<?> clazz : classes) {
-            createBean(clazz); //빈으로 만듬
+            Object instance = createBean(clazz); //빈으로 만듬
+
+            //@Bean 메소드가 있는 클래스 찾기
+            Method[] methods = clazz.getDeclaredMethods();
+            for (Method method : methods){
+                createBeanInstance(method,instance);
+            }
         }
     }
 
@@ -50,6 +60,19 @@ public class BeanFactory {
             return instance;
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    //빈 어노테이션이 붙은 메소드 찾기
+    private void createBeanInstance(Method method, Object instance)
+            throws InvocationTargetException, IllegalAccessException {
+        Annotation[] annotations = method.getAnnotations();
+
+        for(Annotation annotation : annotations){
+            if (annotation.toString().equals("Bean")){
+               method.invoke(instance);
+               return;
+            }
         }
     }
 
