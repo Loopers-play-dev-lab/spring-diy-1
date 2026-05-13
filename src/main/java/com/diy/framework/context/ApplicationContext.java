@@ -2,6 +2,7 @@ package com.diy.framework.context;
 
 import com.diy.framework.beans.factory.BeanScanner;
 import com.diy.framework.context.annotation.Autowired;
+import com.diy.framework.context.annotation.Bean;
 import com.diy.framework.context.annotation.Component;
 
 import java.lang.reflect.Constructor;
@@ -24,6 +25,7 @@ public class ApplicationContext {
     public void initialize() {
         final BeanScanner beanScanner = new BeanScanner(basePackage);
         beanClasses.addAll(beanScanner.scanClassesTypeAnnotatedWith(Component.class));
+        beanClasses.addAll(beanScanner.scanBeansTypeAnnotatedWithName().values());
 
         beanClasses.forEach(clazz -> {
             if (isBeanInitialized(clazz)) {
@@ -33,6 +35,9 @@ public class ApplicationContext {
             final Object bean = createInstance(clazz);
             saveBean(bean);
         });
+
+        // @Bean 어노테이션 코드도 저장
+        beanClasses.forEach(clazz -> {});
     }
 
     private Object createInstance(final Class<?> clazz) {
