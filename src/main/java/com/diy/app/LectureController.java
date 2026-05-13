@@ -1,5 +1,7 @@
 package com.diy.app;
 
+import com.diy.framework.context.annotation.Component;
+import com.diy.framework.context.annotation.RequestMapping;
 import com.diy.framework.web.mvc.Controller;
 import com.diy.framework.web.mvc.view.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +15,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
+@RequestMapping("/lectures")
 public class LectureController implements Controller {
 
     private final Map<Long, Lecture> lectureRepository = new HashMap<>();

@@ -2,20 +2,20 @@ package com.diy.framework.context;
 
 import com.diy.framework.beans.factory.BeanScanner;
 import com.diy.framework.context.annotation.Autowired;
+import com.diy.framework.context.annotation.Bean;
 import com.diy.framework.context.annotation.Component;
+import com.diy.framework.context.annotation.RequestMapping;
+import com.diy.framework.web.mvc.Controller;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.lang.reflect.Method;
+import java.util.*;
 
 public class ApplicationContext {
 
     private final String basePackage;
     private final Set<Class<?>> beanClasses = new HashSet<>();
-    private final List<Object> beans = new ArrayList<>();
+    private final Map<String, Object> beans = new HashMap<>();
 
     public ApplicationContext(final String basePackage) {
         this.basePackage = basePackage;
@@ -31,8 +31,39 @@ public class ApplicationContext {
             }
 
             final Object bean = createInstance(clazz);
-            saveBean(bean);
+            saveBean(generateBeanName(clazz), bean);
         });
+
+        registerBeanMethods();
+    }
+
+    private void registerBeanMethods() {
+        // 이미 등록된 @Component 빈들을 순회
+        new ArrayList<>(beans.values()).forEach(componentBean -> {
+            final Method[] methods = componentBean.getClass().getDeclaredMethods();
+            Arrays.stream(methods)
+                    .filter(method -> method.isAnnotationPresent(Bean.class))
+                    .forEach(method -> registerBeanFromMethod(componentBean, method));
+        });
+    }
+
+    private void registerBeanFromMethod(final Object componentBean, final Method method) {
+        try {
+            final Bean beanAnnotation = method.getAnnotation(Bean.class);
+
+            // 이름: @Bean("name")이면 name, 없으면 메서드명
+            final String beanName = beanAnnotation.value().isEmpty()
+                    ? method.getName()
+                    : beanAnnotation.value();
+
+            method.setAccessible(true);
+            final Object bean = method.invoke(componentBean);
+            method.setAccessible(false);
+
+            saveBean(beanName, bean);
+        } catch (Exception e) {
+            throw new RuntimeException("@Bean 메서드 실행 실패", e);
+        }
     }
 
     private Object createInstance(final Class<?> clazz) {
@@ -81,21 +112,44 @@ public class ApplicationContext {
 
         return parameterTypes.stream().map(parameterType -> {
             if (isBeanInitialized(parameterType)) {
-                return beans.stream().findFirst().get();
+                return beans.values().stream()
+                        .filter(bean -> bean.getClass().equals(parameterType))
+                        .findFirst().get();
             }
 
             final Object bean = createInstance(parameterType);
-            saveBean(bean);
+            saveBean(generateBeanName(parameterType), bean);
 
             return bean;
         }).toArray();
     }
 
-    private boolean isBeanInitialized(final Class<?> parameterType) {
-        return beans.stream().anyMatch(bean -> bean.getClass().equals(parameterType));
+    public Map<String, Controller> getControllerMapping() {
+        final Map<String, Controller> mapping = new HashMap<>();
+
+        beans.values().stream()
+                .filter(bean -> bean instanceof Controller)
+                .forEach(bean -> {
+                    final RequestMapping annotation =
+                            bean.getClass().getAnnotation(RequestMapping.class);
+                    if (annotation != null) {
+                        mapping.put(annotation.value(), (Controller) bean);
+                    }
+                });
+
+        return mapping;
     }
 
-    private void saveBean(final Object bean) {
-        beans.add(bean);
+    private boolean isBeanInitialized(final Class<?> clazz) {
+        return beans.values().stream().anyMatch(bean -> bean.getClass().equals(clazz));
+    }
+
+    private void saveBean(final String beanName, final Object bean) {
+        beans.put(beanName, bean);
+    }
+
+    private String generateBeanName(final Class<?> clazz) {
+        final String simpleName = clazz.getSimpleName();
+        return Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1);
     }
 }
