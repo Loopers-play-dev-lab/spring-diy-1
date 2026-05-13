@@ -1,6 +1,8 @@
 package com.diy.framework.web.servlet;
 
 import com.diy.app.controller.LectureController;
+import com.diy.app.model.LectureRepository;
+import com.diy.framework.web.context.ApplicationContext;
 import com.diy.framework.web.mvc.Controller;
 import com.diy.framework.web.mvc.view.ModelAndView;
 import com.diy.framework.web.mvc.view.View;
@@ -16,6 +18,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +31,15 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        handlerMapping.register("/lectures", new LectureController());
+        try {
+            ApplicationContext context = new ApplicationContext("com.diy.app");
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e ) {
+            throw new RuntimeException(e);
+        }
+        final LectureRepository lectureRepository = new LectureRepository();
+        final LectureController lectureController = new LectureController(lectureRepository);
+
+        handlerMapping.register("/lectures", lectureController);
         this.viewResolvers.add(new UrlBasedViewResolver());
         this.viewResolvers.add(new HtmlViewResolver());
     }

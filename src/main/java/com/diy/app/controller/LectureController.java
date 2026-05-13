@@ -1,6 +1,8 @@
 package com.diy.app.controller;
 
 import com.diy.app.model.Lecture;
+import com.diy.app.model.LectureRepository;
+import com.diy.framework.web.anotation.Autowired;
 import com.diy.framework.web.mvc.Controller;
 import com.diy.framework.web.mvc.view.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,7 +17,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LectureController implements Controller {
-    private final Map<Long, Lecture> lectureRepository = new HashMap<>();
+    private final LectureRepository lectureRepository;
+
+    @Autowired
+    public LectureController(LectureRepository lectureRepository) {
+        this.lectureRepository = lectureRepository;
+    }
 
     @Override
     public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -33,15 +40,13 @@ public class LectureController implements Controller {
 
         final Lecture lecture = new ObjectMapper().readValue(body, Lecture.class);
 
-        final long id = lectureRepository.size();
-        lectureRepository.put(id, lecture);
-        lecture.setId(id);
+        lectureRepository.save(lecture);
 
         return new ModelAndView("redirect:/lectures");
     }
 
     public ModelAndView doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        final Collection<Lecture> lectures = lectureRepository.values();
+        final Collection<Lecture> lectures = lectureRepository.findAll();
         final Map<String, Object> model = new HashMap<>();
         final Object lectureModels = lectures.stream().map(lecture -> Map.of("id", lecture.getId(), "name", lecture.getName(), "price", lecture.getPrice())).toList();
         model.put("lectures", lectureModels);
