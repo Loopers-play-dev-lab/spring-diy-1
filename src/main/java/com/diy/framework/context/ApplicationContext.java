@@ -1,17 +1,15 @@
 package com.diy.framework.context;
 
+import com.diy.framework.beans.definition.BeanDefinition;
+import com.diy.framework.beans.definition.ConstructureBeanDefinition;
+import com.diy.framework.beans.definition.MethodBeanDefinition;
 import com.diy.framework.beans.factory.BeanScanner;
-import com.diy.framework.context.annotation.Autowired;
 import com.diy.framework.context.annotation.Bean;
 import com.diy.framework.context.annotation.Component;
-import com.diy.framework.web.mvc.Controller;
-import com.diy.framework.web.mvc.annotation.RequestMapping;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -21,11 +19,8 @@ import java.util.Set;
 public class ApplicationContext {
 
     private final String[] basePackages;
-
-    private final Set<Class<?>> componentClasses = new HashSet<>();
+    private final Set<BeanDefinition> beanDefinitionRegistry = new HashSet<>();
     private final Map<String, Object> beans = new HashMap<>();
-    private final Map<Class<?>, List<String>> beanNamesByType = new HashMap<>();
-    private final Map<String, Controller> handlerMap = new HashMap<>();
 
     public ApplicationContext(String... basePackages) {
         this.basePackages = basePackages;
@@ -33,150 +28,117 @@ public class ApplicationContext {
 
     public void initialize() {
         BeanScanner beanScanner = new BeanScanner(basePackages);
-        componentClasses.addAll(beanScanner.scanClassesTypeAnnotatedWith(Component.class));
-        componentClasses.forEach(this::registerConstructorBean);
-        componentClasses.forEach(this::registerMethodBean);
-        componentClasses.forEach(this::registerHandlerMapping);
+        Set<Class<?>> beanClasses = beanScanner.scanClassesTypeAnnotatedWith(Component.class);
+        beanClasses.forEach(this::registerBeanDefinition);
+        beanDefinitionRegistry.forEach(this::registerBean);
     }
 
-    public Object getBean(String name) {
-        Object bean = beans.get(name);
-        if (bean == null) {
-            throw new RuntimeException("Bean not found");
-        }
+    private void registerBeanDefinition(Class<?> clazz) {
+        BeanDefinition constructureBeanDefinition = new ConstructureBeanDefinition(clazz);
+        beanDefinitionRegistry.add(constructureBeanDefinition);
 
-        return bean;
+        Arrays.stream(clazz.getDeclaredMethods())
+                .filter(method -> method.isAnnotationPresent(Bean.class))
+                .forEach(method -> {
+                    BeanDefinition methodBeanDefinition = new MethodBeanDefinition(method, constructureBeanDefinition.getBeanName());
+                    beanDefinitionRegistry.add(methodBeanDefinition);
+                });
     }
 
-    public Map<String, Controller> getHandlerMap() {
-        return Collections.unmodifiableMap(handlerMap);
-    }
-
-    private void registerConstructorBean(Class<?> clazz) {
-        String beanName = getBeanName(clazz);
+    private void registerBean(BeanDefinition beanDefinition) {
+        String beanName = beanDefinition.getBeanName();
         if (beans.containsKey(beanName)) {
             return;
         }
 
-        if (clazz.isInterface()) {
-            Class<?> implementClass = resolveImplementation(clazz);
-            registerConstructorBean(implementClass);
-            return;
-        }
+        createInstance(beanDefinition);
+    }
 
-        if (!componentClasses.contains(clazz)) {
-            throw new RuntimeException("Not componentClass");
-        }
+    private Object createInstance(BeanDefinition beanDefinition) {
+        Executable factoryMethod = beanDefinition.getFactoryMethod();
 
         try {
-            Constructor<?> constructor = resolveConstructor(clazz);
-            Object[] args = resolveArgs(constructor);
-            Object instance = constructor.newInstance(args);
-            putBean(beanName, clazz, instance);
+            factoryMethod.setAccessible(true);
+            Class<?>[] parameterTypes = beanDefinition.getParameterTypes();
+            Object[] arguments = resolveArguments(parameterTypes);
+
+            if (beanDefinition instanceof ConstructureBeanDefinition constructureBeanDefinition) {
+                Constructor<?> constructor = constructureBeanDefinition.getFactoryMethod();
+                Object bean = constructor.newInstance(arguments);
+                saveBean(beanDefinition.getBeanName(), bean);
+                return bean;
+            }
+
+            if (beanDefinition instanceof MethodBeanDefinition methodBeanDefinition) {
+                Object factoryBean = getFactoryBean(methodBeanDefinition);
+                Method method = methodBeanDefinition.getFactoryMethod();
+                Object bean = method.invoke(factoryBean, arguments);
+                saveBean(beanDefinition.getBeanName(), bean);
+                return bean;
+            }
+
+            throw new RuntimeException("Not support factory method");
         } catch (Exception e) {
             throw new RuntimeException(e);
+        } finally {
+            factoryMethod.setAccessible(false);
         }
     }
 
-    private Constructor<?> resolveConstructor(Class<?> clazz) {
-        List<Constructor<?>> constructors = Arrays.stream(clazz.getDeclaredConstructors())
-                .filter(c -> c.isAnnotationPresent(Autowired.class))
-                .toList();
-
-        if (constructors.isEmpty()) {
-            return Arrays.stream(clazz.getDeclaredConstructors())
-                    .filter(c -> c.getParameterCount() == 0)
-                    .findFirst()
-                    .orElse(clazz.getDeclaredConstructors()[0]);
-        }
-        if (constructors.size() > 1) {
-            throw new RuntimeException("Multiple @Autowired constructors");
-        }
-
-        return constructors.getFirst();
-    }
-
-    private Class<?> resolveImplementation(Class<?> interfaceType) {
-        List<Class<?>> implementations = componentClasses.stream()
-                .filter(c -> !c.isInterface() && interfaceType.isAssignableFrom(c))
-                .toList();
-
-        if (implementations.isEmpty()) {
-            throw new RuntimeException("Bean not found");
-        }
-        if (implementations.size() > 1) {
-            throw new RuntimeException("Multiple implementations found");
-        }
-
-        return implementations.getFirst();
-    }
-
-    private void registerMethodBean(Class<?> clazz) {
-        Arrays.stream(clazz.getDeclaredMethods())
-                .filter(method -> method.isAnnotationPresent(Bean.class))
-                .forEach(method -> {
-                    String beanName = getBeanName(method);
-                    if (beans.containsKey(beanName)) {
-                        return;
-                    }
-                    try {
-                        Object factory = getBean(clazz);
-                        Object instance = method.invoke(factory, resolveArgs(method));
-                        putBean(beanName, method.getReturnType(), instance);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-    }
-
-    private void registerHandlerMapping(Class<?> clazz) {
-        if (!clazz.isAnnotationPresent(RequestMapping.class)) {
-            return;
-        }
-
-        Object bean = beans.get(getBeanName(clazz));
-        if (bean instanceof Controller controller) {
-            String url = clazz.getAnnotation(RequestMapping.class).value();
-            handlerMap.put(url, controller);
-        }
-    }
-
-    private Object[] resolveArgs(Executable executable) {
-        return Arrays.stream(executable.getParameterTypes())
-                .map(type -> {
-                    registerConstructorBean(type);
-                    return getBean(type);
+    private Object[] resolveArguments(Class<?>[] parameterTypes) {
+        return Arrays.stream(parameterTypes)
+                .map(parameterType -> {
+                    BeanDefinition beanDefinition = findBeanDefinition(parameterType);
+                    return getBean(beanDefinition);
                 })
                 .toArray();
     }
 
-    private void putBean(String beanName, Class<?> clazz, Object instance) {
-        beans.put(beanName, instance);
-        beanNamesByType.computeIfAbsent(clazz, c -> new ArrayList<>()).add(beanName);
-        Arrays.stream(clazz.getInterfaces())
-                .forEach(i -> beanNamesByType.computeIfAbsent(i, k -> new ArrayList<>()).add(beanName));
-    }
+    private BeanDefinition findBeanDefinition(Class<?> type) {
+        List<BeanDefinition> definitions = beanDefinitionRegistry.stream()
+                .filter(definition -> {
+                    if(type.isInterface()) {
+                        return type.isAssignableFrom(definition.getBeanClass());
+                    }
 
-    private String getBeanName(Class<?> clazz) {
-        String simpleName = clazz.getSimpleName();
-        return Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1);
-    }
+                    return definition.getBeanClass().equals(type);
+                })
+                .toList();
 
-    private String getBeanName(Method method) {
-        String value = method.getAnnotation(Bean.class).value();
-        return value.isEmpty() ? method.getName() : value;
-    }
-
-    private <T> T getBean(Class<T> type) {
-        List<String> names = beanNamesByType.get(type);
-
-        if (names == null || names.isEmpty()) {
-            throw new RuntimeException("Bean not found");
+        if (definitions.isEmpty()) {
+            throw new RuntimeException("BeanDefinition not found");
         }
-        if (names.size() > 1) {
-            throw new RuntimeException("Multiple beans of same type");
+        if (definitions.size() > 1) {
+            throw new RuntimeException("Multiple BeanDefinition found");
         }
 
-        return type.cast(beans.get(names.getFirst()));
+        return definitions.getFirst();
+    }
+
+    private void saveBean(String beanName, Object bean) {
+        beans.put(beanName, bean);
+    }
+
+    private Object getBean(BeanDefinition beanDefinition) {
+        if (!beans.containsKey(beanDefinition.getBeanName())) {
+            createInstance(beanDefinition);
+        }
+
+        return beans.get(beanDefinition.getBeanName());
+    }
+
+    private Object getFactoryBean(BeanDefinition beanDefinition) {
+        String factoryBeanName = beanDefinition.getFactoryBeanName();
+
+        if (!beans.containsKey(factoryBeanName)) {
+            BeanDefinition factoryBeanDefinition = beanDefinitionRegistry.stream()
+                    .filter(definition -> definition.getBeanName().equals(factoryBeanName))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Bean not found"));
+
+            return createInstance(factoryBeanDefinition);
+        }
+
+        return beans.get(factoryBeanName);
     }
 }

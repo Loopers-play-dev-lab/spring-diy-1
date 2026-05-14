@@ -9,7 +9,7 @@ public class Main {
         ApplicationContext applicationContext = new ApplicationContext(Main.class.getPackageName());
         applicationContext.initialize();
 
-        DispatcherServlet dispatcherServlet = new DispatcherServlet(applicationContext.getHandlerMap());
+        DispatcherServlet dispatcherServlet = new DispatcherServlet(null);
         TomcatWebServer webServer = new TomcatWebServer(dispatcherServlet);
         webServer.start();
     }
