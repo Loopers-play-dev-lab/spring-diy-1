@@ -10,6 +10,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -24,6 +25,19 @@ public class ApplicationContext {
 
     public ApplicationContext(String... basePackages) {
         this.basePackages = basePackages;
+    }
+
+    public Set<String> getBeanNames() {
+        return Collections.unmodifiableSet(this.beans.keySet());
+    }
+
+    public Object getBean(String beanName) {
+        Object bean = beans.get(beanName);
+        if (bean == null) {
+            throw new RuntimeException("Bean not found");
+        }
+
+        return bean;
     }
 
     public void initialize() {
@@ -70,7 +84,7 @@ public class ApplicationContext {
             }
 
             if (beanDefinition instanceof MethodBeanDefinition methodBeanDefinition) {
-                Object factoryBean = getFactoryBean(methodBeanDefinition);
+                Object factoryBean = resolveFactoryBean(methodBeanDefinition);
                 Method method = methodBeanDefinition.getFactoryMethod();
                 Object bean = method.invoke(factoryBean, arguments);
                 saveBean(beanDefinition.getBeanName(), bean);
@@ -89,7 +103,7 @@ public class ApplicationContext {
         return Arrays.stream(parameterTypes)
                 .map(parameterType -> {
                     BeanDefinition beanDefinition = findBeanDefinition(parameterType);
-                    return getBean(beanDefinition);
+                    return resolveBean(beanDefinition);
                 })
                 .toArray();
     }
@@ -119,7 +133,7 @@ public class ApplicationContext {
         beans.put(beanName, bean);
     }
 
-    private Object getBean(BeanDefinition beanDefinition) {
+    private Object resolveBean(BeanDefinition beanDefinition) {
         if (!beans.containsKey(beanDefinition.getBeanName())) {
             createInstance(beanDefinition);
         }
@@ -127,18 +141,21 @@ public class ApplicationContext {
         return beans.get(beanDefinition.getBeanName());
     }
 
-    private Object getFactoryBean(BeanDefinition beanDefinition) {
+    private Object resolveFactoryBean(BeanDefinition beanDefinition) {
         String factoryBeanName = beanDefinition.getFactoryBeanName();
 
         if (!beans.containsKey(factoryBeanName)) {
-            BeanDefinition factoryBeanDefinition = beanDefinitionRegistry.stream()
-                    .filter(definition -> definition.getBeanName().equals(factoryBeanName))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Bean not found"));
-
+            BeanDefinition factoryBeanDefinition = findBeanDefinition(factoryBeanName);
             return createInstance(factoryBeanDefinition);
         }
 
         return beans.get(factoryBeanName);
+    }
+
+    private BeanDefinition findBeanDefinition(String beanName) {
+        return beanDefinitionRegistry.stream()
+                .filter(definition -> definition.getBeanName().equals(beanName))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("BeanDefinition not found"));
     }
 }
