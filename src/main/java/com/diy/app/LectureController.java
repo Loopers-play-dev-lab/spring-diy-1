@@ -15,16 +15,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
 
-@com.diy.framework.bean.Controller
 public class LectureController implements Controller {
 
     private final LectureRepository lectureRepository;
-    private final ObjectMapperConfiguration objectMapperConfiguration;
 
     @Autowired
-    public LectureController(LectureRepository lectureRepository, ObjectMapperConfiguration objectMapperConfiguration) {
+    public LectureController(LectureRepository lectureRepository) {
         this.lectureRepository = lectureRepository;
-        this.objectMapperConfiguration = objectMapperConfiguration;
     }
 
     @Override
