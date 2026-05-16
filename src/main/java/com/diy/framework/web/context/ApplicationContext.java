@@ -1,84 +1,104 @@
 package com.diy.framework.web.context;
 
+import com.diy.framework.web.beans.factory.BeanDefinition;
 import com.diy.framework.web.beans.factory.BeanScanner;
-import com.diy.framework.web.context.annotation.Autowired;
+import com.diy.framework.web.beans.factory.ComponentBeanDefinition;
+import com.diy.framework.web.beans.factory.MethodBeanDefinition;
+import com.diy.framework.web.context.annotation.Bean;
 import com.diy.framework.web.context.annotation.Component;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class ApplicationContext {
-    private final Map<Class<?>, Object> beans = new HashMap<>();
+    private final List<BeanDefinition> beanDefinitionRegistry = new ArrayList<>();
+    private final Map<String, Object> beans = new HashMap<>();
 
-    public ApplicationContext(final String... basePackages) throws Exception {
+    public ApplicationContext(final String... basePackages) {
         BeanScanner scanner = new BeanScanner(basePackages);
-        Set<Class<?>> classes = scanner.scanClassesTypeAnnotatedWith(Component.class);
+        scanner.scanClassesTypeAnnotatedWith(Component.class).forEach(this::registerBean);
 
-        for (Class<?> clazz : classes) {
-            createBean(clazz);
-        }
+        beanDefinitionRegistry.forEach(definition -> {
+            if (!isBeanInitialized(definition.getBeanName())) {
+                createInstance(definition);
+            }
+        });
     }
 
-    private Object createBean(Class<?> clazz) throws Exception {
-        // 이미 생성된 빈이면 그대로 반환
-        if (beans.containsKey(clazz)) {
-            return beans.get(clazz);
-        }
+    private void registerBean(Class<?> beanClass) {
+        beanDefinitionRegistry.add(new ComponentBeanDefinition(beanClass));
 
-        // @Autowired 생성자 찾기
-        Constructor<?> constructor = findConstructor(clazz);
+        Arrays.stream(beanClass.getDeclaredMethods())
+                .filter(method -> method.isAnnotationPresent(Bean.class))
+                .forEach(method -> beanDefinitionRegistry.add(
+                        new MethodBeanDefinition(method, beanClass.getSimpleName())));
+    }
 
-        // 생성자의 파라미터가 없으면 기본 생성자로 빈 생성
-        Class<?>[] paramTypes = constructor.getParameterTypes();
-        if (paramTypes.length == 0) {
-            Object bean = constructor.newInstance();
-            beans.put(clazz, bean);
+    private Object createInstance(BeanDefinition definition) {
+        try {
+            definition.getFactoryMethod().setAccessible(true);
+
+            Object[] arguments = resolveBeanArguments(definition.getArgumentTypes());
+
+            if (definition.getFactoryBeanName() == null) {
+                Object bean = ((Constructor<?>) definition.getFactoryMethod()).newInstance(arguments);
+                saveBean(definition.getBeanName(), bean);
+                return bean;
+            }
+
+            Object configInstance = getFactoryBean(definition);
+            Object bean = ((Method) definition.getFactoryMethod()).invoke(configInstance, arguments);
+            saveBean(definition.getBeanName(), bean);
             return bean;
-        }
 
-        // 파라미터가 있으면 각 파라미터에 해당하는 빈을 찾거나 생성
-        Object[] params = new Object[paramTypes.length];
-        for (int i = 0; i < paramTypes.length; i++) {
-            params[i] = createBean(paramTypes[i]);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            definition.getFactoryMethod().setAccessible(false);
         }
-
-        Object bean = constructor.newInstance(params);
-        beans.put(clazz, bean);
-        return bean;
     }
 
-    private Constructor<?> findConstructor(Class<?> clazz) throws NoSuchMethodException {
-        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
-
-        // @Autowired 붙은 생성자 목록 구성
-        for (Constructor<?> constructor : constructors) {
-            if (constructor.isAnnotationPresent(Autowired.class)) {
-                return constructor;
-            }
-        }
-
-        // @Autowired 생성자가 1개면 해당 생성자 사용
-        if (constructors.length == 1) {
-            return constructors[0];
-        }
-
-        // @Autowired 생성자 없으면 기본 생성자 사용
-        for (Constructor<?> constructor : constructors) {
-            if (constructor.getParameterCount() == 0) {
-                return constructor;
-            }
-        }
-
-        // @Autowired 생성자 여러 개면 에러
-        throw new IllegalStateException(
-            clazz.getSimpleName() + ": 적합한 생성자를 찾을 수 없습니다."
-        );
+    private Object[] resolveBeanArguments(List<Class<?>> argumentTypes) {
+        return argumentTypes.stream()
+                .map(type -> beanDefinitionRegistry.stream()
+                        .filter(d -> d.getBeanClass().equals(type))
+                        .findFirst()
+                        .orElseThrow())
+                .map(definition -> {
+                    if (isBeanInitialized(definition.getBeanName())) {
+                        return getBean(definition.getBeanName());
+                    }
+                    return createInstance(definition);
+                }).toArray();
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> T getBean(Class<T> clazz) {
-        return (T) beans.get(clazz);
+    private Object getFactoryBean(BeanDefinition definition) {
+        if (isBeanInitialized(definition.getFactoryBeanName())) {
+            return getBean(definition.getFactoryBeanName());
+        }
+
+        BeanDefinition factoryDefinition = beanDefinitionRegistry.stream()
+                .filter(d -> d.getBeanName().equals(definition.getFactoryBeanName()))
+                .findFirst()
+                .orElseThrow();
+
+        return createInstance(factoryDefinition);
+    }
+
+    private boolean isBeanInitialized(String beanName) {
+        return beans.containsKey(beanName);
+    }
+
+    private void saveBean(String beanName, Object bean) {
+        beans.put(beanName, bean);
+    }
+
+    public Object getBean(String beanName) {
+        return beans.get(beanName);
     }
 }

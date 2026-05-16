@@ -3,52 +3,64 @@ package com.diy.framework.web.beans.factory;
 import com.diy.framework.web.context.annotation.Autowired;
 
 import java.lang.reflect.Constructor;
+import java.util.Arrays;
+import java.util.List;
 
 public class ComponentBeanDefinition implements BeanDefinition {
-    private final Class<?> clazz;
+    private final Class<?> beanClass;
+    private final String beanName;
     private final Constructor<?> constructor;
 
-    public ComponentBeanDefinition(Class<?> clazz) throws NoSuchMethodException {
-        this.clazz = clazz;
-        this.constructor = findConstructor(clazz);
+    public ComponentBeanDefinition(Class<?> beanClass) {
+        this.beanClass = beanClass;
+        this.beanName = beanClass.getSimpleName();
+        this.constructor = findConstructor(beanClass);
     }
 
     @Override
-    public Object createInstance(Object[] params) throws Exception {
-        return constructor.newInstance(params);
+    public Class<?> getBeanClass() {
+        return beanClass;
     }
 
     @Override
-    public Class<?> getType() {
-        return clazz;
+    public String getBeanName() {
+        return beanName;
     }
 
     @Override
-    public Class<?>[] getDependencyTypes() {
-        return constructor.getParameterTypes();
+    public Constructor<?> getFactoryMethod() {
+        return constructor;
     }
 
-    private Constructor<?> findConstructor(Class<?> clazz) throws NoSuchMethodException {
+    @Override
+    public String getFactoryBeanName() {
+        return null;
+    }
+
+    @Override
+    public List<Class<?>> getArgumentTypes() {
+        return Arrays.stream(constructor.getParameterTypes()).toList();
+    }
+
+    private Constructor<?> findConstructor(Class<?> clazz) {
         Constructor<?>[] constructors = clazz.getDeclaredConstructors();
-
-        for (Constructor<?> constructor : constructors) {
-            if (constructor.isAnnotationPresent(Autowired.class)) {
-                return constructor;
-            }
-        }
 
         if (constructors.length == 1) {
             return constructors[0];
         }
 
-        for (Constructor<?> constructor : constructors) {
-            if (constructor.getParameterCount() == 0) {
-                return constructor;
-            }
+        return findAutowiredConstructor(constructors);
+    }
+
+    private Constructor<?> findAutowiredConstructor(Constructor<?>[] constructors) {
+        Constructor<?>[] autowiredConstructors = Arrays.stream(constructors)
+                .filter(c -> c.isAnnotationPresent(Autowired.class))
+                .toArray(Constructor[]::new);
+
+        if (autowiredConstructors.length != 1) {
+            throw new RuntimeException("Autowired constructor not found");
         }
 
-        throw new IllegalStateException(
-            clazz.getSimpleName() + ": 적합한 생성자를 찾을 수 없습니다."
-        );
+        return autowiredConstructors[0];
     }
 }

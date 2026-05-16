@@ -21,10 +21,10 @@ public class ApplicationContextTest {
 
     @Test
     @DisplayName("생성자가 1개면 해당 생성자로 빈 생성")
-    void getBean() throws Exception {
+    void getBean() {
         ApplicationContext context = new ApplicationContext("com.diy.app");
 
-        LectureRepository repo = context.getBean(LectureRepository.class);
+        Object repo = context.getBean("LectureRepository");
 
         assertThat(repo).isInstanceOf(LectureRepository.class);
     }
@@ -33,15 +33,15 @@ public class ApplicationContextTest {
     @DisplayName("생성자가 여러 개인데 @Autowired도 기본 생성자도 없으면 에러")
     void noDefaultConstructorThrowsError() {
         assertThatThrownBy(() -> new ApplicationContext("com.diy.framework.web.beans.factory"))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(RuntimeException.class);
     }
 
     @Test
     @DisplayName("@Autowired를 통한 빈 주입")
-    void autowiredInjection() throws Exception {
+    void autowiredInjection() {
         ApplicationContext context = new ApplicationContext("com.diy.app");
 
-        LectureController controller = context.getBean(LectureController.class);
+        Object controller = context.getBean("LectureController");
 
         assertThat(controller).isInstanceOf(LectureController.class);
     }

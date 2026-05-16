@@ -1,28 +1,52 @@
 package com.diy.framework.web.beans.factory;
 
+import com.diy.framework.web.context.annotation.Bean;
+
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 
 public class MethodBeanDefinition implements BeanDefinition {
-    private final Method method;
-    private final Object configInstance;
+    private final Class<?> beanClass;
+    private final String beanName;
+    private final Method factoryMethod;
+    private final String factoryBeanName;
 
-    public MethodBeanDefinition(Method method, Object configInstance) {
-        this.method = method;
-        this.configInstance = configInstance;
+    public MethodBeanDefinition(Method factoryMethod, String factoryBeanName) {
+        this.factoryMethod = factoryMethod;
+        this.factoryBeanName = factoryBeanName;
+        this.beanClass = factoryMethod.getReturnType();
+
+        Bean beanAnnotation = factoryMethod.getAnnotation(Bean.class);
+        if (beanAnnotation.name() == null || beanAnnotation.name().isBlank()) {
+            this.beanName = factoryMethod.getName();
+        } else {
+            this.beanName = beanAnnotation.name();
+        }
     }
 
     @Override
-    public Object createInstance(Object[] params) throws Exception {
-        return method.invoke(configInstance, params);
+    public Class<?> getBeanClass() {
+        return beanClass;
     }
 
     @Override
-    public Class<?> getType() {
-        return method.getReturnType();
+    public String getBeanName() {
+        return beanName;
     }
 
     @Override
-    public Class<?>[] getDependencyTypes() {
-        return method.getParameterTypes();
+    public Method getFactoryMethod() {
+        return factoryMethod;
+    }
+
+    @Override
+    public String getFactoryBeanName() {
+        return factoryBeanName;
+    }
+
+    @Override
+    public List<Class<?>> getArgumentTypes() {
+        return Arrays.stream(factoryMethod.getParameterTypes()).toList();
     }
 }

@@ -1,9 +1,16 @@
 package com.diy.framework.web.beans.factory;
 
+import java.lang.reflect.Executable;
+import java.util.List;
+
 public interface BeanDefinition {
-    Object createInstance(Object[] params) throws Exception;
+    Class<?> getBeanClass();
 
-    Class<?> getType();
+    String getBeanName();
 
-    Class<?>[] getDependencyTypes();
+    Executable getFactoryMethod();
+
+    String getFactoryBeanName();
+
+    List<Class<?>> getArgumentTypes();
 }
