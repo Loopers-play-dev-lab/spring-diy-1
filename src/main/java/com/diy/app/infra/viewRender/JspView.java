@@ -24,6 +24,9 @@ public class JspView implements View {
                 .getFile().split("resources/")[1];
 
         final RequestDispatcher requestDispatcher = req.getRequestDispatcher(filePath);
+        for (String key : modelAndView.getModel().keySet()) {
+            req.setAttribute(key, modelAndView.getModel().get(key));
+        }
         requestDispatcher.forward(req, resp);
     }
 

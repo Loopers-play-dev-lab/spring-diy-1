@@ -1,6 +1,7 @@
 package com.diy.app.business.repository;
 
 import com.diy.app.business.domain.Lecture;
+import com.diy.framework.beans.annotations.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -8,8 +9,8 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+@Component
 public class LectureRepository {
-    static LectureRepository instance;
 
     AtomicLong nextId;
     Map<Long, Lecture> lectureDB;
@@ -17,10 +18,6 @@ public class LectureRepository {
     private LectureRepository() {
         nextId = new AtomicLong(1L);
         lectureDB = new ConcurrentHashMap<>();
-    }
-
-    public static LectureRepository getInstance() {
-        return instance == null ? instance = new LectureRepository() : instance;
     }
 
     public List<Lecture> getAll() {
