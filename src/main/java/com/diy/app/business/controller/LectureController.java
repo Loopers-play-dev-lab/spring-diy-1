@@ -16,12 +16,13 @@ import java.util.Map;
 @Component
 public class LectureController implements Controller {
 
-    @Autowired
     private LectureService service;
     private final ObjectMapper objectMapper;
 
-    public LectureController() {
+    @Autowired
+    public LectureController(LectureService service) {
         objectMapper = new ObjectMapper();
+        this.service = service;
     }
 
     //    public LectureController(LectureService service) {

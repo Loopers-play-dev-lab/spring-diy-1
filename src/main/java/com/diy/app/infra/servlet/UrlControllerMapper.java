@@ -15,7 +15,7 @@ public class UrlControllerMapper {
     private static UrlControllerMapper instance;
 
     public UrlControllerMapper() {
-        uriToController.put("/lectures", BeanStorage.getInstance().getBeans(LectureController.class).getFirst());
+        uriToController.put("/lectures", BeanStorage.getInstance().getBean(LectureController.class).get());
     }
 
     public Controller findController(String uri) {

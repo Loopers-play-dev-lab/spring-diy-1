@@ -10,8 +10,12 @@ import java.util.List;
 @Component
 public class LectureService {
 
+    private final LectureRepository repository;
+
     @Autowired
-    private static LectureRepository repository;
+    public LectureService(LectureRepository repository) {
+        this.repository = repository;
+    }
 
     public List<Lecture> getAllLectures() {
         return repository.getAll();

@@ -4,11 +4,8 @@ import com.diy.framework.beans.annotations.Autowired;
 import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.lang.reflect.Constructor;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class BeanScanner {
@@ -26,7 +23,13 @@ public class BeanScanner {
                 .collect(Collectors.toSet());
     }
 
-    public Set<Field> scanField(final Class<?> clazz) {
-        return Arrays.stream(clazz.getDeclaredFields()).filter(field -> Objects.nonNull(field.getDeclaredAnnotation(Autowired.class))).collect(Collectors.toSet());
+    public Constructor<?> scanConstructor(final Class<?> clazz) throws NoSuchMethodException {
+        Optional<Constructor<?>> autowired = Arrays.stream(clazz.getDeclaredConstructors())
+                .filter(constructor -> Objects.nonNull(constructor.getDeclaredAnnotation(Autowired.class)))
+                .findAny();
+        if (autowired.isPresent()) {
+            return autowired.get();
+        }
+        return clazz.getDeclaredConstructor();
     }
 }
