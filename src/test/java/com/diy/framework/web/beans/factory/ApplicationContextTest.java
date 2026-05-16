@@ -37,11 +37,11 @@ public class ApplicationContextTest {
     }
 
     @Test
-    @DisplayName("@Autowired를 통한 빈 주입")
-    void autowiredInjection() {
+    @DisplayName("@Bean 메서드를 통한 빈 등록")
+    void beanMethodRegistration() {
         ApplicationContext context = new ApplicationContext("com.diy.app");
 
-        Object controller = context.getBean("LectureController");
+        Object controller = context.getBean("/lectures");
 
         assertThat(controller).isInstanceOf(LectureController.class);
     }
