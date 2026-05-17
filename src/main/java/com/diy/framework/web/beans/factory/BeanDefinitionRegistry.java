@@ -10,11 +10,11 @@ public class BeanDefinitionRegistry {
     private final Map<String, BeanDefinition> definitionsByName = new HashMap<>();
 
     public void register(final BeanDefinition beanDefinition) {
-        if (definitionsByName.containsKey(beanDefinition.name())) {
-            throw new IllegalStateException("같은 이름의 빈이 이미 등록되어 있습니다: " + beanDefinition.name());
+        if (definitionsByName.containsKey(beanDefinition.getBeanName())) {
+            throw new IllegalStateException("같은 이름의 빈이 이미 등록되어 있습니다: " + beanDefinition.getBeanName());
         }
 
-        definitionsByName.put(beanDefinition.name(), beanDefinition);
+        definitionsByName.put(beanDefinition.getBeanName(), beanDefinition);
     }
 
     public BeanDefinition getByName(final String beanName) {
@@ -27,7 +27,7 @@ public class BeanDefinitionRegistry {
 
     public List<BeanDefinition> getByType(final Class<?> type) {
         return definitionsByName.values().stream()
-            .filter(definition -> type.isAssignableFrom(definition.beanType()))
+            .filter(definition -> type.isAssignableFrom(definition.getBeanClass()))
             .toList();
     }
 

@@ -1,6 +1,6 @@
 package com.diy.app;
 
-import com.diy.framework.web.annotations.Component;
+import com.diy.framework.web.annotations.RequestMapping;
 import com.diy.framework.web.mvc.Controller;
 import com.diy.framework.web.mvc.view.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,13 +13,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
+@RequestMapping("/lectures")
 public class LectureController implements Controller {
 
-    private final LectureRepository lectureRepository;
+    private final LectureService lectureService;
 
-    public LectureController(LectureRepository lectureRepository) {
-        this.lectureRepository = lectureRepository;
+    public LectureController(final LectureService lectureService) {
+        this.lectureService = lectureService;
     }
 
     @Override
@@ -36,7 +36,7 @@ public class LectureController implements Controller {
     public ModelAndView doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("=== doGet called ===");
 
-        Collection<Lecture> lectures = lectureRepository.findAll();
+        Collection<Lecture> lectures = lectureService.getLectures();
         final Map<String, Object> model = new HashMap<>();
         model.put("lectures", lectures);
 
@@ -47,7 +47,7 @@ public class LectureController implements Controller {
         System.out.println("=== doPost called ===");
 
         Lecture lecture = readLecture(req);
-        lectureRepository.save(lecture.toLecture());
+        lectureService.register(lecture);
 
         return new ModelAndView("redirect:/lectures");
     }
@@ -56,7 +56,7 @@ public class LectureController implements Controller {
         System.out.println("=== doPut called ===");
 
         Lecture updated = readLecture(req);
-        lectureRepository.findById(updated.getId()).update(updated);
+        lectureService.update(updated);
 
         return new ModelAndView("redirect:/lectures");
     }
@@ -65,7 +65,7 @@ public class LectureController implements Controller {
         System.out.println("=== doDelete called ===");
 
         String id = req.getParameter("id");
-        lectureRepository.deleteById(id);
+        lectureService.delete(id);
 
         return new ModelAndView("redirect:/lectures");
     }

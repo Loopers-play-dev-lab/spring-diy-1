@@ -11,14 +11,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class BeanContainerTest {
+class ApplicationContextTest {
 
     @Test
     @DisplayName("명시한 이름으로 빈을 조회할 수 있다")
     void getBeanByName() {
-        BeanContainer beanContainer = new BeanContainer("com.diy.framework.web.beans.factory.support");
+        ApplicationContext applicationContext = new ApplicationContext("com.diy.framework.web.beans.factory.support");
 
-        Object bean = beanContainer.getBean("namedRepository");
+        Object bean = applicationContext.getBean("namedRepository");
 
         assertNotNull(bean);
         assertSame(NamedRepository.class, bean.getClass());
@@ -27,10 +27,10 @@ class BeanContainerTest {
     @Test
     @DisplayName("타입으로 조회하면 같은 인스턴스를 반환한다")
     void getBeanByType() {
-        BeanContainer beanContainer = new BeanContainer("com.diy.framework.web.beans.factory.support");
+        ApplicationContext applicationContext = new ApplicationContext("com.diy.framework.web.beans.factory.support");
 
-        NamedService namedService = beanContainer.getBean(NamedService.class);
-        NamedRepository namedRepository = beanContainer.getBean(NamedRepository.class);
+        NamedService namedService = applicationContext.getBean(NamedService.class);
+        NamedRepository namedRepository = applicationContext.getBean(NamedRepository.class);
 
         assertSame(namedRepository, namedService.namedRepository);
     }
@@ -39,7 +39,7 @@ class BeanContainerTest {
     @DisplayName("같은 이름의 빈이 있으면 예외가 발생한다")
     void failWhenBeanNamesConflict() {
         IllegalStateException exception = assertThrows(IllegalStateException.class,
-            () -> new BeanContainer("com.diy.framework.web.beans.factory.conflict"));
+            () -> new ApplicationContext("com.diy.framework.web.beans.factory.conflict"));
 
         assertEquals("같은 이름의 빈이 이미 등록되어 있습니다: duplicatedBean", exception.getMessage());
     }
@@ -47,13 +47,13 @@ class BeanContainerTest {
     @Test
     @DisplayName("@Bean 메서드로 등록한 빈을 이름과 타입으로 조회할 수 있다")
     void getBeanRegisteredByBeanMethod() {
-        BeanContainer beanContainer = new BeanContainer("com.diy.framework.web.beans.factory.support");
+        ApplicationContext applicationContext = new ApplicationContext("com.diy.framework.web.beans.factory.support");
 
-        TestBeanClient beanByType = beanContainer.getBean(TestBeanClient.class);
-        Object beanByName = beanContainer.getBean("testBeanClient");
+        TestBeanClient beanByType = applicationContext.getBean(TestBeanClient.class);
+        Object beanByName = applicationContext.getBean("testBeanClient");
 
         assertNotNull(beanByName);
         assertSame(beanByType, beanByName);
-        assertSame(beanContainer.getBean(NamedRepository.class), beanByType.namedRepository);
+        assertSame(applicationContext.getBean(NamedRepository.class), beanByType.namedRepository);
     }
 }
