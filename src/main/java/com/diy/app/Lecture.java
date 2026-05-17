@@ -21,6 +21,10 @@ public class Lecture {
     }
 
     public Lecture toLecture() {
+        if (this.id != null) {
+            return this;
+        }
+
         return new Lecture(
             UUID.randomUUID().toString(),
             this.name,
