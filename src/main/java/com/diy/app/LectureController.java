@@ -1,35 +1,30 @@
 package com.diy.app;
 
-import com.diy.framework.web.context.annotation.Component;
 import com.diy.framework.web.mvc.ModelAndView;
-
-import com.diy.framework.web.context.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.util.Map;
 
-@Component
 public class LectureController {
-    private final LectureRepository lectureRepository;
+    private final LectureService lectureService;
 
-    @Autowired
-    public LectureController(final LectureRepository lectureRepository) {
-        this.lectureRepository = lectureRepository;
+    public LectureController(final LectureService lectureService) {
+        this.lectureService = lectureService;
     }
 
     public ModelAndView list(final Map<String, ?> params) {
-        return new ModelAndView("lecture-list", Map.of("lectures", lectureRepository.findAll()));
+        return new ModelAndView("lecture-list", Map.of("lectures", lectureService.getLectures()));
     }
 
     public ModelAndView create(final Map<String, ?> params) {
         Lecture lecture = Lecture.register((String) params.get("name"), new BigDecimal((String) params.get("price")));
-        lectureRepository.save(lecture);
+        lectureService.registerLecture(lecture);
         return new ModelAndView("redirect:/lectures");
     }
 
     public ModelAndView update(final Map<String, ?> params) {
         int id = Integer.parseInt((String) params.get("id"));
-        Lecture lecture = lectureRepository.findById(id);
+        Lecture lecture = lectureService.findById(id);
         if (lecture != null) {
             lecture.updateName((String) params.get("name"));
             lecture.updatePrice(new BigDecimal((String) params.get("price")));
@@ -39,7 +34,7 @@ public class LectureController {
 
     public ModelAndView delete(final Map<String, ?> params) {
         int id = Integer.parseInt((String) params.get("id"));
-        lectureRepository.deleteById(id);
+        lectureService.deleteById(id);
         return new ModelAndView("redirect:/lectures");
     }
 }

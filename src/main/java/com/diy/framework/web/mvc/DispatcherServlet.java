@@ -2,6 +2,7 @@ package com.diy.framework.web.mvc;
 
 import com.diy.app.LectureController;
 import com.diy.app.LectureRepository;
+import com.diy.app.LectureService;
 import com.diy.framework.web.mvc.controller.Controller;
 import com.diy.framework.web.mvc.view.DefaultViewResolver;
 import com.diy.framework.web.mvc.view.View;
@@ -30,7 +31,8 @@ public class DispatcherServlet extends HttpServlet {
     public void init(final ServletConfig config) throws ServletException {
         super.init(config);
         final LectureRepository lectureRepository = new LectureRepository();
-        final LectureController lectureController = new LectureController(lectureRepository);
+        final LectureService lectureService = new LectureService(lectureRepository);
+        final LectureController lectureController = new LectureController(lectureService);
         controllers.put("GET /lectures", lectureController::list);
         controllers.put("POST /lectures", lectureController::create);
         controllers.put("PUT /lectures", lectureController::update);
