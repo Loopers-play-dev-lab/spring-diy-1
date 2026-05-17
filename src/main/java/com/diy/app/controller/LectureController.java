@@ -4,6 +4,7 @@ import com.diy.app.controller.dto.OpenLectureRequest;
 import com.diy.app.domain.Lecture;
 import com.diy.app.domain.Price;
 import com.diy.app.repository.build.LectureRepositoryImpl;
+import com.diy.app.service.LectureService;
 import com.diy.framework.web.HttpMethod;
 import com.diy.framework.web.ModelAndView;
 import com.diy.framework.web.beans.factory.annotation.Autowired;
@@ -24,12 +25,11 @@ import static com.diy.app.controller.dto.LectureListResponse.*;
 @Component
 public class LectureController implements Controller {
 
-    private final LectureRepositoryImpl lectureRepositoryImpl;
+    private final LectureService lectureService;
     private final ObjectMapper objectMapper;
 
-    public @Autowired LectureController(LectureRepositoryImpl lectureRepositoryImpl, ObjectMapper objectMapper) {
-        this.lectureRepositoryImpl = lectureRepositoryImpl;
-//        this.objectMapper = objectMapper;
+    public @Autowired LectureController(final LectureService lectureService) {
+        this.lectureService = lectureService;
         this.objectMapper = new ObjectMapper();
     }
 
@@ -52,7 +52,7 @@ public class LectureController implements Controller {
     }
 
     private ModelAndView doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        Collection<Lecture> lectures = lectureRepositoryImpl.findAll();
+        Collection<Lecture> lectures = lectureService.getLecture();
         req.setAttribute("lectures", lectures);
         Map<String, List<LectureListDto>> model = parseParams(req);
 
@@ -63,7 +63,7 @@ public class LectureController implements Controller {
         final String body = new String(req.getInputStream().readAllBytes());
         final OpenLectureRequest openLectureRequest = objectMapper.readValue(body, OpenLectureRequest.class);
 
-        lectureRepositoryImpl.save(Lecture.open(
+        lectureService.registerLecture(Lecture.open(
                 openLectureRequest.name(),
                 Price.of(openLectureRequest.price())
         ));
