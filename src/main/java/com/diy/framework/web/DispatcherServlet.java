@@ -15,12 +15,11 @@ import java.util.Map;
 
 //@WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
-    private Map<String, Controller> controllerMap = new HashMap<>();
+    private final RequestMappingHandlerMapping handlerMapping;
     private final List<ViewResolver> viewResolvers = new ArrayList<>();
 
-    public DispatcherServlet(Map<String, Controller> controllerMap) {
-        this.controllerMap = controllerMap;
-
+    public DispatcherServlet(RequestMappingHandlerMapping  handlerMapping) {
+        this.handlerMapping = handlerMapping;
     }
 
     @Override
@@ -36,7 +35,7 @@ public class DispatcherServlet extends HttpServlet {
         System.out.println("[Dispatcher] URI = " + req.getRequestURI() + ", method = " + req.getMethod());
 
         try {
-            Controller controller = controllerMap.get(req.getRequestURI());
+            Controller controller = handlerMapping.getController(req.getRequestURI());
 
             if (controller == null) {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
