@@ -1,11 +1,11 @@
 package com.diy.framework.web.servlet;
 
-import com.diy.framework.web.mvc.view.ModelAndView;
+import com.diy.framework.web.mvc.Controller;
 import com.diy.framework.web.mvc.view.JspViewResolver;
+import com.diy.framework.web.mvc.view.ModelAndView;
 import com.diy.framework.web.mvc.view.UrlBasedViewResolver;
 import com.diy.framework.web.mvc.view.View;
 import com.diy.framework.web.mvc.view.ViewResolver;
-import com.diy.framework.web.mvc.Controller;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -16,13 +16,13 @@ import javax.servlet.http.HttpServletResponse;
 
 public class DispatcherServlet extends HttpServlet {
 
-    private final Map<String, Controller> controllerMapping;
+    private final ControllerHandlerMapping handlerMapping;
 
     private RequestParamParser requestParamParser;
     private ViewResolverComposite viewResolverComposite;
 
-    public DispatcherServlet(Map<String, Controller> controllerMapping) {
-        this.controllerMapping = controllerMapping;
+    public DispatcherServlet(ControllerHandlerMapping handlerMapping) {
+        this.handlerMapping = handlerMapping;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class DispatcherServlet extends HttpServlet {
             throws ServletException, IOException {
         String requestURI = req.getRequestURI();
 
-        Controller controller = controllerMapping.get(requestURI);
+        Controller controller = handlerMapping.getHandler(requestURI);
         if (controller == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;

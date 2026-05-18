@@ -5,6 +5,7 @@ import com.diy.framework.web.mvc.Controller;
 import com.diy.framework.web.mvc.view.ModelAndView;
 
 import com.diy.framework.context.annotation.Component;
+import com.diy.framework.web.mvc.annotation.RequestMapping;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@RequestMapping("/lectures")
 public class LectureController implements Controller {
 
     private final LectureService lectureService;
