@@ -37,11 +37,11 @@ public class ApplicationContextTest {
     }
 
     @Test
-    @DisplayName("@Bean 메서드를 통한 빈 등록")
-    void beanMethodRegistration() {
-        ApplicationContext context = new ApplicationContext("com.diy.app");
+    @DisplayName("@Controller 어노테이션을 통한 빈 등록")
+    void controllerAnnotationRegistration() {
+        ApplicationContext context = new ApplicationContext("com.diy.app", "com.diy.framework.web.mvc.annotation");
 
-        Object controller = context.getBean("/lectures");
+        Object controller = context.getBean("LectureController");
 
         assertThat(controller).isInstanceOf(LectureController.class);
     }
