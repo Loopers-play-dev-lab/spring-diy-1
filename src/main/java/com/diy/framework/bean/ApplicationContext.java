@@ -1,5 +1,10 @@
 package com.diy.framework.bean;
 
+import com.diy.framework.bean.annotation.Bean;
+import com.diy.framework.bean.annotation.Component;
+import com.diy.framework.bean.annotation.Controller;
+import com.diy.framework.bean.annotation.Repository;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -10,6 +15,7 @@ public class ApplicationContext {
 
     private final String basePackage;
     private final Set<Class<?>> beanClasses = new HashSet<>();
+    private final Set<Method> beanMethods = new HashSet<>();
     private final List<Object> beans = new ArrayList<>();
 
     public ApplicationContext(final String basePackage) {
@@ -18,16 +24,17 @@ public class ApplicationContext {
 
     public void initialize() {
         final BeanScanner beanScanner = new BeanScanner(basePackage);
+//        동적 받아온것을 해당 경로의 모든 애너테이션을 등록하기
         beanClasses.addAll(beanScanner.scanClassesTypeAnnotatedWith(Component.class));
         beanClasses.addAll(beanScanner.scanClassesTypeAnnotatedWith(Controller.class));
         beanClasses.addAll(beanScanner.scanClassesTypeAnnotatedWith(Repository.class));
+        beanMethods.addAll(beanScanner.scanMethodsAnnotatedWith(Bean.class));
 
         addComponents();
-        addBeans(beanScanner);
+        addBeans();
     }
 
-    private void addBeans(BeanScanner beanScanner) {
-        final Set<Method> beanMethods = beanScanner.scanMethodsAnnotatedWith(Bean.class);
+    private void addBeans() {
         beanMethods.forEach(method -> {
             Object configBean = getBean(method.getDeclaringClass());
             try {

@@ -2,7 +2,7 @@ package com.diy.app;
 
 import com.diy.framework.bean.Autowired;
 import com.diy.framework.controller.Controller;
-import com.diy.framework.enums.HttpMethod;
+import com.diy.framework.enums.RequestMethod;
 import com.diy.framework.value.Model;
 import com.diy.framework.value.ModelAndView;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -26,7 +26,7 @@ public class LectureController implements Controller {
 
     @Override
     public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return switch (HttpMethod.equals(request.getMethod())) {
+        return switch (RequestMethod.equals(request.getMethod())) {
             case POST -> doPost(request, response);
             case GET -> doGet(request, response);
             default -> throw new RuntimeException("404 Not Found");

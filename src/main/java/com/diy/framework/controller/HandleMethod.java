@@ -1,4 +1,10 @@
 package com.diy.framework.controller;
 
-public record HandleMethod() {
+import java.lang.reflect.Method;
+
+public record HandleMethod(
+        RequestKey requestKey,
+        Object bean,
+        Method method
+) {
 }

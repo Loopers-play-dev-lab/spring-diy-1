@@ -1,8 +1,9 @@
 package com.diy.app;
 
 import com.diy.framework.bean.Autowired;
-import com.diy.framework.controller.Controller;
-import com.diy.framework.enums.HttpMethod;
+import com.diy.framework.bean.annotation.Controller;
+import com.diy.framework.bean.annotation.RequestMapping;
+import com.diy.framework.enums.RequestMethod;
 import com.diy.framework.value.Model;
 import com.diy.framework.value.ModelAndView;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -15,8 +16,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
 
-@com.diy.framework.bean.Controller
-public class LectureControllerV2 implements Controller {
+@Controller
+public class LectureControllerV2 {
 
     private final LectureRepository lectureRepository;
 
@@ -25,15 +26,11 @@ public class LectureControllerV2 implements Controller {
         this.lectureRepository = lectureRepository;
     }
 
-    @Override
-    public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return switch (HttpMethod.equals(request.getMethod())) {
-            case POST -> doPost(request, response);
-            case GET -> doGet(request, response);
-            default -> throw new RuntimeException("404 Not Found");
-        };
+    public void decide() {
+        System.out.println("RequestMapping is added");
     }
 
+    @RequestMapping(value = "lectures", method = RequestMethod.GET)
     private ModelAndView doGet(HttpServletRequest request, HttpServletResponse response) {
         Collection<Lecture> lectures = lectureRepository.findAll();
         Model model = new Model(Map.of("lectures", lectures));

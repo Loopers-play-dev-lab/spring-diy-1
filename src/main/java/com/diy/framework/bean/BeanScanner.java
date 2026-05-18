@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
 public class BeanScanner {
     private final Reflections reflections;
 
-    public BeanScanner(final String basePackage) {
+    public BeanScanner(final String... basePackage) {
         this.reflections = new Reflections(basePackage, Scanners.TypesAnnotated, Scanners.MethodsAnnotated);
     }
-
+    
     public Set<Class<?>> scanClassesTypeAnnotatedWith(final Class<? extends Annotation> annotation) {
         return reflections.getTypesAnnotatedWith(annotation)
                 .stream()
