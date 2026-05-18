@@ -1,4 +1,4 @@
-package com.diy.framework.web.servlet;
+package com.diy.framework.web.servlet.handler;
 
 import com.diy.framework.context.ApplicationContext;
 import com.diy.framework.web.mvc.Controller;
