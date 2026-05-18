@@ -39,7 +39,7 @@ public class ApplicationContextTest {
     @Test
     @DisplayName("@Controller 어노테이션을 통한 빈 등록")
     void controllerAnnotationRegistration() {
-        ApplicationContext context = new ApplicationContext("com.diy.app", "com.diy.framework.web.mvc.annotation");
+        ApplicationContext context = new ApplicationContext("com.diy.app");
 
         Object controller = context.getBean("LectureController");
 
