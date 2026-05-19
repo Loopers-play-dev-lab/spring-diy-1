@@ -1,45 +1,34 @@
 package com.diy.framework.web.servlet;
 
-import com.diy.framework.web.mvc.Controller;
+import com.diy.framework.controllers.factory.ControllerRegistry;
+import com.diy.framework.web.mvc.IController;
 import com.diy.framework.web.mvc.view.JspViewResolver;
 import com.diy.framework.web.mvc.view.ModelAndView;
 import com.diy.framework.web.mvc.view.UrlBasedViewResolver;
 import com.diy.framework.web.mvc.view.View;
 import com.diy.framework.web.mvc.view.ViewResolver;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
-@WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
 
-    private final Map<String, Controller> controllersMapping;
+    private final ControllerRegistry controllerRegistry;
     private final List<ViewResolver> viewResolvers = new ArrayList<>();
 
-    public DispatcherServlet(final Map<String, Controller> controllersMapping) {
-        this.controllersMapping = controllersMapping;
+    public DispatcherServlet(final ControllerRegistry controllerRegistry) {
+        this.controllerRegistry = controllerRegistry;
         this.viewResolvers.add(new UrlBasedViewResolver());
         this.viewResolvers.add(new JspViewResolver());
     }
 
     @Override
-    protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-        final String uri = req.getRequestURI();
-
-        final Controller controller = controllersMapping.get(uri);
-
+    protected void service(final HttpServletRequest req, final HttpServletResponse resp) {
+        final IController controller = controllerRegistry.get(req);
         if (controller == null) {
-            return;
+            throw new RuntimeException("404 Not Found");
         }
 
         try {
@@ -71,16 +60,5 @@ public class DispatcherServlet extends HttpServlet {
         }
 
         return null;
-    }
-
-    private Map<String, ?> parseParams(final HttpServletRequest req) throws IOException {
-        if ("application/json".equals(req.getHeader("Content-Type"))) {
-            final byte[] bodyBytes = req.getInputStream().readAllBytes();
-            final String body = new String(bodyBytes, StandardCharsets.UTF_8);
-
-            return new ObjectMapper().readValue(body, new TypeReference<Map<String, Object>>() {});
-        } else {
-            return req.getParameterMap();
-        }
     }
 }

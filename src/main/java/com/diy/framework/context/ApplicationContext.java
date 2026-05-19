@@ -6,7 +6,7 @@ import com.diy.framework.beans.factory.BeanScanner;
 import com.diy.framework.beans.factory.ConfigurationClassBeanDefinition;
 import com.diy.framework.context.annotation.Bean;
 import com.diy.framework.context.annotation.Component;
-
+import com.diy.framework.controllers.factory.ControllerRegistry;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
@@ -22,9 +22,14 @@ public class ApplicationContext {
     private final String basePackage;
     private final List<BeanDefinition> beanDefinitionRegistry = new ArrayList<>();
     private final Map<String, Object> beans = new HashMap<>();
+    private final ControllerRegistry controllerRegistry = new ControllerRegistry();
 
     public ApplicationContext(final String basePackage) {
         this.basePackage = basePackage;
+    }
+
+    public ControllerRegistry getControllerRegistry() {
+        return controllerRegistry;
     }
 
     public void initialize() {
@@ -63,6 +68,8 @@ public class ApplicationContext {
             if (beanDefinition.getFactoryBeanName() == null) {
                 final Object bean = autowireConstructor((Constructor<?>) factoryMethod, arguments);
                 saveBean(beanDefinition.getBeanName(), bean);
+
+                controllerRegistry.register(beanDefinition.getBeanClass(), bean);
 
                 return bean;
             }

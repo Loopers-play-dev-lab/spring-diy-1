@@ -1,18 +1,21 @@
 package com.diy.app;
 
-import com.diy.framework.web.mvc.Controller;
+import com.diy.framework.context.RequestMethod;
+import com.diy.framework.context.annotation.Controller;
+import com.diy.framework.context.annotation.RequestMapping;
+import com.diy.framework.web.mvc.IController;
 import com.diy.framework.web.mvc.view.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-public class LectureController implements Controller {
+@Controller
+public class LectureController implements IController {
 
     private final LectureService lectureService;
 
@@ -42,7 +45,8 @@ public class LectureController implements Controller {
         return new ModelAndView("redirect:/lectures");
     }
 
-    private ModelAndView doGet(final HttpServletRequest req, final HttpServletResponse resp) throws Exception {
+    @RequestMapping(methods = RequestMethod.GET, value = "/lecture-list")
+    public ModelAndView doGet(final HttpServletRequest req, final HttpServletResponse resp) throws Exception {
         final Map<String, Object> model = new HashMap<>();
 //        model.put("lectures", lectureModels);
 
