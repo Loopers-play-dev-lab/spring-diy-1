@@ -7,8 +7,7 @@ import com.diy.app.service.LectureService;
 import com.diy.framework.web.HttpRequestMethod;
 import com.diy.framework.web.ModelAndView;
 import com.diy.framework.web.beans.factory.annotation.Autowired;
-import com.diy.framework.web.beans.factory.annotation.Component;
-import com.diy.framework.web.controller.Controller;
+import com.diy.framework.web.beans.factory.annotation.Controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -21,8 +20,8 @@ import java.util.*;
 
 import static com.diy.app.controller.dto.LectureListResponse.*;
 
-@Component
-public class LectureController implements Controller {
+@Controller
+public class LectureController {
 
     private final LectureService lectureService;
     private final ObjectMapper objectMapper;
@@ -32,23 +31,23 @@ public class LectureController implements Controller {
         this.objectMapper = new ObjectMapper();
     }
 
-    @Override
-    public ModelAndView handleRequest(HttpRequestMethod requestMethod,HttpServletRequest req, HttpServletResponse res) throws Exception {
-
-        // TODO: 객체지향적으로 변경해보기
-        switch (requestMethod) {
-            case POST -> {
-                return doPost(req, res);
-            }
-            case GET -> {
-                return doGet(req, res);
-            }
-            default -> {
-                throw new RuntimeException("405 Method Not Allowed");
-            }
-        }
-
-    }
+//    @Override
+//    public ModelAndView handleRequest(HttpRequestMethod requestMethod,HttpServletRequest req, HttpServletResponse res) throws Exception {
+//
+//        // TODO: 객체지향적으로 변경해보기
+//        switch (requestMethod) {
+//            case POST -> {
+//                return doPost(req, res);
+//            }
+//            case GET -> {
+//                return doGet(req, res);
+//            }
+//            default -> {
+//                throw new RuntimeException("405 Method Not Allowed");
+//            }
+//        }
+//
+//    }
 
     private ModelAndView doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         Collection<Lecture> lectures = lectureService.getLecture();

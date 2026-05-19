@@ -7,6 +7,7 @@ import com.diy.framework.web.beans.factory.ConfigurationClassBeanDefinition;
 import com.diy.framework.web.beans.factory.annotation.Bean;
 import com.diy.framework.web.beans.factory.annotation.Component;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
@@ -25,15 +26,19 @@ public class ApplicationContext {
     private final List<BeanDefinition> beanDefinitionRegistry = new ArrayList<>();
     // Bean Map
     private final Map<String, Object> beans = new HashMap<>();
+    private final List<Class<? extends Annotation>> componentAnnotations = new ArrayList<>();
 
     public ApplicationContext(final String basePackage) {
         this.basePackages.add(ApplicationContext.class.getPackageName());
         this.basePackages.add(basePackage);
+        componentAnnotations.add(Component.class);
     }
 
     public void initialize() {
-        final BeanScanner beanScanner = new BeanScanner((String[]) basePackages.toArray());
-        beanScanner.scanClassesTypeAnnotatedWith(Component.class).forEach(this::registerBean);
+        final BeanScanner beanScanner = new BeanScanner(basePackages.get(0), basePackages.get(1));
+        componentAnnotations.addAll(beanScanner.scanAnnotationTypeAnnotatedWith(Component.class));
+
+        scanBean(beanScanner, Component.class);
 
         beanDefinitionRegistry.forEach(beanDefinition -> {
             final String beanName = beanDefinition.getBeanName();
@@ -46,6 +51,10 @@ public class ApplicationContext {
         });
 
         System.out.println(beans);
+    }
+
+    private void scanBean(final BeanScanner beanScanner, final Class<? extends Annotation> beanAnnotation) {
+        beanScanner.scanClassesTypeAnnotatedWith(beanAnnotation).forEach(this::registerBean);
     }
 
     private void registerBean(final Class<?> beanClass) {

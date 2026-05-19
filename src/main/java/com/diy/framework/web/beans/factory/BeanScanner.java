@@ -5,6 +5,7 @@ import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,7 +24,11 @@ public class BeanScanner {
                 .collect(Collectors.toSet());
     }
 
-    public Set<Constructor> scanConstructorsAnnotatedWith(final Class<? extends Annotation> annotation) {
-        return reflections.getConstructorsAnnotatedWith(annotation);
+    public Set<Class<? extends Annotation>> scanAnnotationTypeAnnotatedWith(final Class<? extends Annotation> annotation) {
+        return reflections.getTypesAnnotatedWith(annotation)
+                .stream()
+                .filter(type -> (type.isAnnotation() && type.isInterface()))
+                .map(it -> (Class<? extends Annotation>) it)
+                .collect(Collectors.toSet());
     }
 }
