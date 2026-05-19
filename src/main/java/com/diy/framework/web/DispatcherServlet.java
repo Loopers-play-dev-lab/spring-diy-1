@@ -3,6 +3,7 @@ package com.diy.framework.web;
 import com.diy.framework.web.view.JspViewResolver;
 import com.diy.framework.web.view.ModelAndView;
 import com.diy.framework.web.view.View;
+import java.lang.reflect.InvocationTargetException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -13,12 +14,17 @@ public abstract class DispatcherServlet extends HttpServlet {
     private HandlerMapping handlerMapping;
     private final JspViewResolver viewResolver = new JspViewResolver();
 
-    protected abstract void initHandlerMappings(HandlerMapping handlerMapping);
+    protected abstract void initHandlerMappings(HandlerMapping handlerMapping)
+            throws InvocationTargetException, IllegalAccessException;
 
     @Override
     public void init() {
         handlerMapping = new HandlerMapping();
-        initHandlerMappings(handlerMapping);
+        try {
+            initHandlerMappings(handlerMapping);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

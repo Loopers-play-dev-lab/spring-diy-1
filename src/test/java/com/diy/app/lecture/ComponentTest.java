@@ -2,11 +2,16 @@ package com.diy.app.lecture;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import com.diy.app.lecture.service.LectureService;
+import com.diy.framework.web.beans.factory.BeanFactory;
 import com.diy.framework.web.beans.factory.BeanScanner;
 import com.diy.framework.web.beans.factory.Component;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ComponentTest {
 
@@ -18,5 +23,21 @@ class ComponentTest {
 
         assertFalse(classes.isEmpty());
         classes.forEach(clazz -> System.out.println("스캔된 빈 후보: " + clazz.getName()));
+    }
+
+    @Test
+    @DisplayName("이름으로 빈 조회")
+    void 이름으로_조회() throws InvocationTargetException, IllegalAccessException {
+        BeanFactory beanFactory = new BeanFactory("com.diy");
+        Object bean = beanFactory.getBean("lectureService");
+        assertThat(bean).isInstanceOf(LectureService.class);
+    }
+
+    @Test
+    @DisplayName("@Bean 메서드로 등록된 빈 조회")
+    void Bean_메서드로_등록된_빈_조회() throws InvocationTargetException, IllegalAccessException {
+        BeanFactory beanFactory = new BeanFactory("com.diy");
+        Object bean = beanFactory.getBean("objectMapper");
+        assertThat(bean).isInstanceOf(ObjectMapper.class);
     }
 }
