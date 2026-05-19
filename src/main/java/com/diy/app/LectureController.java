@@ -1,7 +1,7 @@
 package com.diy.app;
 
-import com.diy.framework.web.server.Controller;
-import com.diy.framework.web.server.mv.ModelAndView;
+import com.diy.framework.web.mvc.Controller;
+import com.diy.framework.web.mvc.view.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 

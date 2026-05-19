@@ -1,10 +1,11 @@
-package com.diy.framework.web.server;
+package com.diy.framework.web.servlet;
 
-import com.diy.framework.web.server.mv.JspViewResolver;
-import com.diy.framework.web.server.mv.ModelAndView;
-import com.diy.framework.web.server.mv.UrlBasedViewResolver;
-import com.diy.framework.web.server.mv.View;
-import com.diy.framework.web.server.mv.ViewResolver;
+import com.diy.framework.web.mvc.Controller;
+import com.diy.framework.web.mvc.view.JspViewResolver;
+import com.diy.framework.web.mvc.view.ModelAndView;
+import com.diy.framework.web.mvc.view.UrlBasedViewResolver;
+import com.diy.framework.web.mvc.view.View;
+import com.diy.framework.web.mvc.view.ViewResolver;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
