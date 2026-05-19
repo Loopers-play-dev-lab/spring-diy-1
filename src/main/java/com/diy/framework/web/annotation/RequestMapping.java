@@ -1,6 +1,4 @@
-package com.diy.framework.web.beans;
-
-import com.diy.framework.web.annotation.RequestMethod;
+package com.diy.framework.web.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

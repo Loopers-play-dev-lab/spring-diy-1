@@ -3,7 +3,7 @@ package com.diy.app.lecture.controller;
 import com.diy.framework.web.Controller;
 import com.diy.framework.web.DispatcherServlet;
 import com.diy.framework.web.HandlerMapping;
-import com.diy.framework.web.beans.RequestMapping;
+import com.diy.framework.web.annotation.RequestMapping;
 import com.diy.framework.web.beans.factory.BeanFactory;
 import java.lang.reflect.InvocationTargetException;
 import javax.servlet.annotation.WebServlet;

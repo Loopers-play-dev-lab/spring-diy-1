@@ -2,7 +2,7 @@ package com.diy.app.lecture.controller;
 
 import com.diy.app.lecture.entity.Lecture;
 import com.diy.app.lecture.service.LectureService;
-import com.diy.framework.web.beans.RequestMapping;
+import com.diy.framework.web.annotation.RequestMapping;
 import com.diy.framework.web.beans.factory.Autowired;
 import com.diy.framework.web.beans.factory.Component;
 import com.diy.framework.web.Controller;
