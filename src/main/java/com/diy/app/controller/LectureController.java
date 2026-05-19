@@ -3,9 +3,8 @@ package com.diy.app.controller;
 import com.diy.app.controller.dto.OpenLectureRequest;
 import com.diy.app.domain.Lecture;
 import com.diy.app.domain.Price;
-import com.diy.app.repository.build.LectureRepositoryImpl;
 import com.diy.app.service.LectureService;
-import com.diy.framework.web.HttpMethod;
+import com.diy.framework.web.HttpRequestMethod;
 import com.diy.framework.web.ModelAndView;
 import com.diy.framework.web.beans.factory.annotation.Autowired;
 import com.diy.framework.web.beans.factory.annotation.Component;
@@ -37,7 +36,7 @@ public class LectureController implements Controller {
     public ModelAndView handleRequest(HttpServletRequest req, HttpServletResponse res) throws Exception {
 
         // TODO: 객체지향적으로 변경해보기
-        switch (HttpMethod.from(req.getMethod())) {
+        switch (HttpRequestMethod.from(req.getMethod())) {
             case POST -> {
                 return doPost(req, res);
             }

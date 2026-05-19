@@ -19,16 +19,20 @@ import java.util.Map;
 
 public class ApplicationContext {
 
-    private final String basePackage;
+    // 스캔할 패키지 이름
+    private final List<String> basePackages = new ArrayList<>();
+    // Bean에 대한 정보
     private final List<BeanDefinition> beanDefinitionRegistry = new ArrayList<>();
+    // Bean Map
     private final Map<String, Object> beans = new HashMap<>();
 
     public ApplicationContext(final String basePackage) {
-        this.basePackage = basePackage;
+        this.basePackages.add(ApplicationContext.class.getPackageName());
+        this.basePackages.add(basePackage);
     }
 
     public void initialize() {
-        final BeanScanner beanScanner = new BeanScanner(basePackage);
+        final BeanScanner beanScanner = new BeanScanner((String[]) basePackages.toArray());
         beanScanner.scanClassesTypeAnnotatedWith(Component.class).forEach(this::registerBean);
 
         beanDefinitionRegistry.forEach(beanDefinition -> {
@@ -40,6 +44,8 @@ public class ApplicationContext {
 
             createInstance(beanDefinition);
         });
+
+        System.out.println(beans);
     }
 
     private void registerBean(final Class<?> beanClass) {
@@ -128,5 +134,9 @@ public class ApplicationContext {
 
     private Object getBean(final String beanName) {
         return beans.get(beanName);
+    }
+
+    public Object findBean(String name) {
+        return getBean(name);
     }
 }
