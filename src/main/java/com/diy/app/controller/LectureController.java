@@ -6,6 +6,8 @@ import com.diy.app.domain.Price;
 import com.diy.app.repository.build.LectureRepositoryImpl;
 import com.diy.framework.web.HttpMethod;
 import com.diy.framework.web.ModelAndView;
+import com.diy.framework.web.beans.factory.annotation.Autowired;
+import com.diy.framework.web.beans.factory.annotation.Component;
 import com.diy.framework.web.controller.Controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,13 +21,15 @@ import java.util.*;
 
 import static com.diy.app.controller.dto.LectureListResponse.*;
 
+@Component
 public class LectureController implements Controller {
 
     private final LectureRepositoryImpl lectureRepositoryImpl;
     private final ObjectMapper objectMapper;
 
-    public LectureController(LectureRepositoryImpl lectureRepositoryImpl) {
+    public @Autowired LectureController(LectureRepositoryImpl lectureRepositoryImpl, ObjectMapper objectMapper) {
         this.lectureRepositoryImpl = lectureRepositoryImpl;
+//        this.objectMapper = objectMapper;
         this.objectMapper = new ObjectMapper();
     }
 
