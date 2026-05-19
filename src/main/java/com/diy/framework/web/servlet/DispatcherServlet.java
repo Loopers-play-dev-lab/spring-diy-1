@@ -1,7 +1,8 @@
 package com.diy.framework.web.servlet;
 
 import com.diy.app.controller.LectureController;
-import com.diy.app.model.LectureRepository;
+import com.diy.app.repository.LectureRepository;
+import com.diy.app.service.LectureService;
 import com.diy.framework.web.context.ApplicationContext;
 import com.diy.framework.web.mvc.Controller;
 import com.diy.framework.web.mvc.view.ModelAndView;
@@ -12,13 +13,11 @@ import com.diy.framework.web.mvc.view.resolver.ViewResolver;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,22 +29,19 @@ public class DispatcherServlet extends HttpServlet {
     private final HandlerMapping handlerMapping = new HandlerMapping();
 
     @Override
-    public void init() throws ServletException {
-        try {
-            ApplicationContext context = new ApplicationContext("com.diy.app");
-        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e ) {
-            throw new RuntimeException(e);
-        }
-        final LectureRepository lectureRepository = new LectureRepository();
-        final LectureController lectureController = new LectureController(lectureRepository);
+    public void init() {
 
-        handlerMapping.register("/lectures", lectureController);
+        ApplicationContext context = new ApplicationContext("com.diy.app");
+        context.initialize();
+
+        context.getBeansOfType(Controller.class).forEach(handlerMapping::register);
+
         this.viewResolvers.add(new UrlBasedViewResolver());
         this.viewResolvers.add(new HtmlViewResolver());
     }
 
     @Override
-    protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    protected void service(final HttpServletRequest req, final HttpServletResponse resp) {
         final String uri = req.getRequestURI();
 
         final Controller controller = handlerMapping.getHandler(uri);
@@ -90,7 +86,8 @@ public class DispatcherServlet extends HttpServlet {
             final byte[] bodyBytes = req.getInputStream().readAllBytes();
             final String body = new String(bodyBytes, StandardCharsets.UTF_8);
 
-            return new ObjectMapper().readValue(body, new TypeReference<Map<String, Object>>() {});
+            return new ObjectMapper().readValue(body, new TypeReference<Map<String, Object>>() {
+            });
         } else {
             return req.getParameterMap();
         }

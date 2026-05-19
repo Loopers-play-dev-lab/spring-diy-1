@@ -1,5 +1,6 @@
-package com.diy.app.model;
+package com.diy.app.repository;
 
+import com.diy.app.model.Lecture;
 import com.diy.framework.web.anotation.Component;
 
 import java.util.Collection;
