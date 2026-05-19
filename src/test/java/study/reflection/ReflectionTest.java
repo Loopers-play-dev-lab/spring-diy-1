@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 
 import static java.lang.reflect.AccessFlag.PRIVATE;
 
-public class ReflectionTest {
+class ReflectionTest {
 
     @DisplayName("Car class 정보 출력")
     @Test
@@ -81,7 +81,7 @@ public class ReflectionTest {
     @Test
     void constructorWithArgs() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         final Class<Car> carClass = Car.class;
-        final Car car = carClass.getDeclaredConstructor(String.class, int.class)
+        final Car car = carClass.getConstructor(String.class, int.class)
                                 .newInstance("소나타", 3_000);
         System.out.println("[constructorWithArgs] " + car.getName() + " / " + car.getPrice());
     }
