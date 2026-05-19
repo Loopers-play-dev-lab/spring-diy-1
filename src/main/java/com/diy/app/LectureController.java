@@ -20,31 +20,29 @@ public class LectureController {
     }
 
     @RequestMapping(methods = RequestMethod.GET)
-    public ModelAndView list(final Map<String, ?> params) {
+    public ModelAndView list() {
         return new ModelAndView("lecture-list", Map.of("lectures", lectureService.getLectures()));
     }
 
     @RequestMapping(methods = RequestMethod.POST)
-    public ModelAndView create(final Map<String, ?> params) {
-        Lecture lecture = Lecture.register((String) params.get("name"), new BigDecimal((String) params.get("price")));
+    public ModelAndView create(String name, BigDecimal price) {
+        Lecture lecture = Lecture.register(name, price);
         lectureService.registerLecture(lecture);
         return new ModelAndView("redirect:/lectures");
     }
 
     @RequestMapping(methods = RequestMethod.PUT)
-    public ModelAndView update(final Map<String, ?> params) {
-        int id = Integer.parseInt((String) params.get("id"));
+    public ModelAndView update(int id, String name, BigDecimal price) {
         Lecture lecture = lectureService.findById(id);
         if (lecture != null) {
-            lecture.updateName((String) params.get("name"));
-            lecture.updatePrice(new BigDecimal((String) params.get("price")));
+            lecture.updateName(name);
+            lecture.updatePrice(price);
         }
         return new ModelAndView("redirect:/lectures");
     }
 
     @RequestMapping(methods = RequestMethod.DELETE)
-    public ModelAndView delete(final Map<String, ?> params) {
-        int id = Integer.parseInt((String) params.get("id"));
+    public ModelAndView delete(int id) {
         lectureService.deleteById(id);
         return new ModelAndView("redirect:/lectures");
     }
