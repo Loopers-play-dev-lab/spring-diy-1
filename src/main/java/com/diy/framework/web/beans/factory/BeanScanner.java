@@ -11,7 +11,7 @@ public class BeanScanner {
 
     private final Reflections reflections;
 
-    public BeanScanner(final String... basePackages) {
+    public BeanScanner(String basePackages) {
         reflections = new Reflections(basePackages);
     }
 
