@@ -1,6 +1,6 @@
 package com.diy.app;
 
-import com.diy.framework.web.server.Component;
+import com.diy.framework.context.annotation.Component;
 
 import java.util.Collection;
 import java.util.Optional;
