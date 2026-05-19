@@ -1,4 +1,4 @@
-package com.diy.framework.web.server;
+package com.diy.framework.beans;
 
 import org.reflections.Reflections;
 

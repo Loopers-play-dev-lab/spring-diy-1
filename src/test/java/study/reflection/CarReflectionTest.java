@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 
 import static java.lang.reflect.AccessFlag.PRIVATE;
 
-class ReflectionTest {
+class CarReflectionTest {
 
     @DisplayName("Car class 정보 출력")
     @Test

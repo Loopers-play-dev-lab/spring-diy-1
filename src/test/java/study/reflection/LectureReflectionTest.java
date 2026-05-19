@@ -1,4 +1,4 @@
-package com.diy.app;
+package study.reflection;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessFlag;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.math.BigDecimal;
 import java.util.Arrays;
 
-class LectureTest {
+class LectureReflectionTest {
 
     @DisplayName("생성자 찾기")
     @Test
@@ -27,14 +27,10 @@ class LectureTest {
     @Test
     void newInstance() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         final Class<Lecture> lectureClass = Lecture.class;
-        final Constructor<Lecture> constructor = lectureClass.getDeclaredConstructor(Long.class, String.class, BigDecimal.class);
-        constructor.setAccessible(true);
-        final Lecture lecture = constructor.newInstance(null, "Lecture test", BigDecimal.valueOf(99_000));
-        constructor.setAccessible(false);
-
+        final Constructor<Lecture> constructor = lectureClass.getDeclaredConstructor(String.class, int.class);
+        final Lecture lecture = constructor.newInstance("Lecture test", 99_000);
         System.out.println("[newInstance] " + lecture.getName() + " / " + lecture.getPrice());
     }
-
 
     @DisplayName("private 메서드 찾기")
     @Test
@@ -48,11 +44,10 @@ class LectureTest {
         }
     }
 
-
     @DisplayName("private 메서드 호출")
     @Test
     void invokePrivateMethod() throws InvocationTargetException, IllegalAccessException {
-        final Lecture lecture = Lecture.of(null, "test lecture", BigDecimal.valueOf(99_000));
+        final Lecture lecture = new Lecture("test lecture", 99_000);
         final Class<? extends Lecture> lectureClass = lecture.getClass();
         final Method[] methods = lectureClass.getDeclaredMethods();
         for (Method method : methods) {
@@ -82,13 +77,12 @@ class LectureTest {
     @DisplayName("@MethodOrder가 붙어있는 메서드 실행")
     @Test
     void invokeMethodByMethodOrderAnnotation() throws InvocationTargetException, IllegalAccessException {
-        final Lecture lecture = Lecture.of(null, "test lecture", BigDecimal.valueOf(99_000));
+        final Lecture lecture = new Lecture("test lecture", 99_000);
         final Class<? extends Lecture> lectureClass = lecture.getClass();
         final Method[] methods = lectureClass.getDeclaredMethods();
         for (Method method : methods) {
             if (method.isAnnotationPresent(MethodOrder.class)) {
-                method.invoke(lecture);
-                System.out.println("method.getName() = " + method.getName());
+                System.out.println("invoke method " + method.getName() + ": " + method.invoke(lecture));
             }
         }
     }
@@ -97,7 +91,11 @@ class LectureTest {
     @Test
     void showMethodOrderAnnotation() {
         final Class<MethodOrder> methodOrderClass = MethodOrder.class;
-        System.out.println("methodOrderClass.isAnnotation() = " + methodOrderClass.isAnnotation());
-        System.out.println("methodOrderClass.getDeclaredAnnotations() = " + Arrays.toString(methodOrderClass.getDeclaredAnnotations()));
+        System.out.println("methodOrderClass.isAnnotation(): " + methodOrderClass.isAnnotation());
+        System.out.println("methodOrderClass.getDeclaredAnnotations(): " + Arrays.toString(methodOrderClass.getDeclaredAnnotations()));
+        final Method[] methods = methodOrderClass.getDeclaredMethods();
+        for (Method method : methods) {
+            System.out.println("method.getName(): " + method.getName());
+        }
     }
 }
