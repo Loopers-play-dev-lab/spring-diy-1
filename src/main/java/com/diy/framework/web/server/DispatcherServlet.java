@@ -3,6 +3,7 @@ package com.diy.framework.web.server;
 import com.diy.framework.web.server.mv.JspViewResolver;
 import com.diy.framework.web.server.mv.ModelAndView;
 import com.diy.framework.web.server.mv.UrlBasedViewResolver;
+import com.diy.framework.web.server.mv.View;
 import com.diy.framework.web.server.mv.ViewResolver;
 
 import javax.servlet.annotation.WebServlet;
@@ -16,10 +17,10 @@ import java.util.Map;
 @WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
 
-    private static final Map<String, Controller> controllers;
-    private static final List<ViewResolver> viewResolvers = new ArrayList<>();
+    private final Map<String, Controller> controllers;
+    private final List<ViewResolver> viewResolvers = new ArrayList<>();
 
-    public DispatcherServlet(Map<String, Controller> controllers) {
+    public DispatcherServlet(final Map<String, Controller> controllers) {
         this.controllers = controllers;
         viewResolvers.add(new JspViewResolver());
         viewResolvers.add(new UrlBasedViewResolver());
@@ -49,10 +50,20 @@ public class DispatcherServlet extends HttpServlet {
 
     private void render(final HttpServletRequest req, final HttpServletResponse resp, final ModelAndView mav) throws Exception {
         final var viewName = mav.getViewName();
-        final var view = viewResolver.resolve(viewName);
+        final var view = resolveViewName(viewName);
         if (view == null) {
             throw new RuntimeException("[DispatcherServlet] view not found: " + viewName);
         }
         view.render(req, resp, mav);
+    }
+
+    private View resolveViewName(final String viewName) {
+        for (final ViewResolver viewResolver : viewResolvers) {
+            final View view = viewResolver.resolve(viewName);
+            if (view != null) {
+                return view;
+            }
+        }
+        return null;
     }
 }
