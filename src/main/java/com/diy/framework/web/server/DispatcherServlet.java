@@ -1,28 +1,28 @@
 package com.diy.framework.web.server;
 
-import com.diy.app.LectureController;
 import com.diy.framework.web.server.mv.JspViewResolver;
 import com.diy.framework.web.server.mv.ModelAndView;
+import com.diy.framework.web.server.mv.UrlBasedViewResolver;
 import com.diy.framework.web.server.mv.ViewResolver;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @WebServlet("/")
-public class DispatchServlet extends HttpServlet {
+public class DispatcherServlet extends HttpServlet {
 
-    private static Map<String, Controller> controllers;
-    private static final ViewResolver viewResolver = new JspViewResolver();
+    private static final Map<String, Controller> controllers;
+    private static final List<ViewResolver> viewResolvers = new ArrayList<>();
 
-    @Override
-    public void init() {
-        System.out.println("[DispatcherServlet] init() is called.");
-        controllers = new HashMap<>();
-        controllers.put("/lectures", new LectureController());
+    public DispatcherServlet(Map<String, Controller> controllers) {
+        this.controllers = controllers;
+        viewResolvers.add(new JspViewResolver());
+        viewResolvers.add(new UrlBasedViewResolver());
     }
 
     @Override
