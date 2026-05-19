@@ -1,20 +1,27 @@
-package com.diy.framework.web.servlet.handler;
+package com.diy.framework.web.servlet.handler.mapping;
 
 import com.diy.framework.context.ApplicationContext;
 import com.diy.framework.context.annotation.Controller;
 import com.diy.framework.web.mvc.annotation.RequestMapping;
 import com.diy.framework.web.mvc.annotation.RequestMethod;
-import java.lang.reflect.Method;
+import com.diy.framework.web.servlet.handler.HandlerExecution;
+import com.diy.framework.web.servlet.handler.HandlerKey;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
 
-    private final Map<HandlerKey, Method> handlerMap = new HashMap<>();
+    private final ApplicationContext context;
+    private final Map<HandlerKey, HandlerExecution> handlerMap = new HashMap<>();
 
     public AnnotationHandlerMapping(ApplicationContext context) {
+        this.context = context;
+    }
+
+    @Override
+    public void initialize() {
         context.getBeanNames().forEach(name -> {
             Object bean = context.getBean(name);
             Class<?> clazz = bean.getClass();
@@ -37,13 +44,15 @@ public class AnnotationHandlerMapping {
                                 throw new RuntimeException("Multiple handler mapping");
                             }
 
-                            handlerMap.put(handlerKey, method);
+                            HandlerExecution handlerExecution = new HandlerExecution(bean, method);
+                            handlerMap.put(handlerKey, handlerExecution);
                         });
                     });
         });
     }
 
-    public Method getHandler(HttpServletRequest request) {
+    @Override
+    public Object getHandler(HttpServletRequest request) {
         String url = request.getRequestURI();
         RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod());
         HandlerKey handlerKey = new HandlerKey(url, requestMethod);
@@ -54,6 +63,7 @@ public class AnnotationHandlerMapping {
         if (clazz.isAnnotationPresent(RequestMapping.class)) {
             return clazz.getAnnotation(RequestMapping.class).value();
         }
+
         return "";
     }
 
@@ -63,9 +73,12 @@ public class AnnotationHandlerMapping {
         }
 
         if (clazz.isAnnotationPresent(RequestMapping.class)) {
-            return clazz.getAnnotation(RequestMapping.class).methods();
+            RequestMapping classAnnotation = clazz.getAnnotation(RequestMapping.class);
+            if (classAnnotation.methods().length > 0) {
+                return classAnnotation.methods();
+            }
         }
 
-        return new RequestMethod[0];
+        return RequestMethod.values();
     }
 }

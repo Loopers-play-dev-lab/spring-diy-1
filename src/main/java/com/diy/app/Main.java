@@ -2,8 +2,8 @@ package com.diy.app;
 
 import com.diy.framework.context.ApplicationContext;
 import com.diy.framework.web.server.TomcatWebServer;
-import com.diy.framework.web.servlet.ControllerHandlerMapping;
 import com.diy.framework.web.servlet.DispatcherServlet;
+import com.diy.framework.web.servlet.handler.mapping.ControllerHandlerMapping;
 
 public class Main {
     public static void main(String[] args) {
