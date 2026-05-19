@@ -8,6 +8,7 @@ import com.diy.framework.web.HttpRequestMethod;
 import com.diy.framework.web.ModelAndView;
 import com.diy.framework.web.beans.factory.annotation.Autowired;
 import com.diy.framework.web.beans.factory.annotation.Controller;
+import com.diy.framework.web.beans.factory.annotation.RequestMapping;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -21,6 +22,7 @@ import java.util.*;
 import static com.diy.app.controller.dto.LectureListResponse.*;
 
 @Controller
+@RequestMapping("/lectures")
 public class LectureController {
 
     private final LectureService lectureService;
@@ -49,6 +51,7 @@ public class LectureController {
 //
 //    }
 
+    @RequestMapping(methods = HttpRequestMethod.GET)
     private ModelAndView doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         Collection<Lecture> lectures = lectureService.getLecture();
         req.setAttribute("lectures", lectures);
@@ -57,6 +60,7 @@ public class LectureController {
         return new ModelAndView("lecture-list", model);
     }
 
+    @RequestMapping(methods = HttpRequestMethod.POST)
     private ModelAndView doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         final String body = new String(req.getInputStream().readAllBytes());
         final OpenLectureRequest openLectureRequest = objectMapper.readValue(body, OpenLectureRequest.class);
