@@ -1,12 +1,12 @@
-package com.diy.framework.web.server.mv;
+package com.diy.framework.web.mvc.view;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class RedirectView implements View {
+public class JspView implements View {
     private final String viewName;
 
-    public RedirectView(final String viewName) {
+    public JspView(final String viewName) {
         if (viewName == null || viewName.isBlank()) {
             throw new IllegalArgumentException("viewName is required");
         }
@@ -15,7 +15,11 @@ public class RedirectView implements View {
 
     @Override
     public void render(final HttpServletRequest req, final HttpServletResponse resp, final ModelAndView mav) throws Exception {
-        System.out.println("[RedirectView] render is called. redirect to " + viewName);
-        resp.sendRedirect(viewName);
+        System.out.println("[JspView] render is called.");
+        final var attributes = mav.getAttributes();
+        for (String key : attributes.keySet()) {
+            req.setAttribute(key, attributes.get(key));
+        }
+        req.getRequestDispatcher(viewName).forward(req, resp);
     }
 }

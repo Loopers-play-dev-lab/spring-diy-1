@@ -22,6 +22,10 @@ public class LecturePutRequest {
         this.price = price;
     }
 
+    public Lecture toLecture() {
+        return Lecture.of(id, name, price);
+    }
+
     public Long getId() {
         return id;
     }

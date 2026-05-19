@@ -1,4 +1,4 @@
-package com.diy.framework.web.server.mv;
+package com.diy.framework.web.mvc.view;
 
 import java.util.Map;
 

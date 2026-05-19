@@ -1,28 +1,30 @@
-package com.diy.framework.web.server;
+package com.diy.framework.web.servlet;
 
-import com.diy.app.LectureController;
-import com.diy.framework.web.server.mv.JspViewResolver;
-import com.diy.framework.web.server.mv.ModelAndView;
-import com.diy.framework.web.server.mv.ViewResolver;
+import com.diy.framework.web.mvc.Controller;
+import com.diy.framework.web.mvc.view.JspViewResolver;
+import com.diy.framework.web.mvc.view.ModelAndView;
+import com.diy.framework.web.mvc.view.UrlBasedViewResolver;
+import com.diy.framework.web.mvc.view.View;
+import com.diy.framework.web.mvc.view.ViewResolver;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @WebServlet("/")
-public class DispatchServlet extends HttpServlet {
+public class DispatcherServlet extends HttpServlet {
 
-    private static Map<String, Controller> controllers;
-    private static final ViewResolver viewResolver = new JspViewResolver();
+    private final Map<String, Controller> controllers;
+    private final List<ViewResolver> viewResolvers = new ArrayList<>();
 
-    @Override
-    public void init() {
-        System.out.println("[DispatcherServlet] init() is called.");
-        controllers = new HashMap<>();
-        controllers.put("/lectures", new LectureController());
+    public DispatcherServlet(final Map<String, Controller> controllers) {
+        this.controllers = controllers;
+        viewResolvers.add(new JspViewResolver());
+        viewResolvers.add(new UrlBasedViewResolver());
     }
 
     @Override
@@ -49,10 +51,20 @@ public class DispatchServlet extends HttpServlet {
 
     private void render(final HttpServletRequest req, final HttpServletResponse resp, final ModelAndView mav) throws Exception {
         final var viewName = mav.getViewName();
-        final var view = viewResolver.resolve(viewName);
+        final var view = resolveViewName(viewName);
         if (view == null) {
             throw new RuntimeException("[DispatcherServlet] view not found: " + viewName);
         }
         view.render(req, resp, mav);
+    }
+
+    private View resolveViewName(final String viewName) {
+        for (final ViewResolver viewResolver : viewResolvers) {
+            final View view = viewResolver.resolve(viewName);
+            if (view != null) {
+                return view;
+            }
+        }
+        return null;
     }
 }

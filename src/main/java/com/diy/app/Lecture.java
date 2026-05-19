@@ -28,4 +28,12 @@ public class Lecture {
     public BigDecimal getPrice() {
         return price;
     }
+
+    public boolean isNew() {
+        return id == null;
+    }
+
+    public Lecture createWithId(final Long id) {
+        return new Lecture(id, name, price);
+    }
 }

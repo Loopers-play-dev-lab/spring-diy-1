@@ -16,8 +16,8 @@ public class LecturePostRequest {
         this.price = price;
     }
 
-    public Lecture toLecture(Long id) {
-        return Lecture.of(id, name, price);
+    public Lecture toNewLecture() {
+        return Lecture.of(null, name, price);
     }
 
     public String getName() {
