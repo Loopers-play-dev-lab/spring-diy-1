@@ -1,14 +1,11 @@
-package com.diy.framework.web.servlet;
+package com.diy.framework.web.servlet.handler.mapping;
 
 import com.diy.framework.context.ApplicationContext;
-import com.diy.framework.web.servlet.handler.mapping.AnnotationHandlerMapping;
-import com.diy.framework.web.servlet.handler.mapping.ControllerHandlerMapping;
-import com.diy.framework.web.servlet.handler.mapping.HandlerMapping;
 import java.util.List;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 
-public class HandlerMappingComposite {
+public class HandlerMappingComposite implements HandlerMapping {
 
     private final List<HandlerMapping> handlerMappings;
 
@@ -19,10 +16,12 @@ public class HandlerMappingComposite {
         );
     }
 
+    @Override
     public void initialize() {
         handlerMappings.forEach(HandlerMapping::initialize);
     }
 
+    @Override
     public Object getHandler(HttpServletRequest request) {
         return handlerMappings.stream()
                 .map(handlerMapping -> handlerMapping.getHandler(request))
