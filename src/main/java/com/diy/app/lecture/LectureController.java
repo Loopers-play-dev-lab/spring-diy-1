@@ -1,22 +1,23 @@
 package com.diy.app.lecture;
 
 import com.diy.app.lecture.request.CreateLectureRequest;
-import com.diy.framework.web.mvc.Controller;
-import com.diy.framework.web.mvc.view.ModelAndView;
-
-import com.diy.framework.context.annotation.Component;
+import com.diy.framework.context.annotation.Controller;
 import com.diy.framework.web.mvc.annotation.RequestMapping;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.diy.framework.web.mvc.annotation.RequestMethod;
+import com.diy.framework.web.mvc.view.ModelAndView;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-@Component
+@Controller
 @RequestMapping("/lectures")
-public class LectureController implements Controller {
+public class LectureController {
 
     private final LectureService lectureService;
 
@@ -24,29 +25,19 @@ public class LectureController implements Controller {
         this.lectureService = lectureService;
     }
 
-    @Override
-    public ModelAndView handleRequest(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-        if ("POST".equals(request.getMethod())) {
-            return doPost(request, response);
-        } else if ("GET".equals(request.getMethod())) {
-            return doGet(request, response);
-        }
-
-        throw new RuntimeException("404 Not Found");
-    }
-
-    private ModelAndView doPost(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
-        Map<String, ?> params = (Map<String, ?>) request.getAttribute("params");
-        String name = (String) params.get("name");
-        int price = Integer.parseInt((String) params.get("price"));
-        CreateLectureRequest createRequest = new CreateLectureRequest(name, price);
+    @RequestMapping(methods = RequestMethod.POST)
+    public ModelAndView doPost(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
+        byte[] bodyBytes = request.getInputStream().readAllBytes();
+        String body = new String(bodyBytes, StandardCharsets.UTF_8);
+        CreateLectureRequest createRequest = new ObjectMapper().readValue(body, CreateLectureRequest.class);
 
         lectureService.createLecture(createRequest);
 
         return new ModelAndView("redirect:/lectures");
     }
 
-    private ModelAndView doGet(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+    @RequestMapping(methods = RequestMethod.GET)
+    public ModelAndView doGet(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
         List<Lecture> lectures = lectureService.getAllLectures();
 
         Map<String, Object> model = new HashMap<>();

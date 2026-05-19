@@ -1,5 +1,8 @@
 package com.diy.framework.web.servlet;
 
+import com.diy.framework.web.mvc.view.HtmlViewResolver;
+import com.diy.framework.web.mvc.view.JspViewResolver;
+import com.diy.framework.web.mvc.view.UrlBasedViewResolver;
 import com.diy.framework.web.mvc.view.View;
 import com.diy.framework.web.mvc.view.ViewResolver;
 import java.util.List;
@@ -9,8 +12,12 @@ public class ViewResolverComposite {
 
     private final List<ViewResolver> viewResolvers;
 
-    public ViewResolverComposite(List<ViewResolver> viewResolvers) {
-        this.viewResolvers = viewResolvers;
+    public ViewResolverComposite() {
+        this.viewResolvers = List.of(
+                new UrlBasedViewResolver(),
+                new JspViewResolver(),
+                new HtmlViewResolver()
+        );
     }
 
     public View resolve(String viewName) {

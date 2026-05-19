@@ -1,15 +1,9 @@
 package com.diy.framework.web.servlet;
 
-import com.diy.framework.web.mvc.Controller;
-import com.diy.framework.web.mvc.view.JspViewResolver;
+import com.diy.framework.context.ApplicationContext;
 import com.diy.framework.web.mvc.view.ModelAndView;
-import com.diy.framework.web.mvc.view.UrlBasedViewResolver;
 import com.diy.framework.web.mvc.view.View;
-import com.diy.framework.web.mvc.view.ViewResolver;
-import com.diy.framework.web.servlet.handler.ControllerHandlerMapping;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -17,40 +11,26 @@ import javax.servlet.http.HttpServletResponse;
 
 public class DispatcherServlet extends HttpServlet {
 
-    private final ControllerHandlerMapping handlerMapping;
+    private final HandlerMappingComposite handlerMappingComposite;
+    private final HandlerAdapterComposite handlerAdapterComposite;
+    private final ViewResolverComposite viewResolverComposite;
 
-    private RequestParamParser requestParamParser;
-    private ViewResolverComposite viewResolverComposite;
-
-    public DispatcherServlet(ControllerHandlerMapping handlerMapping) {
-        this.handlerMapping = handlerMapping;
+    public DispatcherServlet(ApplicationContext context) {
+        this.handlerMappingComposite = new HandlerMappingComposite(context);
+        this.handlerAdapterComposite = new HandlerAdapterComposite();
+        this.viewResolverComposite = new ViewResolverComposite();
     }
 
     @Override
     public void init() {
-        this.requestParamParser = new RequestParamParser();
-
-        List<ViewResolver> viewResolvers = List.of(new UrlBasedViewResolver(), new JspViewResolver());
-        this.viewResolverComposite = new ViewResolverComposite(viewResolvers);
+        handlerMappingComposite.initialize();
     }
 
     @Override
-    protected void service(final HttpServletRequest req, final HttpServletResponse resp)
-            throws ServletException, IOException {
-        String requestURI = req.getRequestURI();
-
-        Controller controller = handlerMapping.getHandler(requestURI);
-        if (controller == null) {
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-
+    protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
         try {
-            Map<String, ?> params = requestParamParser.parse(req);
-            req.setAttribute("params", params);
-
-            ModelAndView mav = controller.handleRequest(req, resp);
-
+            Object handler = handlerMappingComposite.getHandler(req);
+            ModelAndView mav = handlerAdapterComposite.handle(handler, req, resp);
             View view = viewResolverComposite.resolve(mav.getViewName());
             view.render(mav.getModel(), req, resp);
         } catch (Exception e) {
