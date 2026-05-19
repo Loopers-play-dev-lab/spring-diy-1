@@ -3,12 +3,12 @@ package com.diy.app.controller;
 import com.diy.app.controller.dto.OpenLectureRequest;
 import com.diy.app.domain.Lecture;
 import com.diy.app.domain.Price;
-import com.diy.app.repository.build.LectureRepositoryImpl;
-import com.diy.framework.web.HttpMethod;
+import com.diy.app.service.LectureService;
+import com.diy.framework.web.HttpRequestMethod;
 import com.diy.framework.web.ModelAndView;
 import com.diy.framework.web.beans.factory.annotation.Autowired;
-import com.diy.framework.web.beans.factory.annotation.Component;
-import com.diy.framework.web.controller.Controller;
+import com.diy.framework.web.beans.factory.annotation.Controller;
+import com.diy.framework.web.beans.factory.annotation.RequestMapping;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -21,49 +21,51 @@ import java.util.*;
 
 import static com.diy.app.controller.dto.LectureListResponse.*;
 
-@Component
-public class LectureController implements Controller {
+@Controller
+@RequestMapping("/lectures")
+public class LectureController {
 
-    private final LectureRepositoryImpl lectureRepositoryImpl;
+    private final LectureService lectureService;
     private final ObjectMapper objectMapper;
 
-    public @Autowired LectureController(LectureRepositoryImpl lectureRepositoryImpl, ObjectMapper objectMapper) {
-        this.lectureRepositoryImpl = lectureRepositoryImpl;
-//        this.objectMapper = objectMapper;
+    public @Autowired LectureController(final LectureService lectureService) {
+        this.lectureService = lectureService;
         this.objectMapper = new ObjectMapper();
     }
 
-    @Override
-    public ModelAndView handleRequest(HttpServletRequest req, HttpServletResponse res) throws Exception {
+//    @Override
+//    public ModelAndView handleRequest(HttpRequestMethod requestMethod,HttpServletRequest req, HttpServletResponse res) throws Exception {
+//
+//        // TODO: 객체지향적으로 변경해보기
+//        switch (requestMethod) {
+//            case POST -> {
+//                return doPost(req, res);
+//            }
+//            case GET -> {
+//                return doGet(req, res);
+//            }
+//            default -> {
+//                throw new RuntimeException("405 Method Not Allowed");
+//            }
+//        }
+//
+//    }
 
-        // TODO: 객체지향적으로 변경해보기
-        switch (HttpMethod.from(req.getMethod())) {
-            case POST -> {
-                return doPost(req, res);
-            }
-            case GET -> {
-                return doGet(req, res);
-            }
-            default -> {
-                throw new RuntimeException("405 Method Not Allowed");
-            }
-        }
-
-    }
-
+    @RequestMapping(methods = HttpRequestMethod.GET)
     private ModelAndView doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        Collection<Lecture> lectures = lectureRepositoryImpl.findAll();
+        Collection<Lecture> lectures = lectureService.getLecture();
         req.setAttribute("lectures", lectures);
         Map<String, List<LectureListDto>> model = parseParams(req);
 
         return new ModelAndView("lecture-list", model);
     }
 
+    @RequestMapping(methods = HttpRequestMethod.POST)
     private ModelAndView doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         final String body = new String(req.getInputStream().readAllBytes());
         final OpenLectureRequest openLectureRequest = objectMapper.readValue(body, OpenLectureRequest.class);
 
-        lectureRepositoryImpl.save(Lecture.open(
+        lectureService.registerLecture(Lecture.open(
                 openLectureRequest.name(),
                 Price.of(openLectureRequest.price())
         ));

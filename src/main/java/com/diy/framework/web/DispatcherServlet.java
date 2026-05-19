@@ -1,7 +1,7 @@
 package com.diy.framework.web;
 
-import com.diy.framework.web.controller.Controller;
 import com.diy.framework.web.controller.ControllerMap;
+import com.diy.framework.web.controller.HttpServletController;
 import com.diy.framework.web.view.View;
 import com.diy.framework.web.viewresolver.JspViewResolver;
 import com.diy.framework.web.viewresolver.ViewResolver;
@@ -31,7 +31,7 @@ public class DispatcherServlet extends HttpServlet {
     @Override
     protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
 
-        Controller controller = controllerMap.find(req.getServletPath());
+        HttpServletController controller = new HttpServletController(controllerMap.find(req.getServletPath()));
 
         try {
             final ModelAndView mav = controller.handleRequest(req, resp);

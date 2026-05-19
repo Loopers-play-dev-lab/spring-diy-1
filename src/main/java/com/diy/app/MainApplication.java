@@ -10,6 +10,7 @@ public class MainApplication {
     public static void main(String[] args) {
 
         ApplicationContext applicationContext = new ApplicationContext(MainApplication.class.getPackageName());
+        applicationContext.initialize();
 
         Controller lectureController = (Controller) applicationContext.findBean(LectureController.class.getName());
         ControllerMap controllerMap = new ControllerMap();
