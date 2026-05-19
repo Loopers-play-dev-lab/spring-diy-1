@@ -1,14 +1,14 @@
 package com.diy.framework.web.server;
 
 import com.diy.app.controller.lecture.LectureController;
-import com.diy.app.repository.InMemoryLectureRepositoryImpl;
-import com.diy.app.repository.LectureRepository;
+import com.diy.framework.web.bean.BeanContainer;
 import com.diy.framework.web.controller.AbstractController;
-import com.diy.framework.web.view.*;
+import com.diy.framework.web.view.ModelAndView;
+import com.diy.framework.web.view.View;
+import com.diy.framework.web.view.ViewResolver;
 import com.diy.framework.web.view.resolver.HtmlViewResolver;
 import com.diy.framework.web.view.resolver.JspViewResolver;
 import com.diy.framework.web.view.resolver.RedirectViewResolver;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,19 +21,15 @@ import java.util.Map;
 @WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
     private HandlerMapping handlerMapping;
-    private LectureRepository lectureRepository;
-    private ObjectMapper objectMapper;
     private List<ViewResolver> viewResolvers;
+    private final BeanContainer container = new BeanContainer();
 
     @Override
     public void init() throws ServletException {
-        lectureRepository = new InMemoryLectureRepositoryImpl();
-        objectMapper = new ObjectMapper();
         viewResolvers = List.of(new JspViewResolver(), new HtmlViewResolver(), new RedirectViewResolver());
         this.handlerMapping = new HandlerMapping(
                 Map.of(
-                        "/lectures", new LectureController(objectMapper, lectureRepository)
-                )
+                        "/lectures", container.getBean(LectureController.class))
         );
     }
 
