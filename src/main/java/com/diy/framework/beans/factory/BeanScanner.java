@@ -1,4 +1,4 @@
-package com.diy.framework.beans;
+package com.diy.framework.beans.factory;
 
 import org.reflections.Reflections;
 
@@ -10,8 +10,8 @@ public class BeanScanner {
 
     private final Reflections reflections;
 
-    public BeanScanner(final String... basePackages) {
-        this.reflections = new Reflections(basePackages);
+    public BeanScanner(final String basePackage, final String... basePackages) {
+        this.reflections = new Reflections(basePackage, basePackages);
     }
 
     public Set<Class<?>> scanClassesTypeAnnotatedWith(final Class<? extends Annotation> annotation) {
