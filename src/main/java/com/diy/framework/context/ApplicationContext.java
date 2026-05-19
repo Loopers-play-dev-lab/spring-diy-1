@@ -19,12 +19,19 @@ import java.util.Set;
 
 public class ApplicationContext {
 
-    private final String[] basePackages;
+    private final String basePackage;
     private final Set<BeanDefinition> beanDefinitionRegistry = new HashSet<>();
     private final Map<String, Object> beans = new HashMap<>();
 
-    public ApplicationContext(String... basePackages) {
-        this.basePackages = basePackages;
+    public ApplicationContext(String basePackage) {
+        this.basePackage = basePackage;
+    }
+
+    public void initialize() {
+        BeanScanner beanScanner = new BeanScanner("com.diy.framework", basePackage);
+        Set<Class<?>> beanClasses = beanScanner.scanClassesTypeAnnotatedWith(Component.class);
+        beanClasses.forEach(this::registerBeanDefinition);
+        beanDefinitionRegistry.forEach(this::registerBean);
     }
 
     public Set<String> getBeanNames() {
@@ -38,13 +45,6 @@ public class ApplicationContext {
         }
 
         return bean;
-    }
-
-    public void initialize() {
-        BeanScanner beanScanner = new BeanScanner(basePackages);
-        Set<Class<?>> beanClasses = beanScanner.scanClassesTypeAnnotatedWith(Component.class);
-        beanClasses.forEach(this::registerBeanDefinition);
-        beanDefinitionRegistry.forEach(this::registerBean);
     }
 
     private void registerBeanDefinition(Class<?> clazz) {
