@@ -56,12 +56,13 @@ public abstract class DispatcherServlet extends HttpServlet {
                 return;
             }
 
+            final Object finalHandler = handler;
             HandlerAdapter adapter = handlerAdapters.stream()
-                    .filter(a -> a.supports(handler))
+                    .filter(a -> a.supports(finalHandler))
                     .findFirst()
-                    .orElseThrow(() -> new RuntimeException("No adapter found for: " + handler.getClass()));
+                    .orElseThrow(() -> new RuntimeException("No adapter found for: " + finalHandler.getClass()));
 
-            final ModelAndView mav = adapter.handle(req, resp, handler);
+            final ModelAndView mav = adapter.handle(req, resp, finalHandler);
             if (mav != null) {
                 render(mav, req, resp);
             }
