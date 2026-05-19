@@ -33,10 +33,10 @@ public class LectureController implements Controller {
     }
 
     @Override
-    public ModelAndView handleRequest(HttpServletRequest req, HttpServletResponse res) throws Exception {
+    public ModelAndView handleRequest(HttpRequestMethod requestMethod,HttpServletRequest req, HttpServletResponse res) throws Exception {
 
         // TODO: 객체지향적으로 변경해보기
-        switch (HttpRequestMethod.from(req.getMethod())) {
+        switch (requestMethod) {
             case POST -> {
                 return doPost(req, res);
             }
