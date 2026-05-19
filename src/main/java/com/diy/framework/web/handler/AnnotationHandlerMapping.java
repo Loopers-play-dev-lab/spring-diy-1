@@ -1,7 +1,8 @@
-package com.diy.framework.web;
+package com.diy.framework.web.handler;
 
 import com.diy.framework.web.annotation.Controller;
 import com.diy.framework.web.annotation.RequestMapping;
+import com.diy.framework.web.annotation.RequestMethod;
 import com.diy.framework.web.beans.factory.BeanFactory;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +34,7 @@ public class AnnotationHandlerMapping {
                 }
                 RequestMapping rm = method.getAnnotation(RequestMapping.class);
                 String uri = baseUri + rm.value();
-                for (com.diy.framework.web.annotation.RequestMethod httpMethod : rm.methods()) {
+                for (RequestMethod httpMethod : rm.methods()) {
                     mappings.put(httpMethod.name() + ":" + uri, new HandlerExecution(bean, method));
                 }
             }
