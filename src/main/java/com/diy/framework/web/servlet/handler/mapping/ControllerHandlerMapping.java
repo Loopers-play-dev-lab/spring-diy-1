@@ -2,7 +2,6 @@ package com.diy.framework.web.servlet.handler.mapping;
 
 import com.diy.framework.context.ApplicationContext;
 import com.diy.framework.web.mvc.Controller;
-import com.diy.framework.web.mvc.annotation.RequestMapping;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -20,9 +19,12 @@ public class ControllerHandlerMapping implements HandlerMapping {
     public void initialize() {
         context.getBeanNames().forEach(name -> {
             Object bean = context.getBean(name);
-            if (bean instanceof Controller controller && bean.getClass().isAnnotationPresent(RequestMapping.class)) {
-                String url = bean.getClass().getAnnotation(RequestMapping.class).value();
-                handlerMap.put(url, controller);
+            if (bean instanceof Controller controller) {
+                if (!name.startsWith("/")) {
+                    throw new RuntimeException("Controller bean name does not start with '/'");
+                }
+
+                handlerMap.put(name, controller);
             }
         });
     }
