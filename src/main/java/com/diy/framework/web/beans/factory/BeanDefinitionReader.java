@@ -3,8 +3,10 @@ package com.diy.framework.web.beans.factory;
 import com.diy.framework.web.annotations.Bean;
 import com.diy.framework.web.annotations.Component;
 import com.diy.framework.web.annotations.Configuration;
+import com.diy.framework.web.annotations.Controller;
 
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.Set;
 
 public class BeanDefinitionReader {
@@ -18,7 +20,10 @@ public class BeanDefinitionReader {
     }
 
     public void loadBeanDefinitions() {
-        registerComponentDefinitions(beanScanner.scanClassesTypeAnnotatedWith(Component.class));
+        Set<Class<?>> componentClasses = new HashSet<>(beanScanner.scanClassesTypeAnnotatedWith(Component.class));
+        componentClasses.addAll(beanScanner.scanClassesTypeAnnotatedWith(Controller.class));
+
+        registerComponentDefinitions(componentClasses);
         registerConfigurationDefinitions(beanScanner.scanClassesTypeAnnotatedWith(Configuration.class));
     }
 

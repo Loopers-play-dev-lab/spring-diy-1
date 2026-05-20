@@ -74,8 +74,7 @@ public class AnnotatedGenericBeanDefinition implements BeanDefinition {
     }
 
     private boolean hasComponentAnnotation(final Class<?> clazz) {
-        return Arrays.stream(clazz.getAnnotations())
-            .anyMatch(annotation -> isComponentAnnotation(annotation.annotationType(), new HashSet<>()));
+        return AnnotationMetadataUtils.isAnnotatedWith(clazz, Component.class);
     }
 
     private boolean isComponentAnnotation(

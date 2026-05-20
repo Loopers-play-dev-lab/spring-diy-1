@@ -1,5 +1,6 @@
 package com.diy.framework.web.beans.factory;
 
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -39,6 +40,18 @@ public class BeanFactory {
         Map<String, T> beans = new LinkedHashMap<>();
         for (BeanDefinition candidate : registry.getByType(type)) {
             beans.put(candidate.getBeanName(), type.cast(getBean(candidate.getBeanName())));
+        }
+        return beans;
+    }
+
+    public Map<String, Object> getBeansWithAnnotation(final Class<? extends Annotation> annotationType) {
+        Map<String, Object> beans = new LinkedHashMap<>();
+        for (BeanDefinition candidate : registry.getAll()) {
+            if (!AnnotationMetadataUtils.isAnnotatedWith(candidate.getBeanClass(), annotationType)) {
+                continue;
+            }
+
+            beans.put(candidate.getBeanName(), getBean(candidate.getBeanName()));
         }
         return beans;
     }
