@@ -1,7 +1,8 @@
 package com.diy.app;
 
 import com.diy.framework.bean.Autowired;
-import com.diy.framework.controller.Controller;
+import com.diy.framework.bean.annotation.Controller;
+import com.diy.framework.bean.annotation.RequestMapping;
 import com.diy.framework.enums.RequestMethod;
 import com.diy.framework.value.Model;
 import com.diy.framework.value.ModelAndView;
@@ -15,24 +16,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
 
-public class LectureController implements Controller {
+@Controller
+public class LectureControllerV2 {
 
     private final LectureRepository lectureRepository;
 
     @Autowired
-    public LectureController(LectureRepository lectureRepository) {
+    public LectureControllerV2(LectureRepository lectureRepository) {
         this.lectureRepository = lectureRepository;
     }
 
-    @Override
-    public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return switch (RequestMethod.equals(request.getMethod())) {
-            case POST -> doPost(request, response);
-            case GET -> doGet(request, response);
-            default -> throw new RuntimeException("404 Not Found");
-        };
-    }
-
+    @RequestMapping(value = "lectures", method = RequestMethod.GET)
     private ModelAndView doGet(HttpServletRequest request, HttpServletResponse response) {
         Collection<Lecture> lectures = lectureRepository.findAll();
         Model model = new Model(Map.of("lectures", lectures));

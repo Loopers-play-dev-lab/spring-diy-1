@@ -1,7 +1,6 @@
 package com.diy.app;
 
-import com.diy.framework.bean.Component;
-import com.diy.framework.bean.Repository;
+import com.diy.framework.bean.annotation.Repository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
