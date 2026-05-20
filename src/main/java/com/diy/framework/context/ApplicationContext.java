@@ -4,12 +4,14 @@ import com.diy.framework.beans.factory.BeanScanner;
 import com.diy.framework.context.annotation.Autowired;
 import com.diy.framework.context.annotation.Bean;
 import com.diy.framework.context.annotation.Component;
+import com.diy.framework.context.annotation.Controller;
 import com.diy.framework.context.annotation.RequestMapping;
-import com.diy.framework.web.mvc.Controller;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
 
 public class ApplicationContext {
 
@@ -24,6 +26,7 @@ public class ApplicationContext {
     public void initialize() {
         final BeanScanner beanScanner = new BeanScanner(basePackage);
         beanClasses.addAll(beanScanner.scanClassesTypeAnnotatedWith(Component.class));
+        beanClasses.addAll(beanScanner.scanClassesTypeAnnotatedWith(Controller.class));
 
         beanClasses.forEach(clazz -> {
             if (isBeanInitialized(clazz)) {
@@ -124,16 +127,20 @@ public class ApplicationContext {
         }).toArray();
     }
 
-    public Map<String, Controller> getControllerMapping() {
-        final Map<String, Controller> mapping = new HashMap<>();
+    public Collection<Object> getBeans() {
+        return Collections.unmodifiableCollection(beans.values());
+    }
+
+    public Map<String, com.diy.framework.web.mvc.Controller> getControllerMapping() {
+        final Map<String, com.diy.framework.web.mvc.Controller> mapping = new HashMap<>();
 
         beans.values().stream()
-                .filter(bean -> bean instanceof Controller)
+                .filter(bean -> bean instanceof com.diy.framework.web.mvc.Controller)
                 .forEach(bean -> {
                     final RequestMapping annotation =
                             bean.getClass().getAnnotation(RequestMapping.class);
                     if (annotation != null) {
-                        mapping.put(annotation.value(), (Controller) bean);
+                        mapping.put(annotation.value(), (com.diy.framework.web.mvc.Controller) bean);
                     }
                 });
 
