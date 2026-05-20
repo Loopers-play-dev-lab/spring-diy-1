@@ -1,6 +1,11 @@
 plugins {
     id("java")
+    id("application")
     kotlin("jvm")
+}
+
+application {
+    mainClass.set("com.diy.app.LectureApplication")
 }
 
 group = "com.diy"
