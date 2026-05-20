@@ -26,10 +26,6 @@ public class LectureControllerV2 {
         this.lectureRepository = lectureRepository;
     }
 
-    public void decide() {
-        System.out.println("RequestMapping is added");
-    }
-
     @RequestMapping(value = "lectures", method = RequestMethod.GET)
     private ModelAndView doGet(HttpServletRequest request, HttpServletResponse response) {
         Collection<Lecture> lectures = lectureRepository.findAll();

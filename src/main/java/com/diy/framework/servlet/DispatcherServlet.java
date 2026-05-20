@@ -24,13 +24,11 @@ import java.util.Set;
 
 public class DispatcherServlet extends HttpServlet {
 
-//    private final Map<String, Controller> controllerMapping;
     private final Map<RequestKey, RequestHandler> handlers;
     private final List<ViewResolver> viewResolvers;
 
-    public DispatcherServlet(/*Map<String, Controller> controllerMapping,*/ Map<RequestKey, RequestHandler> handlers, List<ViewResolver> viewResolvers) {
+    public DispatcherServlet(Map<RequestKey, RequestHandler> handlers, List<ViewResolver> viewResolvers) {
         this.handlers = handlers;
-//        this.controllerMapping = controllerMapping;
         this.viewResolvers = viewResolvers;
     }
 
@@ -38,7 +36,6 @@ public class DispatcherServlet extends HttpServlet {
     protected void service(final HttpServletRequest req, final HttpServletResponse resp) {
         final RequestKey requestKey = new RequestKey(req.getRequestURI(), RequestMethod.valueOf(req.getMethod()));
         final RequestHandler handler = handlers.get(requestKey);
-//        final Controller controller = controllerMapping.get(req.getRequestURI());
 
         if (handler == null) {
             return;
