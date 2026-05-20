@@ -1,6 +1,8 @@
 package com.diy.framework.web.servlet;
 
-import com.diy.framework.web.mvc.Controller;
+import com.diy.framework.context.ApplicationContext;
+import com.diy.framework.web.mvc.ControllerV1;
+import com.diy.framework.web.mvc.controller.ControllerDefinition;
 import com.diy.framework.web.mvc.view.JspViewResolver;
 import com.diy.framework.web.mvc.view.ModelAndView;
 import com.diy.framework.web.mvc.view.UrlBasedViewResolver;
@@ -17,26 +19,34 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@WebServlet("/")
+//@WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
-
-    private final Map<String, Controller> controllersMapping;
+    private final Map<String, ControllerDefinition> controllerDefinitionMapping;
     private final List<ViewResolver> viewResolvers = new ArrayList<>();
 
-    public DispatcherServlet(final Map<String, Controller> controllersMapping) {
-        this.controllersMapping = controllersMapping;
+    public DispatcherServlet(final ApplicationContext applicationContext) {
+        this.controllerDefinitionMapping = new HashMap<>();
         this.viewResolvers.add(new UrlBasedViewResolver());
         this.viewResolvers.add(new JspViewResolver());
+        init(applicationContext);
+    }
+
+    public void init(final ApplicationContext applicationContext) {
+        List<ControllerDefinition> beans = applicationContext.getControllerBeans();
+        beans.forEach(bean -> {
+            controllerDefinitionMapping.put(bean.getUrl(), bean);
+        });
+
     }
 
     @Override
     protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
         final String uri = req.getRequestURI();
-
-        final Controller controller = controllersMapping.get(uri);
+        final ControllerDefinition controller = controllerDefinitionMapping.get(uri);
 
         if (controller == null) {
             return;
@@ -49,6 +59,7 @@ public class DispatcherServlet extends HttpServlet {
             throw new RuntimeException(e);
         }
     }
+
 
     private void render(final ModelAndView mav, final HttpServletRequest req, final HttpServletResponse resp) throws Exception {
         final String viewName = mav.getViewName();

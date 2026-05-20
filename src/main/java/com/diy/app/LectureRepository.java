@@ -10,7 +10,6 @@ import java.util.Map;
 public class LectureRepository {
 
     public LectureRepository() {
-        System.out.println("lectureRepository = " + lectureRepository);
     }
 
     private final Map<Long, Lecture> lectureRepository = new HashMap<>();

@@ -13,7 +13,6 @@ public class LectureService {
     @Autowired
     public LectureService(final LectureRepository lectureRepository) {
         this.lectureRepository = lectureRepository;
-        System.out.println("lectureService::lectureRepository = " + lectureRepository);
     }
 
 

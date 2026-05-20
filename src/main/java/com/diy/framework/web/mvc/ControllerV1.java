@@ -6,6 +6,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @FunctionalInterface
-public interface Controller {
+public interface ControllerV1 {
     ModelAndView handleRequest(final HttpServletRequest request, final HttpServletResponse response) throws Exception;
 }

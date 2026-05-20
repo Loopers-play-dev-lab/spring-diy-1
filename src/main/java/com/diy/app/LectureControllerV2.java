@@ -1,5 +1,9 @@
 package com.diy.app;
 
+import com.diy.framework.context.annotation.Autowired;
+import com.diy.framework.context.annotation.Controller;
+import com.diy.framework.context.annotation.RequestMapping;
+import com.diy.framework.context.annotation.RequestMethod;
 import com.diy.framework.web.mvc.ControllerV1;
 import com.diy.framework.web.mvc.view.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,26 +16,19 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LectureController implements ControllerV1 {
+@RequestMapping("/lectures/v2")
+@Controller
+public class LectureControllerV2 {
 
     private final LectureService lectureService;
 
-    public LectureController(final LectureService lectureService) {
+    @Autowired
+    public LectureControllerV2(final LectureService lectureService) {
         this.lectureService = lectureService;
     }
 
-    @Override
-    public ModelAndView handleRequest(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-        if ("POST".equals(request.getMethod())) {
-            return doPost(request, response);
-        } else if ("GET".equals(request.getMethod())) {
-            return doGet(request, response);
-        }
-
-        throw new RuntimeException("404 Not Found");
-    }
-
-    private ModelAndView doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    @RequestMapping(methods = RequestMethod.POST)
+    public ModelAndView doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
         final byte[] bodyBytes = req.getInputStream().readAllBytes();
         final String body = new String(bodyBytes, StandardCharsets.UTF_8);
 
@@ -41,7 +38,8 @@ public class LectureController implements ControllerV1 {
         return new ModelAndView("redirect:/lectures");
     }
 
-    private ModelAndView doGet(final HttpServletRequest req, final HttpServletResponse resp) throws Exception {
+    @RequestMapping(methods = RequestMethod.GET)
+    public ModelAndView doGet(final HttpServletRequest req, final HttpServletResponse resp) throws Exception {
         final Map<String, Object> model = new HashMap<>();
 //        model.put("lectures", lectureModels);
 
