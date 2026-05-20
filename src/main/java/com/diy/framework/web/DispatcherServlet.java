@@ -1,9 +1,17 @@
 package com.diy.framework.web;
 
+import com.diy.framework.web.beans.factory.BeanFactory;
+import com.diy.framework.web.handler.AnnotationHandlerMapping;
+import com.diy.framework.web.handler.ControllerHandlerAdapter;
+import com.diy.framework.web.handler.HandlerAdapter;
+import com.diy.framework.web.handler.HandlerExecutionAdapter;
+import com.diy.framework.web.handler.HandlerMapping;
 import com.diy.framework.web.view.JspViewResolver;
 import com.diy.framework.web.view.ModelAndView;
 import com.diy.framework.web.view.View;
+
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -12,7 +20,14 @@ import javax.servlet.http.HttpServletResponse;
 public abstract class DispatcherServlet extends HttpServlet {
 
     private HandlerMapping handlerMapping;
+    private AnnotationHandlerMapping annotationHandlerMapping;
     private final JspViewResolver viewResolver = new JspViewResolver();
+    private final List<HandlerAdapter> handlerAdapters = List.of(
+            new ControllerHandlerAdapter(),
+            new HandlerExecutionAdapter()
+    );
+
+    protected abstract String[] getBasePackages();
 
     protected abstract void initHandlerMappings(HandlerMapping handlerMapping)
             throws InvocationTargetException, IllegalAccessException;
@@ -22,6 +37,8 @@ public abstract class DispatcherServlet extends HttpServlet {
         handlerMapping = new HandlerMapping();
         try {
             initHandlerMappings(handlerMapping);
+            BeanFactory beanFactory = new BeanFactory(getBasePackages());
+            annotationHandlerMapping = new AnnotationHandlerMapping(beanFactory);
         } catch (InvocationTargetException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -30,13 +47,22 @@ public abstract class DispatcherServlet extends HttpServlet {
     @Override
     protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException {
         try {
-            Controller controller = handlerMapping.getController(req);
-            if (controller == null) {
+            Object handler = handlerMapping.getController(req);
+            if (handler == null) {
+                handler = annotationHandlerMapping.getHandler(req);
+            }
+            if (handler == null) {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
 
-            final ModelAndView mav = controller.handleRequest(req, resp);
+            final Object finalHandler = handler;
+            HandlerAdapter adapter = handlerAdapters.stream()
+                    .filter(a -> a.supports(finalHandler))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("No adapter found for: " + finalHandler.getClass()));
+
+            final ModelAndView mav = adapter.handle(req, resp, finalHandler);
             if (mav != null) {
                 render(mav, req, resp);
             }
@@ -49,7 +75,7 @@ public abstract class DispatcherServlet extends HttpServlet {
             throws Exception {
         final View view = viewResolver.resolveViewName(mav.getViewName());
         if (view == null) {
-            throw new RuntimeException("View not found!!!!!!: " + mav.getViewName());
+            throw new RuntimeException("View not found: " + mav.getViewName());
         }
         view.render(mav.getModel(), req, resp);
     }
