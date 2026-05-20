@@ -1,12 +1,11 @@
 package com.diy.app;
 
-import com.diy.framework.context.annotation.Component;
+import com.diy.framework.context.annotation.Controller;
 import com.diy.framework.context.annotation.RequestMapping;
-import com.diy.framework.web.mvc.Controller;
+import com.diy.framework.web.mvc.RequestMethod;
 import com.diy.framework.web.mvc.view.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -15,24 +14,27 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
+@Controller
 @RequestMapping("/lectures")
-public class LectureController implements Controller {
+public class LectureController {
 
     private final Map<Long, Lecture> lectureRepository = new HashMap<>();
 
-    @Override
-    public ModelAndView handleRequest(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-        if ("POST".equals(request.getMethod())) {
-            return doPost(request, response);
-        } else if ("GET".equals(request.getMethod())) {
-            return doGet(request, response);
-        }
+    @RequestMapping(methods = RequestMethod.GET)
+    public ModelAndView list(final HttpServletRequest req, final HttpServletResponse resp) {
+        final Collection<Lecture> lectures = lectureRepository.values();
+        final Object lectureModels = lectures.stream()
+                .map(lecture -> Map.of("id", lecture.getId(), "name", lecture.getName(), "price", lecture.getPrice()))
+                .toList();
 
-        throw new RuntimeException("404 Not Found");
+        final Map<String, Object> model = new HashMap<>();
+        model.put("lectures", lectureModels);
+
+        return new ModelAndView("lecture-list", model);
     }
 
-    private ModelAndView doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    @RequestMapping(methods = RequestMethod.POST)
+    public ModelAndView create(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         final byte[] bodyBytes = req.getInputStream().readAllBytes();
         final String body = new String(bodyBytes, StandardCharsets.UTF_8);
 
@@ -43,14 +45,5 @@ public class LectureController implements Controller {
         lecture.setId(id);
 
         return new ModelAndView("redirect:/lectures");
-    }
-
-    private ModelAndView doGet(final HttpServletRequest req, final HttpServletResponse resp) throws Exception {
-        final Collection<Lecture> lectures = lectureRepository.values();
-        final Map<String, Object> model = new HashMap<>();
-        final Object lectureModels = lectures.stream().map(lecture -> Map.of("id", lecture.getId(), "name", lecture.getName(), "price", lecture.getPrice())).toList();
-        model.put("lectures", lectureModels);
-
-        return new ModelAndView("lecture-list", model);
     }
 }
