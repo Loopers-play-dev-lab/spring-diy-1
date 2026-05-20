@@ -17,7 +17,7 @@ public class InterfaceControllerStrategy implements ControllerStrategy {
     RequestMapping requestMapping = clazz.getDeclaredAnnotation(RequestMapping.class);
     IController controller = (IController) bean;
 
-    for (RequestMethod method : requestMapping.methods()) {
+    for (RequestMethod method : RequestMethod.values()) {
       registry.add(method, requestMapping.value(), controller);
     }
   }

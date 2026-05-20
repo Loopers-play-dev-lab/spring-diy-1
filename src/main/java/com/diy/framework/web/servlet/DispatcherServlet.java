@@ -7,6 +7,7 @@ import com.diy.framework.web.mvc.view.ModelAndView;
 import com.diy.framework.web.mvc.view.UrlBasedViewResolver;
 import com.diy.framework.web.mvc.view.View;
 import com.diy.framework.web.mvc.view.ViewResolver;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServlet;
@@ -25,10 +26,12 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     @Override
-    protected void service(final HttpServletRequest req, final HttpServletResponse resp) {
+    protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         final IController controller = controllerRegistry.get(req);
         if (controller == null) {
-            throw new RuntimeException("404 Not Found");
+            System.out.println("404 Not Found: " + req.getMethod() + " " + req.getRequestURI());
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
         }
 
         try {

@@ -33,16 +33,14 @@ public class ApplicationContext {
     }
 
     public void initialize() {
-        final BeanScanner beanScanner = new BeanScanner(basePackage);
+        final BeanScanner beanScanner = new BeanScanner(
+            basePackage,
+            Component.class.getPackage().getName() // 이걸 이렇게 하는게 맞나..
+        );
         beanScanner.scanClassesTypeAnnotatedWith(Component.class).forEach(this::registerBean);
 
         beanDefinitionRegistry.forEach(beanDefinition -> {
-            final String beanName = beanDefinition.getBeanName();
-
-            if (isBeanInitialized(beanName)) {
-                return;
-            }
-
+            if (isBeanInitialized(beanDefinition.getBeanName())) return;
             createInstance(beanDefinition);
         });
     }
