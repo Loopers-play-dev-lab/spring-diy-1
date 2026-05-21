@@ -33,6 +33,10 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
 }
 
+tasks.withType<JavaCompile> {
+    options.compilerArgs.add("-parameters")
+}
+
 tasks.test {
     useJUnitPlatform()
 }

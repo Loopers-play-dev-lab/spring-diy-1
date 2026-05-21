@@ -1,9 +1,12 @@
 package com.diy.framework.web.mvc;
 
-import com.diy.app.LectureController;
-import com.diy.app.LectureRepository;
-import com.diy.app.LectureService;
-import com.diy.framework.web.mvc.controller.Controller;
+import com.diy.framework.web.context.ApplicationContext;
+import com.diy.framework.web.mvc.handler.AnnotationHandlerAdapter;
+import com.diy.framework.web.mvc.handler.AnnotationHandlerMapping;
+import com.diy.framework.web.mvc.handler.HandlerAdapter;
+import com.diy.framework.web.mvc.handler.HandlerMapping;
+import com.diy.framework.web.mvc.handler.SimpleControllerHandlerAdapter;
+import com.diy.framework.web.mvc.handler.SimpleControllerHandlerMapping;
 import com.diy.framework.web.mvc.view.DefaultViewResolver;
 import com.diy.framework.web.mvc.view.View;
 import com.diy.framework.web.mvc.view.ViewResolver;
@@ -19,24 +22,31 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
-    private final Map<String, Controller> controllers = new HashMap<>();
+    private final List<HandlerMapping> handlerMappings = new ArrayList<>();
+    private final List<HandlerAdapter> handlerAdapters = new ArrayList<>();
     private final ViewResolver viewResolver = new DefaultViewResolver();
 
     @Override
     public void init(final ServletConfig config) throws ServletException {
         super.init(config);
-        final LectureRepository lectureRepository = new LectureRepository();
-        final LectureService lectureService = new LectureService(lectureRepository);
-        final LectureController lectureController = new LectureController(lectureService);
-        controllers.put("GET /lectures", lectureController::list);
-        controllers.put("POST /lectures", lectureController::create);
-        controllers.put("PUT /lectures", lectureController::update);
-        controllers.put("DELETE /lectures", lectureController::delete);
+
+        ApplicationContext applicationContext = new ApplicationContext("com.diy");
+
+        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping(applicationContext);
+        annotationHandlerMapping.initialize();
+        handlerMappings.add(annotationHandlerMapping);
+
+        SimpleControllerHandlerMapping simpleHandlerMapping = new SimpleControllerHandlerMapping();
+        handlerMappings.add(simpleHandlerMapping);
+
+        handlerAdapters.add(new AnnotationHandlerAdapter());
+        handlerAdapters.add(new SimpleControllerHandlerAdapter());
     }
 
     private Map<String, ?> parseParams(final HttpServletRequest req) throws IOException {
@@ -52,20 +62,32 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-        final String url = req.getRequestURL().toString();
-        final String path = url.substring(url.lastIndexOf("/"));
+        final String path = req.getRequestURI();
         final String key = req.getMethod() + " " + path;
-        final Controller controller = controllers.get(key);
 
-        if (controller == null) {
+        Object handler = null;
+        for (HandlerMapping handlerMapping : handlerMappings) {
+            handler = handlerMapping.getHandler(key);
+            if (handler != null) break;
+        }
+
+        if (handler == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
         try {
             final Map<String, ?> params = parseParams(req);
-            final ModelAndView mav = controller.handleRequest(params);
-            render(mav, req, resp);
+
+            for (HandlerAdapter handlerAdapter : handlerAdapters) {
+                if (handlerAdapter.supports(handler)) {
+                    final ModelAndView mav = handlerAdapter.handle(handler, params);
+                    render(mav, req, resp);
+                    return;
+                }
+            }
+
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
