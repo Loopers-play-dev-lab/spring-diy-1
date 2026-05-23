@@ -1,5 +1,6 @@
 package com.diy.framework.beans.factory;
 
+import java.util.HashSet;
 import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
@@ -15,9 +16,24 @@ public class BeanScanner {
     }
 
     public Set<Class<?>> scanClassesTypeAnnotatedWith(final Class<? extends Annotation> annotation) {
-        return reflections.getTypesAnnotatedWith(annotation)
-                .stream()
-                .filter(type -> (!type.isAnnotation() && !type.isInterface()))
-                .collect(Collectors.toSet());
+        final Set<Class<? extends Annotation>> childAnnotations = new HashSet<>();
+        collectChildAnnotations(annotation, childAnnotations);
+
+        return childAnnotations.stream()
+            .flatMap(child -> reflections.getTypesAnnotatedWith(child).stream())
+            .filter(type -> (!type.isAnnotation() && !type.isInterface()))
+            .collect(Collectors.toSet());
+    }
+
+    private void collectChildAnnotations(
+        final Class<? extends Annotation> annotation,
+        final Set<Class<? extends Annotation>> visited
+    ) {
+        if (visited.contains(annotation)) return;
+
+        visited.add(annotation);
+        reflections.getTypesAnnotatedWith(annotation).stream()
+            .filter(Class::isAnnotation)
+            .forEach(type -> collectChildAnnotations(type.asSubclass(Annotation.class), visited));
     }
 }
