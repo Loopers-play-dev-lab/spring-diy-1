@@ -14,16 +14,20 @@ import com.diy.framework.web.server.TomcatWebServer;
 import com.diy.framework.web.servlet.DispatcherServlet;
 
 import java.util.List;
+import java.util.Map;
 
 public class LectureApplication {
     public static void main(String[] args) {
         final ApplicationContext ac = new ApplicationContext(LectureApplication.class.getPackageName());
         ac.initialize();
 
-        final AnnotationHandlerMapping annotationHM = new AnnotationHandlerMapping();
-        annotationHM.initialize(ac.getBeans());
+        final Map<String, Object> beans = ac.getBeans();
 
-        final SimpleUrlHandlerMapping simpleHM = new SimpleUrlHandlerMapping(ac.getControllerMapping());
+        final AnnotationHandlerMapping annotationHM = new AnnotationHandlerMapping();
+        annotationHM.initialize(beans);
+
+        final SimpleUrlHandlerMapping simpleHM = new SimpleUrlHandlerMapping();
+        simpleHM.initialize(beans);
 
         final List<HandlerMapping> handlerMappings = List.of(annotationHM, simpleHM);
         final List<HandlerAdapter> handlerAdapters = List.of(new AnnotationHandlerAdapter(), new SimpleControllerHandlerAdapter());
