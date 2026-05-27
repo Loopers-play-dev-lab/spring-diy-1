@@ -17,8 +17,8 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     private final Map<HandlerKey, HandlerMethod> handlerMap = new HashMap<>();
 
-    public void initialize(final Collection<Object> beans) {
-        beans.stream()
+    public void initialize(final Map<String, Object> beans) {
+        beans.values().stream()
                 .filter(bean -> bean.getClass().isAnnotationPresent(Controller.class))
                 .forEach(this::registerHandler);
     }
