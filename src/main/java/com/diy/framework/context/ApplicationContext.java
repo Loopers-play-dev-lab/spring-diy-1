@@ -1,16 +1,21 @@
 package com.diy.framework.context;
 
+import com.diy.framework.beans.factory.AnnotatedGenericBeanDefinition;
+import com.diy.framework.beans.factory.BeanDefinition;
 import com.diy.framework.beans.factory.BeanScanner;
+import com.diy.framework.beans.factory.ConfigurationClassBeanDefinition;
 import com.diy.framework.context.annotation.*;
 import com.diy.framework.web.mvc.controller.Controller;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 public class ApplicationContext {
 
     private final String basePackage;
-    private final Set<Class<?>> beanClasses = new HashSet<>();
+    private final List<BeanDefinition> beanDefinitionRegistry = new ArrayList<>();
     private final Map<String, Object> beans = new HashMap<>();
 
     public ApplicationContext(String basePackage) {
@@ -19,81 +24,96 @@ public class ApplicationContext {
 
     public void initialize() {
         BeanScanner beanScanner = new BeanScanner(this.basePackage);
-        beanClasses.addAll(beanScanner.scanClassesTypeAnnotatedWith(Component.class));
+        beanScanner.scanClassesTypeAnnotatedWith(Component.class).forEach(this::registerBean);
 
-        for(Class<?> clazz : beanClasses) {
-            if(isBeanInitialized(clazz)) {
-                continue;
+        beanDefinitionRegistry.forEach(beanDefinition -> {
+            String beanName = beanDefinition.getBeanName();
+
+            if(isBeanInitialized(beanName)) {
+                return;
             }
 
-            Object bean = createInstance(clazz);
-            saveBean(resolveBeanName(clazz), bean);
-
-            registerExternalBeans(clazz, bean);
-        }
+            createInstance(beanDefinition);
+        });
     }
 
-    private Object createInstance(Class<?> clazz) {
-        Constructor<?> constructor = findConstructor(clazz);
+    private void registerBean(Class<?> beanClass) {
+        this.beanDefinitionRegistry.add(new AnnotatedGenericBeanDefinition(beanClass));
+        postProcessBeanDefinitionRegistry(beanClass);
+    }
+
+    private void postProcessBeanDefinitionRegistry(Class<?> beanClass) {
+        Arrays.stream(beanClass.getDeclaredMethods()).filter(method -> method.isAnnotationPresent(Bean.class))
+                .forEach(method -> beanDefinitionRegistry.add(new ConfigurationClassBeanDefinition(method, beanClass.getSimpleName())));
+    }
+
+    private Object createInstance(BeanDefinition beanDefinition) {
+        Executable factoryMethod = beanDefinition.getFactoryMethod();
 
         try{
-            constructor.setAccessible(true);
+            factoryMethod.setAccessible(true);
 
-            final Object[] parameters = getConstructorParameters(constructor);
+            Object[] arguments = resolveBeanArguments(beanDefinition.getArgumentsType());
 
-            return constructor.newInstance(parameters);
+            if(beanDefinition.getFactoryBeanName() == null) {
+                Object bean = autowireConstructor((Constructor<?>) factoryMethod, arguments);
+                saveBean(beanDefinition.getBeanName(), bean);
+
+                return bean;
+            }
+
+            Object bean = instantiateUsingFactoryMethod(beanDefinition, arguments);
+            saveBean(beanDefinition.getBeanName(), bean);
+
+            return bean;
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }   finally {
-            constructor.setAccessible(false);
+            factoryMethod.setAccessible(false);
         }
     }
 
-    private Object[] getConstructorParameters(Constructor<?> constructor) {
-        List<Class<?>> parameterTypes =  Arrays.stream(constructor.getParameterTypes()).toList();
+    private Object[] resolveBeanArguments(List<Class<?>> argumentsType) {
+        return argumentsType.stream()
+                .map(argumentType -> beanDefinitionRegistry.stream()
+                        .filter(definition -> definition.getBeanClass().equals(argumentType))
+                        .findFirst()
+                        .get())
+                .map(beanDefinition -> {
+                    String beanName = beanDefinition.getBeanName();
+                    if(isBeanInitialized(beanName)) {
+                        return getBean(beanName);
+                    }
 
-        if(!beanClasses.containsAll(parameterTypes)) {
-            throw new RuntimeException("파라미터 타입이 bean이 아닙니다.");
-        }
-
-        return parameterTypes.stream().map(parameterType -> {
-            String beanName = resolveBeanName(parameterType);
-
-            if(isBeanInitialized(parameterType)) {
-                return beans.get(beanName);
-            }
-
-            Object bean = createInstance(parameterType);
-            saveBean(beanName, bean);
-
-            return bean;
-        }).toArray();
+                    return createInstance(beanDefinition);
+                }).toArray();
     }
 
-    private Constructor<?> findConstructor(Class<?> clazz) {
-        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
-
-        if(constructors.length == 1) {
-            return constructors[0];
-        }
-
-        return findAutowiredConstructor(constructors);
+    private Object autowireConstructor(Constructor<?> constructor, Object[] arguments) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+        return constructor.newInstance(arguments);
     }
 
-    private Constructor<?> findAutowiredConstructor(Constructor<?>[] constructors) {
-        Constructor<?>[] autowiredConstructors = Arrays.stream(constructors)
-                .filter(constructor -> constructor.isAnnotationPresent(Autowired.class))
-                .toArray(Constructor[]::new);
-
-        if(autowiredConstructors.length == 0) {
-            throw new RuntimeException("Autowired 생성자가 없습니다.");
+    private Object instantiateUsingFactoryMethod(BeanDefinition beanDefinition, Object[] arguments) throws InvocationTargetException, IllegalAccessException {
+        if(!(beanDefinition instanceof ConfigurationClassBeanDefinition)) {
+            throw new RuntimeException("required ConfigurationClassBeanDefinition.");
         }
 
-        if(autowiredConstructors.length > 1) {
-            throw new RuntimeException("Autowired 생성자는 하나여야합니다.");
+        Method method = (Method) beanDefinition.getFactoryMethod();
+        return method.invoke(getFactoryBean(beanDefinition), arguments);
+    }
+
+    private Object getFactoryBean(BeanDefinition beanDefinition) {
+        String factoryBeanName = beanDefinition.getFactoryBeanName();
+
+        if(isBeanInitialized(factoryBeanName)) {
+            return getBean(factoryBeanName);
         }
 
-        return autowiredConstructors[0];
+        BeanDefinition factoryBeanDefinition = beanDefinitionRegistry.stream()
+                .filter(definition -> definition.getBeanName().equals(factoryBeanName))
+                .findFirst().get();
+
+        return createInstance(factoryBeanDefinition);
     }
 
     private void saveBean(String name, Object bean) {
@@ -104,36 +124,12 @@ public class ApplicationContext {
         beans.put(name, bean);
     }
 
-    private String resolveBeanName(Class<?> clazz) {
-        String clazzName = clazz.getSimpleName();
-        return clazzName.substring(0, 1).toLowerCase() + clazzName.substring(1);
+    private boolean isBeanInitialized(String beanName) {
+        return beans.containsKey(beanName);
     }
 
-    private boolean isBeanInitialized(Class<?> clazz) {
-        return beans.containsKey(resolveBeanName(clazz));
-    }
-
-    private void registerExternalBeans(Class<?> clazz, Object bean) {
-        Arrays.stream(clazz.getDeclaredMethods())
-                .filter(m -> m.isAnnotationPresent(Bean.class))
-                .forEach(method -> {
-                    try {
-                        method.setAccessible(true);
-                        saveBean(method.getDeclaredAnnotation(Bean.class).name(), method.invoke(bean));
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        throw new RuntimeException(e);
-                    } finally {
-                        method.setAccessible(false);
-                    }
-                });
-    }
-
-    public Object getBean(Class<?> clazz) {
-        return beans.get(resolveBeanName(clazz));
-    }
-
-    public Object getBean(String name) {
-        return beans.get(name);
+    public Object getBean(String beanName) {
+        return beans.get(beanName);
     }
 
     public Map<String, Controller> getControllersMapping() {
@@ -141,7 +137,7 @@ public class ApplicationContext {
 
         beans.values().stream()
                 .filter(bean -> bean.getClass().isAnnotationPresent(RequestMapping.class)).toList()
-                .forEach(bean -> controllersMapping.put(bean.getClass().getDeclaredAnnotation(RequestMapping.class).path(), (Controller) bean));
+                .forEach(bean -> controllersMapping.put(bean.getClass().getDeclaredAnnotation(RequestMapping.class).value(), (Controller) bean));
 
         return controllersMapping;
     }
