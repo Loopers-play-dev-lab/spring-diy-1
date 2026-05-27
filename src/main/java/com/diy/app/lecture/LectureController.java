@@ -2,6 +2,7 @@ package com.diy.app.lecture;
 
 import com.diy.framework.context.annotation.Autowired;
 import com.diy.framework.context.annotation.Component;
+import com.diy.framework.context.annotation.RequestMapping;
 import com.diy.framework.web.mvc.controller.Controller;
 import com.diy.framework.web.mvc.ModelAndView;
 import com.diy.framework.web.mvc.model.Model;
@@ -12,13 +13,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
+@RequestMapping(value = "/lectures")
 public class LectureController implements Controller{
     private final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private final LectureRepository lectureRepository;
+    private final LectureService lectureService;
 
     @Autowired
-    public LectureController(LectureRepository lectureRepository) {
-        this.lectureRepository = lectureRepository;
+    public LectureController(LectureService lectureService) {
+        this.lectureService = lectureService;
     }
 
     @Override
@@ -36,25 +38,25 @@ public class LectureController implements Controller{
 
     protected ModelAndView doGet(HttpServletRequest req, HttpServletResponse resp) {
         Model model = new Model();
-        model.addAttribute("lectures", lectureRepository.findAll());
+        model.addAttribute("lectures", lectureService.getLectures());
         return new ModelAndView("lecture-list", model);
     }
 
     protected ModelAndView doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Lecture lecture = OBJECT_MAPPER.readValue(req.getInputStream(), Lecture.class);
-        lectureRepository.insert(lecture);
+        lectureService.insert(lecture);
         return new ModelAndView("redirect:/lectures");
     }
 
     protected ModelAndView doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Lecture lecture = OBJECT_MAPPER.readValue(req.getInputStream(), Lecture.class);
-        lectureRepository.update(lecture);
+        lectureService.update(lecture);
         return new ModelAndView("redirect:/lectures");
     }
 
     protected ModelAndView doDelete(HttpServletRequest req, HttpServletResponse resp) {
         final Long id = Long.valueOf(req.getParameter("id"));
-        lectureRepository.delete(id);
+        lectureService.delete(id);
         return new ModelAndView("redirect:/lectures");
     }
 }
