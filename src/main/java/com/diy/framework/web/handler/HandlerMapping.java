@@ -1,4 +1,6 @@
-package com.diy.framework.web;
+package com.diy.framework.web.handler;
+
+import com.diy.framework.web.Controller;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
