@@ -2,7 +2,7 @@ package com.diy.app.lecture;
 
 import com.diy.framework.context.annotation.Autowired;
 import com.diy.framework.context.annotation.Component;
-import com.diy.framework.context.annotation.RequestMapping;
+import com.diy.framework.web.mvc.annotation.RequestMapping;
 import com.diy.framework.web.mvc.controller.Controller;
 import com.diy.framework.web.mvc.ModelAndView;
 import com.diy.framework.web.mvc.model.Model;
@@ -11,6 +11,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @RequestMapping(value = "/lectures")
@@ -37,8 +39,10 @@ public class LectureController implements Controller{
     }
 
     protected ModelAndView doGet(HttpServletRequest req, HttpServletResponse resp) {
-        Model model = new Model();
-        model.addAttribute("lectures", lectureService.getLectures());
+        // Model model = new Model();
+        // model.addAttribute("lectures", lectureService.getLectures());
+        Map<String, Object> model = new HashMap<>();
+
         return new ModelAndView("lecture-list", model);
     }
 

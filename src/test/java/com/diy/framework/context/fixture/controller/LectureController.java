@@ -1,7 +1,7 @@
 package com.diy.framework.context.fixture.controller;
 
 import com.diy.framework.context.annotation.Component;
-import com.diy.framework.context.annotation.RequestMapping;
+import com.diy.framework.web.mvc.annotation.RequestMapping;
 import com.diy.framework.web.mvc.ModelAndView;
 import com.diy.framework.web.mvc.controller.Controller;
 
