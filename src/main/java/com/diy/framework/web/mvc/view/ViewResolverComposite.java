@@ -1,19 +1,22 @@
-package com.diy.framework.web.servlet;
+package com.diy.framework.web.mvc.view;
 
-import com.diy.framework.web.mvc.view.View;
-import com.diy.framework.web.mvc.view.ViewResolver;
 import java.util.List;
 import java.util.Objects;
 
-public class ViewResolverComposite {
+public class ViewResolverComposite implements ViewResolver {
 
     private final List<ViewResolver> viewResolvers;
 
-    public ViewResolverComposite(List<ViewResolver> viewResolvers) {
-        this.viewResolvers = viewResolvers;
+    public ViewResolverComposite() {
+        this.viewResolvers = List.of(
+                new UrlBasedViewResolver(),
+                new JspViewResolver(),
+                new HtmlViewResolver()
+        );
     }
 
-    public View resolve(String viewName) {
+    @Override
+    public View resolveViewName(String viewName) {
         return viewResolvers.stream()
                 .map(resolver -> resolver.resolveViewName(viewName))
                 .filter(Objects::nonNull)
