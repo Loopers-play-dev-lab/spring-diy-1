@@ -17,8 +17,7 @@ import java.util.*;
 
 public class ApplicationContext {
 
-    public static final Map<RequestMappingInfo, Object> handlerMapping = new HashMap<>();
-
+    private static final Map<RequestMappingInfo, Object> handlerMapping = new HashMap<>();
     private final String basePackage;
     private final List<BeanDefinition> beanDefinitionRegistry = new ArrayList<>();
     private final Map<String, Object> beans = new HashMap<>();
@@ -28,7 +27,7 @@ public class ApplicationContext {
     }
 
     public void initialize() {
-        BeanScanner beanScanner = new BeanScanner(this.basePackage);
+        BeanScanner beanScanner = new BeanScanner(this.basePackage, "com.diy.framework");
         beanScanner.scanClassesTypeAnnotatedWith(Component.class).forEach(this::registerBean);
 
         beanDefinitionRegistry.forEach(beanDefinition -> {
@@ -164,13 +163,7 @@ public class ApplicationContext {
         return beans.get(beanName);
     }
 
-    public Map<String, Controller> getControllersMapping() {
-        Map<String, Controller> controllersMapping = new HashMap<>();
-
-        beans.values().stream()
-                .filter(bean -> bean.getClass().isAnnotationPresent(RequestMapping.class)).toList()
-                .forEach(bean -> controllersMapping.put(bean.getClass().getDeclaredAnnotation(RequestMapping.class).value(), (Controller) bean));
-
-        return controllersMapping;
+    public static Map<RequestMappingInfo, Object> getHandlerMapping() {
+        return Collections.unmodifiableMap(handlerMapping);
     }
 }

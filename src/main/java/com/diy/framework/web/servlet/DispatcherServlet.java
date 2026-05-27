@@ -1,10 +1,8 @@
 package com.diy.framework.web.servlet;
 
-import com.diy.app.LectureApplication;
 import com.diy.framework.context.ApplicationContext;
 import com.diy.framework.web.method.HandlerMethod;
 import com.diy.framework.web.method.RequestMappingInfo;
-import com.diy.framework.web.mvc.annotation.RequestMapping;
 import com.diy.framework.web.mvc.annotation.RequestMethod;
 import com.diy.framework.web.mvc.controller.Controller;
 import com.diy.framework.web.mvc.ModelAndView;
@@ -12,16 +10,13 @@ import com.diy.framework.web.mvc.view.*;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
     private final List<ViewResolver> viewResolvers = new ArrayList<>();
 
@@ -65,7 +60,7 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private Object getHandler(String uri, RequestMethod requestMethod) {
-        Map<RequestMappingInfo, Object> handlerMapping = ApplicationContext.handlerMapping;
+        Map<RequestMappingInfo, Object> handlerMapping = ApplicationContext.getHandlerMapping();
 
         for(RequestMappingInfo mapping : handlerMapping.keySet()) {
             if(mapping.isMatch(uri, requestMethod)) {
