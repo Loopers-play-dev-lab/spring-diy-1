@@ -127,24 +127,8 @@ public class ApplicationContext {
         }).toArray();
     }
 
-    public Collection<Object> getBeans() {
-        return Collections.unmodifiableCollection(beans.values());
-    }
-
-    public Map<String, com.diy.framework.web.mvc.Controller> getControllerMapping() {
-        final Map<String, com.diy.framework.web.mvc.Controller> mapping = new HashMap<>();
-
-        beans.values().stream()
-                .filter(bean -> bean instanceof com.diy.framework.web.mvc.Controller)
-                .forEach(bean -> {
-                    final RequestMapping annotation =
-                            bean.getClass().getAnnotation(RequestMapping.class);
-                    if (annotation != null) {
-                        mapping.put(annotation.value(), (com.diy.framework.web.mvc.Controller) bean);
-                    }
-                });
-
-        return mapping;
+    public Map<String, Object> getBeans() {
+        return Collections.unmodifiableMap(beans);
     }
 
     private boolean isBeanInitialized(final Class<?> clazz) {
