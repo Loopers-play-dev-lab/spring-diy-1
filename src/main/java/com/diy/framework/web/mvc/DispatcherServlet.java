@@ -38,11 +38,14 @@ public class DispatcherServlet extends HttpServlet {
 
         ApplicationContext applicationContext = new ApplicationContext("com.diy");
 
+        // 1) 애너테이션 매핑(METHOD + URL)
         AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping(applicationContext);
         annotationHandlerMapping.initialize();
         handlerMappings.add(annotationHandlerMapping);
 
-        SimpleControllerHandlerMapping simpleHandlerMapping = new SimpleControllerHandlerMapping();
+        // 2) 인터페이스 매핑(URL)
+        SimpleControllerHandlerMapping simpleHandlerMapping = new SimpleControllerHandlerMapping(applicationContext);
+        simpleHandlerMapping.initialize();
         handlerMappings.add(simpleHandlerMapping);
 
         handlerAdapters.add(new AnnotationHandlerAdapter());
