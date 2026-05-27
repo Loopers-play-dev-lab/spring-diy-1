@@ -6,7 +6,7 @@ import com.diy.framework.context.annotation.Component;
 @Component
 public class AppConfig {
 
-    @Bean(name = "dataSource")
+    @Bean(value = "dataSource")
     public DataSource dataSource() {
         return new DataSource();
     }

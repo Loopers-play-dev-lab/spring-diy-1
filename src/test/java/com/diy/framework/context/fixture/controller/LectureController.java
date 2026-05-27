@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Component
-@RequestMapping(path = "/lectures")
+@RequestMapping(value = "/lectures")
 public class LectureController implements Controller {
 
     @Override
