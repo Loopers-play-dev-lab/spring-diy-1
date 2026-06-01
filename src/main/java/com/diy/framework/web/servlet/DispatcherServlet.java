@@ -1,8 +1,7 @@
 package com.diy.framework.web.servlet;
 
 import com.diy.framework.context.ApplicationContext;
-import com.diy.framework.web.mvc.ControllerV1;
-import com.diy.framework.web.mvc.controller.ControllerDefinition;
+import com.diy.framework.web.mvc.controller.HandlerController;
 import com.diy.framework.web.mvc.view.JspViewResolver;
 import com.diy.framework.web.mvc.view.ModelAndView;
 import com.diy.framework.web.mvc.view.UrlBasedViewResolver;
@@ -12,7 +11,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,7 +23,7 @@ import java.util.Map;
 
 //@WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
-    private final Map<String, ControllerDefinition> controllerDefinitionMapping;
+    private final Map<String, HandlerController> controllerDefinitionMapping;
     private final List<ViewResolver> viewResolvers = new ArrayList<>();
 
     public DispatcherServlet(final ApplicationContext applicationContext) {
@@ -36,7 +34,7 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     public void init(final ApplicationContext applicationContext) {
-        List<ControllerDefinition> beans = applicationContext.getControllerBeans();
+        List<HandlerController> beans = applicationContext.getControllerBeans();
         beans.forEach(bean -> {
             controllerDefinitionMapping.put(bean.getUrl(), bean);
         });
@@ -46,7 +44,7 @@ public class DispatcherServlet extends HttpServlet {
     @Override
     protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
         final String uri = req.getRequestURI();
-        final ControllerDefinition controller = controllerDefinitionMapping.get(uri);
+        final HandlerController controller = controllerDefinitionMapping.get(uri);
 
         if (controller == null) {
             return;

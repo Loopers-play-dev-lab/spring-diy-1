@@ -9,14 +9,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
-public class AnnotatedControllerDefinition implements ControllerDefinition {
+public class HandlerAnnotatedController implements HandlerController {
     private final String url;
     private final Object controller;
 
-    public AnnotatedControllerDefinition(String url, Object controller) {
+    public HandlerAnnotatedController(String url, Object controller) {
         this.controller = controller;
         this.url = url;
     }

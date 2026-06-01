@@ -6,11 +6,11 @@ import com.diy.framework.web.mvc.view.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class InterfaceControllerDefinition implements ControllerDefinition {
+public class handlerControllerDefinition implements HandlerController {
     private final ControllerV1 controller;
     private final String url;
 
-    public InterfaceControllerDefinition(String url,ControllerV1 controller) {
+    public handlerControllerDefinition(String url, ControllerV1 controller) {
         this.controller = controller;
         this.url = url;
     }

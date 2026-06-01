@@ -9,9 +9,9 @@ import com.diy.framework.context.annotation.Component;
 import com.diy.framework.context.annotation.Controller;
 import com.diy.framework.context.annotation.RequestMapping;
 import com.diy.framework.web.mvc.ControllerV1;
-import com.diy.framework.web.mvc.controller.AnnotatedControllerDefinition;
-import com.diy.framework.web.mvc.controller.ControllerDefinition;
-import com.diy.framework.web.mvc.controller.InterfaceControllerDefinition;
+import com.diy.framework.web.mvc.controller.HandlerAnnotatedController;
+import com.diy.framework.web.mvc.controller.HandlerController;
+import com.diy.framework.web.mvc.controller.handlerControllerDefinition;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
@@ -30,9 +30,8 @@ public class ApplicationContext {
     }
 
     public void initialize() {
-        final BeanScanner beanScanner = new BeanScanner(basePackage);
+        final BeanScanner beanScanner = new BeanScanner(basePackage, "com.diy.framework");
         beanScanner.scanClassesTypeAnnotatedWith(Component.class).forEach(this::registerBean);
-        beanScanner.scanClassesTypeAnnotatedWith(Controller.class).forEach(this::registerBean);
 
         beanDefinitionRegistry.forEach(beanDefinition -> {
             final String beanName = beanDefinition.getBeanName();
@@ -45,18 +44,18 @@ public class ApplicationContext {
         });
     }
 
-    public List<ControllerDefinition> getControllerBeans() {
+    public List<HandlerController> getControllerBeans() {
         return beanDefinitionRegistry.stream().map(beanDefinition -> {
             System.out.println(beanDefinition.getBeanName());
             if(ControllerV1.class.isAssignableFrom(beanDefinition.getBeanClass())) {
                 Object bean = beans.get(beanDefinition.getBeanName());
-                return new InterfaceControllerDefinition(beanDefinition.getBeanName(), (ControllerV1) bean);
+                return new handlerControllerDefinition(beanDefinition.getBeanName(), (ControllerV1) bean);
             }
 
             if(beanDefinition.getBeanClass().isAnnotationPresent(Controller.class)) {
                 Object bean = beans.get(beanDefinition.getBeanName());
                 String path = beanDefinition.getBeanClass().getAnnotation(RequestMapping.class).value();
-                return new AnnotatedControllerDefinition(path, bean);
+                return new HandlerAnnotatedController(path, bean);
             }
 
             return null;
