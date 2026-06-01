@@ -52,6 +52,9 @@ public class DispatcherServlet extends HttpServlet {
         final Map<String, HandlerAdapter> matchingBeans =
                 BeanFactoryUtils.beansOfTypeIncludingAncestors(context, HandlerAdapter.class);
         this.handlerAdapters = new ArrayList<>(matchingBeans.values());
+        for (HandlerAdapter handlerAdapter : this.handlerAdapters) {
+            System.out.println(handlerAdapter.getClass().getName());
+        }
     }
 
     private void initViewResolvers(final ApplicationContext context) {
@@ -71,11 +74,12 @@ public class DispatcherServlet extends HttpServlet {
         try {
             final Object handler = getHandler(req);
 
+            System.out.println("test");
             final HandlerAdapter ha = getHandlerAdapter(handler);
-
             final ModelAndView mv = ha.handle(req, resp, handler);
-
-            render(mv, req, resp);
+            if(mv != null) {
+                render(mv, req, resp);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
