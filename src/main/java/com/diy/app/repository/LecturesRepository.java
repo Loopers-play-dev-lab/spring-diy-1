@@ -1,22 +1,18 @@
 package com.diy.app.repository;
 
 import com.diy.app.domain.Lecture;
-import com.diy.framework.web.context.annotation.Autowired;
-import com.diy.framework.web.context.annotation.Component;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@Component
 public class LecturesRepository {
     private static final LecturesRepository INSTANCE = new LecturesRepository();
     long id;
     private static Map<Long, Lecture> store;
 
-    @Autowired
-    public LecturesRepository() {
+    private LecturesRepository() {
         id = 0L;
         store = new HashMap<>();
     }
