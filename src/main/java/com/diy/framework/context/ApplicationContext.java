@@ -5,7 +5,10 @@ import com.diy.framework.beans.factory.BeanDefinition;
 import com.diy.framework.beans.factory.BeanScanner;
 import com.diy.framework.beans.factory.ConfigurationClassBeanDefinition;
 import com.diy.framework.context.annotation.*;
-import com.diy.framework.web.mvc.controller.Controller;
+import com.diy.framework.web.method.HandlerMethod;
+import com.diy.framework.web.method.RequestMappingInfo;
+import com.diy.framework.web.method.RequestMethodsRequestCondition;
+import com.diy.framework.web.mvc.annotation.RequestMapping;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
@@ -14,6 +17,7 @@ import java.util.*;
 
 public class ApplicationContext {
 
+    private static final Map<RequestMappingInfo, Object> handlerMapping = new HashMap<>();
     private final String basePackage;
     private final List<BeanDefinition> beanDefinitionRegistry = new ArrayList<>();
     private final Map<String, Object> beans = new HashMap<>();
@@ -23,7 +27,7 @@ public class ApplicationContext {
     }
 
     public void initialize() {
-        BeanScanner beanScanner = new BeanScanner(this.basePackage);
+        BeanScanner beanScanner = new BeanScanner(this.basePackage, "com.diy.framework");
         beanScanner.scanClassesTypeAnnotatedWith(Component.class).forEach(this::registerBean);
 
         beanDefinitionRegistry.forEach(beanDefinition -> {
@@ -59,17 +63,44 @@ public class ApplicationContext {
                 Object bean = autowireConstructor((Constructor<?>) factoryMethod, arguments);
                 saveBean(beanDefinition.getBeanName(), bean);
 
+                extractHandlerMethod(beanDefinition, bean);
+
                 return bean;
             }
 
             Object bean = instantiateUsingFactoryMethod(beanDefinition, arguments);
             saveBean(beanDefinition.getBeanName(), bean);
 
+            extractController(beanDefinition, bean);
+
             return bean;
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }   finally {
             factoryMethod.setAccessible(false);
+        }
+    }
+
+    private void extractHandlerMethod(BeanDefinition beanDefinition, Object bean) {
+        if(beanDefinition.getBeanClass().isAnnotationPresent(Controller.class)) {
+            Class<?> controllerClass = beanDefinition.getBeanClass();
+            Arrays.stream(controllerClass.getDeclaredMethods())
+                    .filter(method -> method.isAnnotationPresent(RequestMapping.class))
+                    .forEach(method -> {
+                        RequestMapping mapping = method.getAnnotation(RequestMapping.class);
+
+                        RequestMappingInfo mappingInfo = new RequestMappingInfo(mapping.value(), new RequestMethodsRequestCondition(mapping.methods()));
+                        HandlerMethod handlerMethod = new HandlerMethod(bean, method);
+
+                        handlerMapping.put(mappingInfo, handlerMethod);
+                    });
+        }
+    }
+
+    private void extractController(BeanDefinition beanDefinition, Object bean) {
+        if(Arrays.stream(beanDefinition.getBeanClass().getGenericInterfaces()).toList().contains(com.diy.framework.web.mvc.controller.Controller.class)) {
+            RequestMappingInfo mappingInfo = new RequestMappingInfo(beanDefinition.getBeanName(), new RequestMethodsRequestCondition());
+            handlerMapping.put(mappingInfo, bean);
         }
     }
 
@@ -132,13 +163,7 @@ public class ApplicationContext {
         return beans.get(beanName);
     }
 
-    public Map<String, Controller> getControllersMapping() {
-        Map<String, Controller> controllersMapping = new HashMap<>();
-
-        beans.values().stream()
-                .filter(bean -> bean.getClass().isAnnotationPresent(RequestMapping.class)).toList()
-                .forEach(bean -> controllersMapping.put(bean.getClass().getDeclaredAnnotation(RequestMapping.class).value(), (Controller) bean));
-
-        return controllersMapping;
+    public static Map<RequestMappingInfo, Object> getHandlerMapping() {
+        return Collections.unmodifiableMap(handlerMapping);
     }
 }
