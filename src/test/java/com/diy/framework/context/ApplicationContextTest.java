@@ -1,11 +1,10 @@
 package com.diy.framework.context;
 
-import com.diy.framework.context.fixture.autowired.Repository;
 import com.diy.framework.context.fixture.autowired.Service;
 import com.diy.framework.context.fixture.bean.DataSource;
 import com.diy.framework.context.fixture.controller.LectureController;
 import com.diy.framework.context.fixture.defaults.DefaultConstructorContext;
-import com.diy.framework.web.mvc.controller.Controller;
+import com.diy.framework.web.method.RequestMappingInfo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +22,7 @@ class ApplicationContextTest {
         ApplicationContext applicationContext = new ApplicationContext("com.diy.framework.context.fixture.defaults");
         applicationContext.initialize();
 
-        assertThat(applicationContext.getBean(DefaultConstructorContext.class))
+        assertThat(applicationContext.getBean("DefaultConstructorContext"))
                 .isInstanceOf(DefaultConstructorContext.class)
                 .isNotNull();
     }
@@ -44,8 +43,8 @@ class ApplicationContextTest {
         ApplicationContext applicationContext = new ApplicationContext("com.diy.framework.context.fixture.autowired");
         applicationContext.initialize();
 
-        Object service = applicationContext.getBean(Service.class);
-        Object repository = applicationContext.getBean(Repository.class);
+        Object service = applicationContext.getBean("Service");
+        Object repository = applicationContext.getBean("Repository");
 
         assertThat(service).isInstanceOf(Service.class).isNotNull();
         assertThat(((Service) service).getRepository()).isInstanceOf(repository.getClass()).isNotNull();
@@ -57,7 +56,7 @@ class ApplicationContextTest {
         ApplicationContext applicationContext = new ApplicationContext("com.diy.framework.context.fixture.controller");
         applicationContext.initialize();
 
-        Map<String, Controller> controllersMapping = applicationContext.getControllersMapping();
+        Map<RequestMappingInfo, Object> controllersMapping = ApplicationContext.getHandlerMapping();
 
         assertThat(controllersMapping).hasSize(1);
         assertThat(controllersMapping.get("/lectures")).isInstanceOf(LectureController.class).isNotNull();
