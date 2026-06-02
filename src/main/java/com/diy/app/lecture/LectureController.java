@@ -1,8 +1,6 @@
 package com.diy.app.lecture;
 
 import com.diy.framework.context.annotation.Autowired;
-import com.diy.framework.context.annotation.Component;
-import com.diy.framework.web.mvc.annotation.RequestMapping;
 import com.diy.framework.web.mvc.controller.Controller;
 import com.diy.framework.web.mvc.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,10 +11,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
-@RequestMapping("/lectures/v1")
 public class LectureController implements Controller {
-    private final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final LectureService lectureService;
 
     @Autowired
@@ -45,15 +40,20 @@ public class LectureController implements Controller {
     }
 
     protected ModelAndView doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Lecture lecture = OBJECT_MAPPER.readValue(req.getInputStream(), Lecture.class);
+        Lecture lecture = getLecture(req);
         lectureService.insert(lecture);
         return new ModelAndView("redirect:/lectures");
     }
 
     protected ModelAndView doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Lecture lecture = OBJECT_MAPPER.readValue(req.getInputStream(), Lecture.class);
+        Lecture lecture = getLecture(req);
         lectureService.update(lecture);
         return new ModelAndView("redirect:/lectures");
+    }
+
+    private Lecture getLecture(HttpServletRequest req) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(req.getInputStream(), Lecture.class);
     }
 
     protected ModelAndView doDelete(HttpServletRequest req, HttpServletResponse resp) {
