@@ -22,14 +22,9 @@ public class LectureControllerV3 {
     }
 
     @RequestMapping(value = "/v3/lectures", methods = {RequestMethod.POST})
-    private LectureDto.Lecture createLecture(final HttpServletRequest req) throws IOException {
-        final byte[] bodyBytes = req.getInputStream().readAllBytes();
-        final String body = new String(bodyBytes, StandardCharsets.UTF_8);
+    private LectureDto.Lecture createLecture(final LectureDto.CreateLecture body) throws IOException {
 
-
-        final Lecture lecture = new ObjectMapper().readValue(body, Lecture.class);
-
-        return new LectureDto.Lecture(lecture.getId(), lecture.getName());
+        return new LectureDto.Lecture(body.getId(), body.getName());
     }
 
     @RequestMapping(value = "/v3/lectures", methods = {RequestMethod.GET})
