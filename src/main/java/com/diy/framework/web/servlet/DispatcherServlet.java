@@ -59,7 +59,16 @@ public class DispatcherServlet extends HttpServlet {
                 BeanFactoryUtils.beansOfTypeIncludingAncestors(context, ViewResolver.class);
         this.viewResolvers = new ArrayList<>(matchingBeans.values());
 
-        this.viewResolvers.sort(Comparator.comparingInt(o -> ((Ordered) o).getOrder()));
+        this.viewResolvers.sort(Comparator.comparingInt(o -> {
+            try {
+                if (o.getClass().getDeclaredMethod("getOrder") != null) {
+                    return ((Ordered) o).getOrder();
+                }
+                else return 1;
+            } catch (NoSuchMethodException e) {
+                return 1;
+            }
+        }));
     }
 
     @Override
