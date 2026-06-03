@@ -72,10 +72,10 @@ public class DispatcherServlet extends HttpServlet {
             final Object handler = getHandler(req);
 
             final HandlerAdapter ha = getHandlerAdapter(handler);
-
             final ModelAndView mv = ha.handle(req, resp, handler);
-
-            render(mv, req, resp);
+            if(mv != null) {
+                render(mv, req, resp);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
