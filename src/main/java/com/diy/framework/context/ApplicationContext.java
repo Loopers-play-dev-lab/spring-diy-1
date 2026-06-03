@@ -102,9 +102,27 @@ public class ApplicationContext implements BeanFactory {
     public <A extends Annotation> A findAnnotationOnBean(final Object bean, final Class<A> annotationType) {
         final Set<Class<?>> classes = mapToSuperTypes(bean.getClass());
         for (Class<?> clazz : classes) {
-            if (clazz.isAnnotationPresent(annotationType)) {
-                return clazz.getAnnotation(annotationType);
-            }
+            A annotation = findAnnotation(clazz, annotationType, new HashSet<>());
+            if (annotation != null) return annotation;
+        }
+
+        return null;
+    }
+
+    private <A extends Annotation> A findAnnotation(
+        final Class<?> bean,
+        final Class<A> annotationType,
+        final Set<Class<?>> visited
+    ) {
+        final A annotation = bean.getDeclaredAnnotation(annotationType);
+        if (annotation != null) return annotation;
+
+        for (Annotation current : bean.getDeclaredAnnotations()) {
+            Class<? extends Annotation> type = current.annotationType();
+            if (!visited.add(type)) continue;
+
+            A found = findAnnotation(type, annotationType, visited);
+            if (found != null) return found;
         }
 
         return null;
