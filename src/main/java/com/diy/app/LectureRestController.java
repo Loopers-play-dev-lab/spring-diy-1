@@ -14,7 +14,16 @@ public class LectureRestController {
     }
 
     @RequestMapping(value = "/lecture", methods = {RequestMethod.GET})
-    public String getLecture() {
+    public String getLecture(String id) {
+        System.out.println("id = " + id);
         return new String("hello rest");
+    }
+
+    @RequestMapping(value = "/lecture", methods = {RequestMethod.POST})
+    public Lecture setLecture(String id) {
+        System.out.println("set lecture id = " + id);
+        Lecture lecture = new Lecture();
+        lecture.setId(1L);
+        return lecture;
     }
 }

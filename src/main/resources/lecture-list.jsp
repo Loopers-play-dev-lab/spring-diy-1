@@ -9,7 +9,8 @@
 </head>
 <body>
 <a href="/lecture-registration.jsp">등록</a>
-<button id="rest-button">rest test</button>
+<button id="rest-button">rest get test</button>
+<button id="rest-post-button">rest post test</button>
 <c:forEach var="lecture" items="${lectures}">
     <li>id: ${lecture.id}</li>
     <li>pw: ${lecture.name}</li>
@@ -19,7 +20,18 @@
 </body>
 <script>
     document.getElementById("rest-button").addEventListener("click", function () {
-        fetch("http://localhost:8080/lecture").then(res => res.json()).then(data => console.log(data));
+        fetch("http://localhost:8080/lecture?id=test").then(res => res.json()).then(data => console.log(data));
+    });
+    document.getElementById("rest-post-button").addEventListener("click", function () {
+        fetch("http://localhost:8080/lecture", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                id: "test"
+            })
+        }).then(res => res.json()).then(data => console.log(data));
     });
 </script>
 </html>
