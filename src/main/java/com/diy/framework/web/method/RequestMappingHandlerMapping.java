@@ -88,7 +88,6 @@ public class RequestMappingHandlerMapping extends AbstractHandlerMapping {
 
     private void registerHandlerMethod(final Object handler, final Method method, final RequestMappingInfo mapping) {
 
-        System.out.println(handler.getClass().getName());
         this.mappingRegistry.register(mapping, handler, method);
     }
 
