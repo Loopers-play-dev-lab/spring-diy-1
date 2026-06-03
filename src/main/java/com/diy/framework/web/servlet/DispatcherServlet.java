@@ -75,7 +75,10 @@ public class DispatcherServlet extends HttpServlet {
 
             final ModelAndView mv = ha.handle(req, resp, handler);
 
-            render(mv, req, resp);
+            // null이면 HandlerMethod에서 handle을 통해 JSON이 이미 body로 응답 써졌으므로 뷰 렌더링 스킵
+            if (mv != null) {
+                render(mv, req, resp);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

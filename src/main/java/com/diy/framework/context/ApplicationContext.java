@@ -102,8 +102,28 @@ public class ApplicationContext implements BeanFactory {
     public <A extends Annotation> A findAnnotationOnBean(final Object bean, final Class<A> annotationType) {
         final Set<Class<?>> classes = mapToSuperTypes(bean.getClass());
         for (Class<?> clazz : classes) {
-            if (clazz.isAnnotationPresent(annotationType)) {
-                return clazz.getAnnotation(annotationType);
+            final A annotation = findAnnotation(clazz.getAnnotations(), annotationType, new HashSet<>());
+            if (annotation != null) {
+                return annotation;
+            }
+        }
+
+        return null;
+    }
+
+    // 직접 붙은 애너테이션뿐 아니라 메타애너테이션(애너테이션에 붙은 애너테이션)까지 재귀로 따라간다.
+    private <A extends Annotation> A findAnnotation(final Annotation[] annotations, final Class<A> annotationType, final Set<Class<? extends Annotation>> visited) {
+        for (final Annotation annotation : annotations) {
+            final Class<? extends Annotation> type = annotation.annotationType();
+            if (type == annotationType) {
+                return (A) annotation;
+            }
+            if (type.getName().startsWith("java.lang.annotation.") || !visited.add(type)) {
+                continue;
+            }
+            final A meta = findAnnotation(type.getAnnotations(), annotationType, visited);
+            if (meta != null) {
+                return meta;
             }
         }
 
