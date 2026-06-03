@@ -3,6 +3,7 @@ package com.diy.framework.web.method;
 import com.diy.framework.beans.factory.BeanFactoryUtils;
 import com.diy.framework.context.ApplicationContext;
 import com.diy.framework.context.annotation.Controller;
+import com.diy.framework.context.annotation.RestController;
 import com.diy.framework.web.mvc.anotation.RequestMapping;
 import com.diy.framework.web.mvc.anotation.RequestMethod;
 import com.diy.framework.web.servlet.handler.AbstractHandlerMapping;
@@ -24,6 +25,7 @@ public class RequestMappingHandlerMapping extends AbstractHandlerMapping {
     @Override
     protected void initApplicationContext(final ApplicationContext context) {
         final Map<String, Object> matchingBeans = BeanFactoryUtils.beansOfAnnotated(context, Controller.class);
+        matchingBeans.putAll(BeanFactoryUtils.beansOfAnnotated(context, RestController.class));
 
         matchingBeans.forEach((key, handler) -> detectHandlerMethods(handler));
     }

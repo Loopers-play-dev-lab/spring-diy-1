@@ -5,7 +5,9 @@ import com.diy.framework.context.annotation.Configuration;
 import com.diy.framework.web.method.RequestMappingHandlerMapping;
 import com.diy.framework.web.mvc.SimpleControllerHandlerAdapter;
 import com.diy.framework.web.mvc.method.RequestMappingHandlerAdapter;
+import com.diy.framework.web.mvc.view.HttpMessageConverter;
 import com.diy.framework.web.mvc.view.JspViewResolver;
+import com.diy.framework.web.mvc.view.UrlBasedViewResolver;
 import com.diy.framework.web.servlet.handler.BeanNameUrlHandlerMapping;
 
 @Configuration
@@ -41,4 +43,10 @@ public class WebMvcConfigurationSupport {
     public JspViewResolver jspViewResolver() {
         return new JspViewResolver();
     }
+
+    @Bean
+    public UrlBasedViewResolver urlBasedViewResolver() { return new UrlBasedViewResolver(); }
+
+    @Bean
+    public HttpMessageConverter httpMessageConverter() { return new HttpMessageConverter(); }
 }

@@ -9,6 +9,7 @@
 </head>
 <body>
 <a href="/lecture-registration.jsp">등록</a>
+<button id="rest-button">rest test</button>
 <c:forEach var="lecture" items="${lectures}">
     <li>id: ${lecture.id}</li>
     <li>pw: ${lecture.name}</li>
@@ -16,4 +17,9 @@
     <br>
 </c:forEach>
 </body>
+<script>
+    document.getElementById("rest-button").addEventListener("click", function () {
+        fetch("http://localhost:8080/lecture").then(res => res.json()).then(data => console.log(data));
+    });
+</script>
 </html>

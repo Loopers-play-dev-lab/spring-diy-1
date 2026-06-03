@@ -13,8 +13,8 @@ public class LectureRestController {
         this.lectureService = lectureService;
     }
 
-    @RequestMapping(value = "/lectures", methods = {RequestMethod.GET})
-    public Lecture getLecture(String id) {
-        return lectureService.getLectures().stream().filter(lecture -> lecture.getId().equals(Long.parseLong(id))).findFirst().orElse(null);
+    @RequestMapping(value = "/lecture", methods = {RequestMethod.GET})
+    public String getLecture() {
+        return new String("hello rest");
     }
 }
