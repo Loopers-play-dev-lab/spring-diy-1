@@ -10,17 +10,13 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Stream;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class HandlerMethod {
 
@@ -40,14 +36,20 @@ public class HandlerMethod {
             final byte[] bodyBytes = req.getInputStream().readAllBytes();
             final String body = new String(bodyBytes, StandardCharsets.UTF_8);
 
+            AtomicInteger bodyParamCount = new AtomicInteger();
 
             final Object[] parameters = Arrays.stream(method.getParameterTypes())
                     .map(parameterType -> {
                         if (ServletRequest.class.isAssignableFrom(parameterType)) return req;
                         else if (ServletResponse.class.isAssignableFrom(parameterType)) return res;
                         else
+                            bodyParamCount.getAndIncrement();
                             return deserializedBody(parameterType, body);
                     }).toArray();
+
+            if(bodyParamCount.get() > 1) {
+                throw new RuntimeException("controller에 사용 가능한 body parameter은 1개 입니다.");
+            }
 
             final Object view = this.method.invoke(bean, parameters);
 
