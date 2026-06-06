@@ -1,6 +1,6 @@
 package com.diy.framework.web.servlet;
 
-import com.diy.framework.web.mvc.Controller;
+import com.diy.framework.web.annotations.RequestMethod;
 import com.diy.framework.web.mvc.view.JspViewResolver;
 import com.diy.framework.web.mvc.view.ModelAndView;
 import com.diy.framework.web.mvc.view.UrlBasedViewResolver;
@@ -20,27 +20,29 @@ import java.util.List;
 import java.util.Map;
 
 public class DispatcherServlet extends HttpServlet {
-    private final Map<String, Controller> controllersMapping;
+    private final Map<RequestHandlerKey, HandlerExecution> handlerExecutions;
     private final List<ViewResolver> viewResolvers = new ArrayList<>();
 
-    public DispatcherServlet(final Map<String, Controller> controllersMapping) {
-        this.controllersMapping = controllersMapping;
+    public DispatcherServlet(final Map<RequestHandlerKey, HandlerExecution> handlerExecutions) {
+        this.handlerExecutions = handlerExecutions;
         this.viewResolvers.add(new UrlBasedViewResolver());
         this.viewResolvers.add(new JspViewResolver());
     }
 
     @Override
     protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-        final String uri = req.getRequestURI();
+        final String uri = normalizePath(req.getRequestURI());
+        final RequestMethod requestMethod = RequestMethod.valueOf(req.getMethod());
 
-        final Controller controller = controllersMapping.get(uri);
+        final HandlerExecution handlerExecution = handlerExecutions.get(new RequestHandlerKey(uri, requestMethod));
 
-        if (controller == null) {
+        if (handlerExecution == null) {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
         try {
-            final ModelAndView mav = controller.handleRequest(req, resp);
+            final ModelAndView mav = handlerExecution.handle(req, resp);
             render(mav, req, resp);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -80,5 +82,18 @@ public class DispatcherServlet extends HttpServlet {
         } else {
             return req.getParameterMap();
         }
+    }
+
+    private String normalizePath(final String path) {
+        if (path == null || path.isBlank() || "/".equals(path)) {
+            return "/";
+        }
+
+        String normalizedPath = path.startsWith("/") ? path : "/" + path;
+        if (normalizedPath.endsWith("/")) {
+            return normalizedPath.substring(0, normalizedPath.length() - 1);
+        }
+
+        return normalizedPath;
     }
 }

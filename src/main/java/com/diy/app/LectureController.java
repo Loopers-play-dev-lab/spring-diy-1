@@ -1,7 +1,8 @@
 package com.diy.app;
 
+import com.diy.framework.web.annotations.Controller;
 import com.diy.framework.web.annotations.RequestMapping;
-import com.diy.framework.web.mvc.Controller;
+import com.diy.framework.web.annotations.RequestMethod;
 import com.diy.framework.web.mvc.view.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -13,8 +14,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+@Controller
 @RequestMapping("/lectures")
-public class LectureController implements Controller {
+public class LectureController {
 
     private final LectureService lectureService;
 
@@ -22,17 +24,7 @@ public class LectureController implements Controller {
         this.lectureService = lectureService;
     }
 
-    @Override
-    public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        if ("POST".equals(request.getMethod())) {
-            return doPost(request, response);
-        } else if ("GET".equals(request.getMethod())) {
-            return doGet(request, response);
-        }
-
-        throw new RuntimeException("404 Not Found");
-    }
-
+    @RequestMapping(methods = RequestMethod.GET)
     public ModelAndView doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("=== doGet called ===");
 
@@ -43,6 +35,7 @@ public class LectureController implements Controller {
         return new ModelAndView("lecture-list", model);
     }
 
+    @RequestMapping(methods = RequestMethod.POST)
     public ModelAndView doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("=== doPost called ===");
 
@@ -52,6 +45,7 @@ public class LectureController implements Controller {
         return new ModelAndView("redirect:/lectures");
     }
 
+    @RequestMapping(methods = RequestMethod.PUT)
     public ModelAndView doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("=== doPut called ===");
 
@@ -61,6 +55,7 @@ public class LectureController implements Controller {
         return new ModelAndView("redirect:/lectures");
     }
 
+    @RequestMapping(methods = RequestMethod.DELETE)
     public ModelAndView doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("=== doDelete called ===");
 
