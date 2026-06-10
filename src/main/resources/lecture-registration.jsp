@@ -10,13 +10,34 @@
 <body>
 <form id="registrationForm">
     <label for="name">이름:</label>
-    <input type="text" id="name" name="name" required>
+    <input type="hidden" id="lectureId" name="lectureId" value="${lectureId}"/>
+    <input type="text" id="name" name="name" value="${name}" required>
     <label for="price">가격:</label>
-    <input type="number" id="price" name="price" required>
+    <input type="number" id="price" name="price" value="${price}" required>
     <button type="submit">등록</button>
 </form>
 
 <script>
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const lectureId = urlParams.get('lectureId');
+        if (lectureId == null || lectureId === '') {
+            return;
+        }
+
+        fetch('http://localhost:8080/lecture?lectureId=' + lectureId)
+            .then(response => {
+                return response.json()
+            })
+            .then(data => {
+                console.log(data);
+                document.getElementById("lectureId").value = data.lectureId;
+                document.getElementById("name").value = data.name;
+                document.getElementById("price").value = data.price;
+            }
+            );
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
         const registrationForm = document.getElementById("registrationForm");
         const resultDiv = document.getElementById("result");
@@ -28,18 +49,22 @@
 
             const lecture = {};
             formData.forEach((value, key) => {
-                lecture[key] = value;
+                if (value !== '' && value !== null) {
+                    console.log(key, value);
+                    lecture[key] = value;
+                }
             });
 
             const jsonData = JSON.stringify(lecture);
 
             fetch("http://localhost:8080/lectures", {
-                method: "POST",
+                method: ('lectureId' in lecture) ? "PUT" : "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: jsonData
             }).then(response => {
+                console.log(response);
                 if (response.redirected) {
                     window.location.href = response.url;
                 }

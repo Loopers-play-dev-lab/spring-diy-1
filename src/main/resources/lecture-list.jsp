@@ -12,11 +12,31 @@
 <button id="rest-button">rest get test</button>
 <button id="rest-post-button">rest post test</button>
 <c:forEach var="lecture" items="${lectures}">
-    <li>id: ${lecture.id}</li>
-    <li>pw: ${lecture.name}</li>
-    <li>pw: ${lecture.price}</li>
+    <div id = "${lecture.lectureId}">
+        <li>id: <a href="/lecture-registration?lectureId=${lecture.lectureId}">${lecture.lectureId}</a></li>
+        <li>name: ${lecture.name}</li>
+        <li>price: ${lecture.price}</li>
+        <button id=`del-${lecture.lectureId}`>delete</button>
+    </div>
     <br>
 </c:forEach>
+
+<script>
+    buttons = document.querySelectorAll("button");
+    buttons.forEach(button => {
+        button.addEventListener("click", () => {
+            const lectureId = button.parentElement.id;
+            fetch('/lectures?lectureId=' + lectureId, {
+                method: "DELETE"
+            }).then(res => {
+                console.log(res)
+                if (res.ok) {
+                    window.location.href = "/lectures";
+                }
+            })
+        })
+    })
+</script>
 </body>
 <script>
     document.getElementById("rest-button").addEventListener("click", function () {
