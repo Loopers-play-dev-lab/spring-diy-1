@@ -14,11 +14,13 @@ public class JspView implements View {
         this.viewName = viewName;
     }
 
-    public void render(Map<String, Object> model, final HttpServletRequest req, final HttpServletResponse res) throws ServletException, IOException {
-        final RequestDispatcher requestDispatcher = req.getRequestDispatcher(viewName);
-        for (Map.Entry<String, Object> entry : model.entrySet()) {
+    @Override
+    public void render(final Map<String, ?> model, final HttpServletRequest req, final HttpServletResponse res) throws ServletException, IOException {
+        for (final Map.Entry<String, ?> entry : model.entrySet()) {
             req.setAttribute(entry.getKey(), entry.getValue());
         }
+
+        final RequestDispatcher requestDispatcher = req.getRequestDispatcher(viewName);
         requestDispatcher.forward(req, res);
     }
 }
