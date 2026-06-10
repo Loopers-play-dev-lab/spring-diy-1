@@ -102,9 +102,8 @@ public class ApplicationContext implements BeanFactory {
     public <A extends Annotation> A findAnnotationOnBean(final Object bean, final Class<A> annotationType) {
         final Set<Class<?>> classes = mapToSuperTypes(bean.getClass());
         for (Class<?> clazz : classes) {
-            if (clazz.isAnnotationPresent(annotationType)) {
-                return clazz.getAnnotation(annotationType);
-            }
+            final A found = findAnnotationIncludingMeta(clazz, annotationType, new HashSet<>());
+            if (found != null) return found;
         }
 
         return null;
@@ -255,6 +254,20 @@ public class ApplicationContext implements BeanFactory {
 
     private void prepareWebApplicationContext(final ServletContext servletContext) {
         servletContext.setAttribute(ApplicationContext.APPLICATION_CONTEXT_ATTRIBUTE, this);
+    }
+
+    private <A extends Annotation> A findAnnotationIncludingMeta(final Class<?> element,
+                                                                 final Class<A> target,
+                                                                 final Set<Class<? extends Annotation>> visited) {
+        final A direct = element.getAnnotation(target);
+        if (direct != null) return direct;
+        for (final Annotation ann : element.getAnnotations()) {
+            final Class<? extends Annotation> annType = ann.annotationType();
+            if (!visited.add(annType)) continue;
+            final A found = findAnnotationIncludingMeta(annType, target, visited);
+            if (found != null) return found;
+        }
+        return null;
     }
 
 }

@@ -3,8 +3,6 @@ package com.diy.framework.web.method;
 import com.diy.framework.web.mvc.view.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
@@ -26,7 +24,13 @@ public class HandlerMethod {
         this.mapper = new ObjectMapper();
     }
 
-    public ModelAndView handle(final HttpServletRequest req, final HttpServletResponse res) throws Exception {
+    public Method getMethod() {
+        return method;
+    }
+
+    public Object invokeForRequest(final HttpServletRequest req,
+                                   final HttpServletResponse res,
+                                   final HandlerMethodArgumentResolverComposite argumentResolvers) throws Exception {
         try {
             method.setAccessible(true);
 
@@ -75,9 +79,7 @@ public class HandlerMethod {
                 model.put(name, value);
             });
 
-            return new ModelAndView(view.toString(), model);
-        } catch (final Exception e) {
-            throw e;
+            return method.invoke(bean, args);
         } finally {
             method.setAccessible(false);
         }

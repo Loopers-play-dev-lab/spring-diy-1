@@ -23,7 +23,15 @@ public class Lecture {
         return price;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public void setPrice(final BigDecimal price) {
+        this.price = price;
     }
 }
