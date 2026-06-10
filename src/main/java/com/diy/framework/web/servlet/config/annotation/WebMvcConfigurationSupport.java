@@ -15,6 +15,7 @@ import com.diy.framework.web.mvc.method.ViewNameMethodReturnValueHandler;
 import com.diy.framework.web.mvc.method.annotation.RequestMappingHandlerAdapter;
 import com.diy.framework.web.mvc.view.JspViewResolver;
 import com.diy.framework.web.servlet.handler.BeanNameUrlHandlerMapping;
+import com.diy.framework.web.servlet.handler.ExceptionHandlerExceptionResolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +54,11 @@ public class WebMvcConfigurationSupport {
     @Bean
     public JspViewResolver jspViewResolver() {
         return new JspViewResolver();
+    }
+
+    @Bean
+    public ExceptionHandlerExceptionResolver exceptionHandlerExceptionResolver() {
+        return new ExceptionHandlerExceptionResolver(getDefaultMessageConverters());
     }
 
     private List<HandlerMethodArgumentResolver> getDefaultArgumentResolvers(final RequestResponseBodyMethodProcessor bodyProcessor) {

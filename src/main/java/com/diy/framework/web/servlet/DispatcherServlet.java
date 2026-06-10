@@ -23,6 +23,8 @@ public class DispatcherServlet extends HttpServlet {
     private List<HandlerMapping> handlerMappings;
     private List<HandlerAdapter> handlerAdapters;
     private List<ViewResolver> viewResolvers;
+    private List<HandlerInterceptor> interceptors;
+    private List<HandlerExceptionResolver> handlerExceptionResolvers;
 
     @Override
     public void init() throws ServletException {
@@ -38,6 +40,8 @@ public class DispatcherServlet extends HttpServlet {
         initHandlerMappings(context);
         initHandlerAdapters(context);
         initViewResolvers(context);
+        initInterceptors(context);
+        initHandlerExceptionResolvers(context);
     }
 
     private void initHandlerMappings(final ApplicationContext context) {
@@ -62,24 +66,96 @@ public class DispatcherServlet extends HttpServlet {
         this.viewResolvers.sort(Comparator.comparingInt(o -> ((Ordered) o).getOrder()));
     }
 
+    private void initInterceptors(final ApplicationContext context) {
+        this.interceptors = getOptionalBeans(context, HandlerInterceptor.class);
+    }
+
+    private void initHandlerExceptionResolvers(final ApplicationContext context) {
+        this.handlerExceptionResolvers = getOptionalBeans(context, HandlerExceptionResolver.class);
+    }
+
+    private <T> List<T> getOptionalBeans(final ApplicationContext context, final Class<T> type) {
+        try {
+            return new ArrayList<>(BeanFactoryUtils.beansOfTypeIncludingAncestors(context, type).values());
+        } catch (RuntimeException e) {
+            return new ArrayList<>();
+        }
+    }
+
     @Override
     protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
         doDispatch(req, resp);
     }
 
     private void doDispatch(final HttpServletRequest req, final HttpServletResponse resp) {
+        Object handler = null;
+        int interceptorIndex = -1;
+
         try {
-            final Object handler = getHandler(req);
+            ModelAndView mv;
 
-            final HandlerAdapter ha = getHandlerAdapter(handler);
+            try {
+                handler = getHandler(req);
 
-            final ModelAndView mv = ha.handle(req, resp, handler);
+                final HandlerAdapter ha = getHandlerAdapter(handler);
 
-            if (mv == null) return;
+                for (int i = 0; i < this.interceptors.size(); i++) {
+                    if (!this.interceptors.get(i).preHandle(req, resp, handler)) {
+                        triggerAfterCompletion(interceptorIndex, req, resp, handler, null);
+                        return;
+                    }
+                    interceptorIndex = i;
+                }
 
-            render(mv, req, resp);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+                mv = ha.handle(req, resp, handler);
+
+                for (int i = this.interceptors.size() - 1; i >= 0; i--) {
+                    this.interceptors.get(i).postHandle(req, resp, handler, mv);
+                }
+            } catch (Exception ex) {
+                mv = processHandlerException(req, resp, handler, ex);
+                if (mv == null) {
+                    throw ex;
+                }
+            }
+
+            if (mv != null && mv.getViewName() != null) {
+                render(mv, req, resp);
+            }
+
+            triggerAfterCompletion(interceptorIndex, req, resp, handler, null);
+        } catch (Exception ex) {
+            triggerAfterCompletion(interceptorIndex, req, resp, handler, ex);
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private ModelAndView processHandlerException(final HttpServletRequest req,
+                                                 final HttpServletResponse resp,
+                                                 final Object handler,
+                                                 final Exception ex) {
+        if (this.handlerExceptionResolvers != null) {
+            for (final HandlerExceptionResolver resolver : this.handlerExceptionResolvers) {
+                final ModelAndView mv = resolver.resolveException(req, resp, handler, ex);
+                if (mv != null) {
+                    return mv;
+                }
+            }
+        }
+        return null;
+    }
+
+    private void triggerAfterCompletion(final int interceptorIndex,
+                                        final HttpServletRequest req,
+                                        final HttpServletResponse resp,
+                                        final Object handler,
+                                        final Exception ex) {
+        for (int i = interceptorIndex; i >= 0; i--) {
+            try {
+                this.interceptors.get(i).afterCompletion(req, resp, handler, ex);
+            } catch (Exception e) {
+                System.err.println("HandlerInterceptor.afterCompletion threw exception: " + e);
+            }
         }
     }
 

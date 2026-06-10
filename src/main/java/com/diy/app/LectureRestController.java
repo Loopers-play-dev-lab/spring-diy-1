@@ -28,6 +28,13 @@ public class LectureRestController {
 
     @RequestMapping(value = "/api/lectures", methods = {RequestMethod.POST})
     public Lecture create(@RequestBody final Lecture lecture) {
+        if (lecture.getName() == null || lecture.getName().isBlank()) {
+            throw new IllegalArgumentException("강의명은 필수입니다.");
+        }
+        if (lecture.getPrice() == null || lecture.getPrice().signum() < 0) {
+            throw new IllegalArgumentException("가격은 0 이상이어야 합니다.");
+        }
+
         lecture.setId(100L);
         return lecture;
     }
