@@ -2,6 +2,7 @@ package com.diy.app;
 
 import com.diy.framework.context.ApplicationContext;
 import com.diy.framework.web.server.TomcatWebServer;
+import com.diy.framework.web.server.WebServer;
 import com.diy.framework.web.servlet.DispatcherServlet;
 
 public class Main {
@@ -11,7 +12,7 @@ public class Main {
 
         DispatcherServlet dispatcherServlet = new DispatcherServlet(applicationContext);
 
-        TomcatWebServer webServer = new TomcatWebServer(dispatcherServlet);
+        WebServer webServer = new TomcatWebServer(dispatcherServlet);
         webServer.start();
     }
 }

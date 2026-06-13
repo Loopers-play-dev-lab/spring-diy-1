@@ -10,12 +10,13 @@ import com.diy.framework.web.servlet.handler.adapter.HandlerAdapterComposite;
 import com.diy.framework.web.servlet.handler.mapping.HandlerMapping;
 import com.diy.framework.web.servlet.handler.mapping.HandlerMappingComposite;
 import java.io.IOException;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class DispatcherServlet extends HttpServlet {
+public class DispatcherServlet extends HttpServlet implements ServletContextInitializer {
 
     private final HandlerMapping handlerMapping;
     private final HandlerAdapter handlerAdapter;
@@ -25,6 +26,11 @@ public class DispatcherServlet extends HttpServlet {
         this.handlerMapping = new HandlerMappingComposite(context);
         this.handlerAdapter = new HandlerAdapterComposite();
         this.viewResolver = new ViewResolverComposite();
+    }
+
+    @Override
+    public void onStartup(ServletContext servletContext) throws ServletException {
+        servletContext.addServlet("dispatcherServlet", this).addMapping("/");
     }
 
     @Override
