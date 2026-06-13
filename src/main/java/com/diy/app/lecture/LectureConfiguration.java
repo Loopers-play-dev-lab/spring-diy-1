@@ -1,9 +1,9 @@
 package com.diy.app.lecture;
 
 import com.diy.framework.context.annotation.Bean;
-import com.diy.framework.context.annotation.Component;
+import com.diy.framework.context.annotation.Configuration;
 
-@Component
+@Configuration
 public class LectureConfiguration {
 
     @Bean("/home")
