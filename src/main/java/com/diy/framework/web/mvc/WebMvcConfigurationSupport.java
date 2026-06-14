@@ -1,6 +1,5 @@
 package com.diy.framework.web.mvc;
 
-import com.diy.framework.context.ApplicationContext;
 import com.diy.framework.context.annotation.Bean;
 import com.diy.framework.context.annotation.Configuration;
 import com.diy.framework.web.mvc.view.HtmlViewResolver;
@@ -14,20 +13,18 @@ import com.diy.framework.web.servlet.handler.adapter.ControllerHandlerAdapter;
 @Configuration
 public class WebMvcConfigurationSupport {
 
-    private final ApplicationContext context;
-
-    public WebMvcConfigurationSupport(ApplicationContext context) {
-        this.context = context;
-    }
-
     @Bean
     public AnnotationHandlerMapping annotationHandlerMapping() {
-        return new AnnotationHandlerMapping(context);
+        AnnotationHandlerMapping mapping = new AnnotationHandlerMapping();
+        mapping.setOrder(0);
+        return mapping;
     }
 
     @Bean
     public ControllerHandlerMapping controllerHandlerMapping() {
-        return new ControllerHandlerMapping(context);
+        ControllerHandlerMapping mapping = new ControllerHandlerMapping();
+        mapping.setOrder(2);
+        return mapping;
     }
 
     @Bean

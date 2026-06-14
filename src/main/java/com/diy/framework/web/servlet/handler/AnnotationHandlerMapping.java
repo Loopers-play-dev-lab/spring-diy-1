@@ -13,8 +13,8 @@ public class AnnotationHandlerMapping extends AbstractHandlerMapping {
 
     private final Map<RequestMappingKey, HandlerMethod> handlerMethods = new HashMap<>();
 
-    public AnnotationHandlerMapping(ApplicationContext context) {
-        setOrder(0);
+    @Override
+    protected void initApplicationContext(ApplicationContext context) {
         Arrays.stream(context.getBeanNamesForAnnotation(Controller.class))
                 .forEach(name -> detectHandlerMethods(context.getBean(name)));
     }

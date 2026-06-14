@@ -10,8 +10,8 @@ public class ControllerHandlerMapping extends AbstractHandlerMapping {
 
     private final Map<String, Controller> handlerMap = new HashMap<>();
 
-    public ControllerHandlerMapping(ApplicationContext context) {
-        setOrder(2);
+    @Override
+    protected void initApplicationContext(ApplicationContext context) {
         context.getBeanNames().forEach(name -> {
             Object bean = context.getBean(name);
             if (bean instanceof Controller controller) {

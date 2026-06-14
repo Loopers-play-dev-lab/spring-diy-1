@@ -7,6 +7,7 @@ import com.diy.framework.beans.factory.BeanFactory;
 import com.diy.framework.beans.factory.BeanScanner;
 import com.diy.framework.context.annotation.Bean;
 import com.diy.framework.context.annotation.Component;
+import com.diy.framework.context.support.ApplicationObjectSupport;
 import com.diy.framework.web.server.TomcatWebServer;
 import com.diy.framework.web.server.WebServer;
 import com.diy.framework.web.servlet.DispatcherServlet;
@@ -46,6 +47,13 @@ public class ApplicationContext implements BeanFactory {
         Set<Class<?>> beanClasses = beanScanner.scanClassesTypeAnnotatedWith(Component.class);
         beanClasses.forEach(this::registerBeanDefinition);
         beanDefinitionRegistry.forEach(this::registerBean);
+
+        initApplicationObjectSupport();
+    }
+
+    private void initApplicationObjectSupport() {
+        getBeansOfType(ApplicationObjectSupport.class).values()
+                .forEach(support -> support.setApplicationContext(this));
     }
 
     public WebServer createWebServer() {
