@@ -1,4 +1,4 @@
-package com.diy.framework.web.context;
+package com.diy.framework.web.servlet;
 
 import com.diy.framework.context.ApplicationContext;
 import javax.servlet.ServletContext;

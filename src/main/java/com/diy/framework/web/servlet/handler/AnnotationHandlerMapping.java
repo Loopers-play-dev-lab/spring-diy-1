@@ -2,11 +2,8 @@ package com.diy.framework.web.servlet.handler;
 
 import com.diy.framework.context.ApplicationContext;
 import com.diy.framework.context.annotation.Controller;
-import com.diy.framework.web.method.HandlerMethod;
 import com.diy.framework.web.mvc.annotation.RequestMapping;
 import com.diy.framework.web.mvc.annotation.RequestMethod;
-import com.diy.framework.web.servlet.handler.mapping.RequestMappingKey;
-import com.diy.framework.web.servlet.handler.mapping.RequestMethodsRequestCondition;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;

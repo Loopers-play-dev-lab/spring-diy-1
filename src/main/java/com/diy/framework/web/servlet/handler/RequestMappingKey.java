@@ -1,4 +1,4 @@
-package com.diy.framework.web.servlet.handler.mapping;
+package com.diy.framework.web.servlet.handler;
 
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;

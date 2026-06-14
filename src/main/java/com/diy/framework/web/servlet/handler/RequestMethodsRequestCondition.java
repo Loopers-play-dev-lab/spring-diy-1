@@ -1,4 +1,4 @@
-package com.diy.framework.web.servlet.handler.mapping;
+package com.diy.framework.web.servlet.handler;
 
 import com.diy.framework.web.mvc.annotation.RequestMethod;
 import java.util.Arrays;

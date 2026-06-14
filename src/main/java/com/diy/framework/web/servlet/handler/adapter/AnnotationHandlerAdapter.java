@@ -1,6 +1,6 @@
 package com.diy.framework.web.servlet.handler.adapter;
 
-import com.diy.framework.web.method.HandlerMethod;
+import com.diy.framework.web.servlet.handler.HandlerMethod;
 import com.diy.framework.web.mvc.view.ModelAndView;
 import com.diy.framework.web.servlet.HandlerAdapter;
 import javax.servlet.http.HttpServletRequest;
