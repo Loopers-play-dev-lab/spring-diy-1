@@ -7,6 +7,10 @@ import com.diy.framework.beans.factory.BeanFactory;
 import com.diy.framework.beans.factory.BeanScanner;
 import com.diy.framework.context.annotation.Bean;
 import com.diy.framework.context.annotation.Component;
+import com.diy.framework.web.server.TomcatWebServer;
+import com.diy.framework.web.server.WebServer;
+import com.diy.framework.web.servlet.DispatcherServlet;
+import com.diy.framework.web.servlet.ServletContextInitializer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
@@ -23,7 +27,7 @@ import java.util.Set;
 
 public class ApplicationContext implements BeanFactory {
 
-    public static String APPLICATION_CONTEXT_ATTRIBUTE = ApplicationContext.class.getName();
+    public static final String APPLICATION_CONTEXT_ATTRIBUTE = ApplicationContext.class.getName();
 
     private final String basePackage;
     private final List<String> beanDefinitionNames = new ArrayList<>(256);
@@ -36,10 +40,18 @@ public class ApplicationContext implements BeanFactory {
     }
 
     public void initialize() {
+        saveBean(getClass().getSimpleName(), this);
+
         BeanScanner beanScanner = new BeanScanner("com.diy.framework", basePackage);
         Set<Class<?>> beanClasses = beanScanner.scanClassesTypeAnnotatedWith(Component.class);
         beanClasses.forEach(this::registerBeanDefinition);
         beanDefinitionRegistry.forEach(this::registerBean);
+    }
+
+    public WebServer createWebServer() {
+        DispatcherServlet dispatcherServlet = new DispatcherServlet();
+        ServletContextInitializer contextSetter = servletContext -> servletContext.setAttribute(APPLICATION_CONTEXT_ATTRIBUTE, this);
+        return new TomcatWebServer(contextSetter, dispatcherServlet);
     }
 
     public Set<String> getBeanNames() {
@@ -58,11 +70,10 @@ public class ApplicationContext implements BeanFactory {
         if (beanNames == null) {
             throw new RuntimeException("Bean not found '" + requiredType + "'");
         } else if (beanNames.size() != 1) {
-            throw new RuntimeException("No qualifying bean of type '" + requiredType
-                    + "' available: expected single matching bean but found " + beanNames.size() + ": " + String.join(", ", beanNames));
+            throw new RuntimeException("No qualifying bean of type '" + requiredType + "': " + String.join(", ", beanNames));
         }
 
-        String beanName = beanNames.stream().findFirst().get();
+        String beanName = beanNames.iterator().next();
         return (T) this.beans.get(beanName);
     }
 
@@ -169,6 +180,11 @@ public class ApplicationContext implements BeanFactory {
     private Object[] resolveArguments(Class<?>[] parameterTypes) {
         return Arrays.stream(parameterTypes)
                 .map(parameterType -> {
+                    Set<String> beanNames = allBeanNamesByType.get(parameterType);
+                    if (beanNames != null && beanNames.size() == 1) {
+                        return beans.get(beanNames.iterator().next());
+                    }
+
                     BeanDefinition beanDefinition = findBeanDefinition(parameterType);
                     return resolveBean(beanDefinition);
                 })
@@ -178,7 +194,7 @@ public class ApplicationContext implements BeanFactory {
     private BeanDefinition findBeanDefinition(Class<?> type) {
         List<BeanDefinition> definitions = beanDefinitionRegistry.stream()
                 .filter(definition -> {
-                    if(type.isInterface()) {
+                    if (type.isInterface()) {
                         return type.isAssignableFrom(definition.getBeanClass());
                     }
 

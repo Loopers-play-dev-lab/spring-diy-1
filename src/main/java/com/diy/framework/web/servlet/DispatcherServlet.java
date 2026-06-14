@@ -1,17 +1,14 @@
 package com.diy.framework.web.servlet;
 
 import com.diy.framework.context.ApplicationContext;
-import com.diy.framework.web.mvc.view.JspViewResolver;
-import com.diy.framework.web.mvc.view.HtmlViewResolver;
+import com.diy.framework.core.Ordered;
+import com.diy.framework.web.context.WebApplicationContextUtils;
 import com.diy.framework.web.mvc.view.ModelAndView;
-import com.diy.framework.web.mvc.view.UrlBasedViewResolver;
 import com.diy.framework.web.mvc.view.View;
 import com.diy.framework.web.mvc.view.ViewResolver;
-import com.diy.framework.web.servlet.handler.AnnotationHandlerMapping;
-import com.diy.framework.web.servlet.handler.ControllerHandlerMapping;
-import com.diy.framework.web.servlet.handler.adapter.AnnotationHandlerAdapter;
-import com.diy.framework.web.servlet.handler.adapter.ControllerHandlerAdapter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import javax.servlet.ServletContext;
@@ -22,14 +19,9 @@ import javax.servlet.http.HttpServletResponse;
 
 public class DispatcherServlet extends HttpServlet implements ServletContextInitializer {
 
-    private final ApplicationContext context;
     private List<HandlerMapping> handlerMappings;
     private List<HandlerAdapter> handlerAdapters;
     private List<ViewResolver> viewResolvers;
-
-    public DispatcherServlet(ApplicationContext context) {
-        this.context = context;
-    }
 
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
@@ -38,19 +30,20 @@ public class DispatcherServlet extends HttpServlet implements ServletContextInit
 
     @Override
     public void init() {
-        handlerMappings = List.of(
-                new AnnotationHandlerMapping(context),
-                new ControllerHandlerMapping(context)
-        );
-        handlerAdapters = List.of(
-                new AnnotationHandlerAdapter(),
-                new ControllerHandlerAdapter()
-        );
-        viewResolvers = List.of(
-                new UrlBasedViewResolver(),
-                new JspViewResolver(),
-                new HtmlViewResolver()
-        );
+        ApplicationContext context = WebApplicationContextUtils.getApplicationContext(getServletContext());
+
+        handlerMappings = context.getBeansOfType(HandlerMapping.class).values().stream()
+                .sorted(Comparator.comparingInt(mapping -> {
+                    if (mapping instanceof Ordered o) {
+                        return o.getOrder();
+                    }
+                    return Ordered.LOWEST_PRECEDENCE;
+                }))
+                .toList();
+
+        handlerAdapters = new ArrayList<>(context.getBeansOfType(HandlerAdapter.class).values());
+
+        viewResolvers = new ArrayList<>(context.getBeansOfType(ViewResolver.class).values());
     }
 
     @Override
@@ -73,7 +66,7 @@ public class DispatcherServlet extends HttpServlet implements ServletContextInit
                     .map(resolver -> resolver.resolveViewName(mav.getViewName()))
                     .filter(Objects::nonNull)
                     .findFirst()
-                    .orElseThrow(() -> new RuntimeException("View not found: " + mav.getViewName()));
+                    .orElseThrow(() -> new RuntimeException("View not found"));
 
             view.render(mav.getModel(), req, resp);
         } catch (Exception e) {

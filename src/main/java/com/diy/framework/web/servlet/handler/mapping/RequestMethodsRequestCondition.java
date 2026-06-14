@@ -2,6 +2,7 @@ package com.diy.framework.web.servlet.handler.mapping;
 
 import com.diy.framework.web.mvc.annotation.RequestMethod;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
@@ -15,7 +16,7 @@ public class RequestMethodsRequestCondition {
     }
 
     public Set<RequestMethod> getMethods() {
-        return methods;
+        return Collections.unmodifiableSet(methods);
     }
 
     public boolean matches(HttpServletRequest request) {
