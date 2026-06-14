@@ -8,5 +8,5 @@ import java.util.Map;
 
 public interface View {
 
-    void render(final Map<String, Object> model, final HttpServletRequest req, final HttpServletResponse res) throws ServletException, IOException;
+    void render(Map<String, ?> model, HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException;
 }
