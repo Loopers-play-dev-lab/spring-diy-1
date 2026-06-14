@@ -1,4 +1,4 @@
-package com.diy.framework.web.servlet.handler.adapter;
+package com.diy.framework.web.servlet;
 
 import com.diy.framework.web.mvc.view.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
@@ -8,5 +8,5 @@ public interface HandlerAdapter {
 
     boolean supports(Object handler);
 
-    ModelAndView handle(Object handler, HttpServletRequest request, HttpServletResponse response) throws Exception;
+    ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception;
 }
